@@ -8,8 +8,8 @@
 import Foundation
 
 struct Constants {
-    static let googleApiKey = "AIzaSyAYbbYvlpjjNv9NRbUiEry9t7k5G8l2nLU"
-    static let weatherApiKey = "a829e4b410bcbee38b1ee963b83b54d0"
+    static let googleApiKey = "YOUR_API_KEY"
+    static let weatherApiKey = "YOUR_API_KEY"
     
     static let weatherApiEndpoint = "https://api.openweathermap.org/data/2.5/forecast"
     static let googleApiBaseURL = "https://maps.googleapis.com/maps/api/place/"

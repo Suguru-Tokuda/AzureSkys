@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct WeatherForecastView: View {
+    @EnvironmentObject var coordinator: MainCoordinator
     @EnvironmentObject var mainCoordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
+    @Environment(\.dismiss) var dismiss: DismissAction
     @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
+    var placeDetails: GooglePlaceDetailsResult?
     var showTopActionBar: Bool = false
+        
+    init(placeDetails: GooglePlaceDetailsResult? = nil, showTopActionBar: Bool = false) {
+        self.placeDetails = placeDetails
+        self.showTopActionBar = showTopActionBar
+    }
     
     var body: some View {
         ZStack {
@@ -20,12 +28,13 @@ struct WeatherForecastView: View {
             VStack {
                 if showTopActionBar {
                     WeatherForecastAddHeaderView(cancelBtnTapped: {
-                        print("cancel")
+                        dismiss()
                     },
                     addBtnTapped: {
                         print("add")
                     })
                     .padding(.horizontal, 20)
+                    .padding(.top, 40)
                 } else {
                     Spacer()
                 }
@@ -33,32 +42,47 @@ struct WeatherForecastView: View {
                 )
             }
             .zIndex(2.0)
-            ScrollView {
-                if let city = vm.city,
-                   let firstForecast = vm.fiveDayForecast.first
-                {
-                    VStack {
-                        WeatherForecasetHeaderView(city: city, forecast: firstForecast)
-                        WeatherThreeHourlyForecastListView(forecasts: vm.weatherList)
-                        WeatherDailyForecasetListView(list: vm.fiveDayForecast)
+            if !vm.isLoading {
+                ScrollView {
+                    if let city = vm.city,
+                       let firstForecast = vm.fiveDayForecast.first
+                    {
+                        VStack {
+                            WeatherForecasetHeaderView(city: city, forecast: firstForecast)
+                            WeatherThreeHourlyForecastListView(forecasts: vm.weatherList)
+                            WeatherDailyForecasetListView(list: vm.fiveDayForecast)
+                        }
+                        .padding(.top, 50)
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.top, 50)
-                    .padding(.horizontal, 20)
                 }
+            } else {
+                ProgressView("Loading...")
             }
         }
         .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-                Spacer()
-                Button(action: {
-                    mainCoordinator.goToLocations()
-                }, label: {
-                    Image(systemName: "list.bullet")
-                })
+            if !showTopActionBar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Spacer()
+                    Button(action: {
+                        mainCoordinator.goToLocations()
+                    }, label: {
+                        Image(systemName: "list.bullet")
+                    })
+                    .fullScreenCover(isPresented: $coordinator.showLocationsFullScreenSheet) {
+                        LocationsView()
+                    }
+                }
             }
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
+            
+            if let placeDetails {
+                Task {
+                    await vm.getWeatherForecasetData(place: placeDetails)
+                }                
+            }
         }
     }
 }

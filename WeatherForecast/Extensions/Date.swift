@@ -10,7 +10,7 @@ import Foundation
 extension Date {
     func getWeekDayStr() -> String {
         // comapre today and self first
-        var dayComparison = Calendar.current.compare(Date(), to: self, toGranularity: .day)
+        let dayComparison = Calendar.current.compare(Date(), to: self, toGranularity: .day)
         
         // if it's the same day then return "Today"
         if dayComparison == .orderedSame {

@@ -13,7 +13,12 @@ struct GooglePlaceDetailsResponse: Decodable {
 
 struct GooglePlaceDetailsResult: Decodable {
     let formattedAddress: String
-    let geometory: GooglePlaceGeometry
+    let geometry: GooglePlaceGeometry
+    
+    enum CodingKeys: String, CodingKey {
+        case formattedAddress = "formatted_address"
+        case geometry
+    }
 }
 
 struct GooglePlaceGeometry: Decodable {

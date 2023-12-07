@@ -30,8 +30,13 @@ struct PreviewManager {
             sunset: 1701132722))
     
     static let predictions: [Prediction] = [
+        Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA")),
+        Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA")),
+        Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA")),
+        Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA")),
+        Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA")),
         Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA"))
     ]
     
-    static let placeDetails: GooglePlaceDetailsResult = GooglePlaceDetailsResult(formattedAddress: "Chicago, IL, USA", geometory: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)))
+    static let placeDetails: GooglePlaceDetailsResult = GooglePlaceDetailsResult(formattedAddress: "Chicago, IL, USA", geometry: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)))
 }

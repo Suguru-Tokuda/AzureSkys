@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct LocationSearchResultListCellView: View {
-    var predictions: Prediction?
+    var prediction: Prediction
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            Text(prediction.description ?? "")
+            Spacer()
+        }
     }
 }
 
 #Preview {
-    LocationSearchResultListCellView(predictions: nil)
+    LocationSearchResultListCellView(prediction: PreviewManager.predictions.first!)
 }

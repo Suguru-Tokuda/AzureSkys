@@ -21,7 +21,6 @@ class WeatherForecastViewModel: ObservableObject {
 
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
-    var apiCancellables = Set<AnyCancellable>()
     
     var networkManager: Networking
     var locationManager: LocationManager?
@@ -32,9 +31,11 @@ class WeatherForecastViewModel: ObservableObject {
         
     deinit {
         self.cancellables.removeAll()
-        self.apiCancellables.removeAll()
     }
     
+    /**
+        Adds subscription for the current location from the locationManager
+     */
     func addLocationSubscriptions() {
         if let locationManager {
             locationManager.$locationAuthorized
@@ -53,10 +54,11 @@ class WeatherForecastViewModel: ObservableObject {
         }
     }
     
+    /**
+        Get weather forecast data with the user's current location.
+     */
     func getWeatherForecasetData(urlString: String = Constants.weatherApiEndpoint) async {
         if !isLoading && currentLocation != nil {
-            apiCancellables.removeAll()
-            
             guard let url = URL(string: getWeatherForecaseAPIString(urlString: urlString)) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
@@ -70,11 +72,34 @@ class WeatherForecastViewModel: ObservableObject {
                 self.weatherList = res.list
                 self.city = res.city
                 self.fiveDayForecast = res.getDailyForecast()
-                self.fiveDayForecast.forEach { forecast in
-                    print(forecast)
-                }
                 self.isLoading = false
             } catch {
+                await handleGetWeatherForecasetError(error: error)
+            }
+        }
+    }
+    
+    /**
+        Get weather forecast data by using City data.
+     */
+    func getWeatherForecasetData(place: GooglePlaceDetailsResult) async {
+        if !isLoading {
+            guard let url = URL(string: getWeatherForecaseAPIString(place: place)) else {
+                isErrorOccured = true
+                customError = NetworkError.badUrl
+                return
+            }
+            
+            isLoading = true
+            
+            do {
+                let res = try await networkManager.getDataWithAsync(url: url, type: WeatherForecastResponse.self)
+                self.weatherList = res.list
+                self.city = res.city
+                self.fiveDayForecast = res.getDailyForecast()
+                self.isLoading = false
+            } catch {
+                self.isLoading = false
                 await handleGetWeatherForecasetError(error: error)
             }
         }
@@ -99,14 +124,27 @@ class WeatherForecastViewModel: ObservableObject {
         isErrorOccured = true
     }
     
+    /**
+        Dependency injection for locationManager
+     */
     func setLocationManager(locationManager: LocationManager) {
         self.locationManager = locationManager
         self.cancellables.removeAll()
         self.addLocationSubscriptions()
     }
     
-    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.googleApiKey) -> String {
+    /**
+        Get url by using the current location
+     */
+    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey) -> String {
         guard let currentLocation else { return "" }
         return "\(urlString)?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
+    }
+    
+    /**
+        Get url by using City data.
+     */
+    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey, place: GooglePlaceDetailsResult) -> String {
+        return "\(urlString)?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&appid=\(apiKey)"
     }
 }

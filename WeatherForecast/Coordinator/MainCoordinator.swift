@@ -11,27 +11,33 @@ import SwiftUI
 @MainActor
 class MainCoordinator: ObservableObject {
     @Published var path = NavigationPath()
+    @Published var showLocationsFullScreenSheet: Bool = false
+    @Published var weatherForecastSheetPresented: Bool = false
+    var placeDetails: GooglePlaceDetailsResult?
     
     func startCoordinator() {
         path.append(Page.forecast)
     }
     
     func goToLocations() {
-        path.append(Page.locations)
+        showLocationsFullScreenSheet = true
     }
-    
+
+    func showForecastSheet(location: GooglePlaceDetailsResult) {
+        self.placeDetails = location
+        self.weatherForecastSheetPresented = true
+    }
+        
     @ViewBuilder
     func getPage(page: Page) -> some View {
         switch page {
         case .forecast:
             WeatherForecastView()
-        case .locations:
-            LocationsView()
         }
     }
 }
 
 enum Page: String, CaseIterable, Identifiable {
-    case forecast, locations
+    case forecast
     var id: String { self.rawValue }
 }

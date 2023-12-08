@@ -16,17 +16,21 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var weatherList: [WeatherForecast] = []
     @Published var isLoading = false
     @Published var isErrorOccured = false
-    @Published var customError: NetworkError?
+    @Published var customError: Error?
     @Published var locationAuthorized: Bool = false
 
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
     
     var networkManager: Networking
+    var coreDataManager: CityCoreDataActions
     var locationManager: LocationManager?
     
-    init(networkManager: Networking = NetworkManager()) {
+    init(networkManager: Networking = NetworkManager(), coreDataManager: CityCoreDataActions = CityCoreDataManager()) {
         self.networkManager = networkManager
+        self.coreDataManager = coreDataManager
+        
+        self.getSQLitePath()
     }
         
     deinit {
@@ -41,10 +45,10 @@ class WeatherForecastViewModel: ObservableObject {
             locationManager.$locationAuthorized
                 .combineLatest(locationManager.$currentLocation)
                 .receive(on: RunLoop.main)
-                .sink { publisher in
-                    self.locationAuthorized = publisher.0
+                .sink { receivedVal in
+                    self.locationAuthorized = receivedVal.0
                     let callApi: Bool = self.currentLocation == nil
-                    self.currentLocation = publisher.1
+                    self.currentLocation = receivedVal.1
                     
                     Task {
                         if callApi { await self.getWeatherForecasetData() }
@@ -58,8 +62,9 @@ class WeatherForecastViewModel: ObservableObject {
         Get weather forecast data with the user's current location.
      */
     func getWeatherForecasetData(urlString: String = Constants.weatherApiEndpoint) async {
-        if !isLoading && currentLocation != nil {
-            guard let url = URL(string: getWeatherForecaseAPIString(urlString: urlString)) else {
+        if let _ = currentLocation,
+           !isLoading {
+            guard let url = URL(string: getWeatherForecastAPIString(urlString: urlString)) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -82,9 +87,9 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get weather forecast data by using City data.
      */
-    func getWeatherForecasetData(place: GooglePlaceDetailsResult) async {
+    func getWeatherForecasetData(city: City) async {
         if !isLoading {
-            guard let url = URL(string: getWeatherForecaseAPIString(place: place)) else {
+            guard let url = URL(string: getWeatherForecaseAPIString(city: city)) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -133,18 +138,44 @@ class WeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
     
+    func addCity(completionHandler: @escaping (Result<Bool, Error>) -> Void) {
+        if let city {
+            Task {
+                do {
+                    try await coreDataManager.saveCityIntoDatabase(city: city)
+                    completionHandler(.success(true))
+                } catch {
+                    self.isErrorOccured = true
+                    self.customError = CoreDataError.save
+                    
+                    completionHandler(.failure(error))
+                }
+            }
+        }
+    }
+    
     /**
         Get url by using the current location
      */
-    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey) -> String {
+    private func getWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey) -> String {
         guard let currentLocation else { return "" }
-        return "\(urlString)?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
+        return "\(urlString)forecast?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
     }
     
     /**
         Get url by using City data.
      */
-    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey, place: GooglePlaceDetailsResult) -> String {
-        return "\(urlString)?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&appid=\(apiKey)"
+    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey, city: City) -> String {
+        return "\(urlString)forecast?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&appid=\(apiKey)"
+    }
+    
+    func getSQLitePath() {
+        // .shared, .default, .standard - same thing
+        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return
+        }
+        
+        let sqlitePath = url.appendingPathComponent("WeatherCoreData")
+        print(sqlitePath.absoluteString)
     }
 }

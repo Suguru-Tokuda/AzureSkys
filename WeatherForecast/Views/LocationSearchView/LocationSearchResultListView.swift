@@ -23,17 +23,6 @@ struct LocationSearchResultListView: View {
         }
         .listStyle(.plain)
         .padding(.horizontal, 10)
-//        ScrollView(.vertical) {
-//            LazyVStack {
-//                ForEach(predictions) { prediction in
-//                    LocationSearchResultListCellView(prediction: prediction)
-//                        .onTapGesture {
-//                            onSelect?(prediction)
-//                        }
-//                }
-//            }
-//        }
-//        .padding(.horizontal, 10)
     }
 }
 

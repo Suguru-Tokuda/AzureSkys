@@ -16,18 +16,19 @@ struct WeatherForecasetHeaderView: View {
         VStack(alignment: .center) {
             Text(city.name)
                 .font(.largeTitle)
-            Text("\(forecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0))&deg;")
+            Text("\(forecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
                 .font(.system(size: 60))
                 .fontWeight(.regular)
             if let weather = forecast.weathers.first {
-                Text(weather.main)
-                    .font(.title3)
-                HStack {
-                    Spacer()
-                    Text("H:\(forecast.main.tempMax.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0))&deg;")
-                    Text("L:\(forecast.main.tempMin.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0))&deg;")
-                    Spacer()
-                }
+                Group {
+                    Text(weather.main)
+                        .font(.title3)
+                    HStack {
+                        Spacer()
+                        HighLowTemperatures(maxTemp: forecast.main.tempMax, minTemp: forecast.main.tempMin)
+                        Spacer()
+                    }
+                }.fontWeight(.semibold)
             }
         }
     }

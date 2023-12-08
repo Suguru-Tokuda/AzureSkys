@@ -25,7 +25,7 @@ struct WeatherThreeHourlyForecastListViewCell: View {
                         .frame(width: 40, height: 40)
                 }
             }
-            Text("\(forecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0))&deg;")
+            Text("\(forecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
         }
         .fontWeight(.bold)
     }

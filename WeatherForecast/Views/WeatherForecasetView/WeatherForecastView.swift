@@ -9,16 +9,17 @@ import SwiftUI
 
 struct WeatherForecastView: View {
     @EnvironmentObject var coordinator: MainCoordinator
-    @EnvironmentObject var mainCoordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.dismiss) var dismiss: DismissAction
     @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
-    var placeDetails: GooglePlaceDetailsResult?
+    var city: City?
     var showTopActionBar: Bool = false
+    var onLocationAdded: (() -> ())?
         
-    init(placeDetails: GooglePlaceDetailsResult? = nil, showTopActionBar: Bool = false) {
-        self.placeDetails = placeDetails
+    init(city: City? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
+        self.city = city
         self.showTopActionBar = showTopActionBar
+        self.onLocationAdded = onLocationAdded
     }
     
     var body: some View {
@@ -31,10 +32,21 @@ struct WeatherForecastView: View {
                         dismiss()
                     },
                     addBtnTapped: {
-                        print("add")
+                        vm.addCity { result in
+                            switch result {
+                            case .success(let added):
+                                if added == true {
+                                    dismiss()
+                                    onLocationAdded?()
+                                }
+                                break
+                            case .failure(_):
+                                break
+                            }
+                        }
                     })
                     .padding(.horizontal, 20)
-                    .padding(.top, 40)
+                    .padding(.top, 20)
                 } else {
                     Spacer()
                 }
@@ -65,23 +77,41 @@ struct WeatherForecastView: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
                     Button(action: {
-                        mainCoordinator.goToLocations()
+                        coordinator.goToLocations()
                     }, label: {
                         Image(systemName: "list.bullet")
                     })
-                    .fullScreenCover(isPresented: $coordinator.showLocationsFullScreenSheet) {
-                        LocationsView()
+                    .fullScreenCover(
+                        isPresented: $coordinator.showLocationsFullScreenSheet
+                    ) {
+                        LocationsView() { city in
+                            Task {
+                                if let city {
+                                    await vm.getWeatherForecasetData(city: city)
+                                } else {
+                                    await vm.getWeatherForecasetData()
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
-            
-            if let placeDetails {
-                Task {
-                    await vm.getWeatherForecasetData(place: placeDetails)
-                }                
+        }
+        .task {
+            if let city {
+                await vm.getWeatherForecasetData(city: city)
+            }
+        }
+        .refreshable {
+            Task {
+                if let city {
+                    await vm.getWeatherForecasetData(city: city)
+                } else {
+                    await vm.getWeatherForecasetData()
+                }
             }
         }
     }
@@ -91,6 +121,7 @@ struct WeatherForecastView: View {
     NavigationStack {
         WeatherForecastView()
     }
+        .environmentObject(MainCoordinator())
         .environmentObject(LocationManager())
 }
 

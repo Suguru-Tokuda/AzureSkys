@@ -25,6 +25,7 @@ struct WeatherForecastAddHeaderView: View {
                 Text("Add")
             })
         }
+        .fontWeight(.semibold)
     }
 }
 

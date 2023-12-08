@@ -125,8 +125,9 @@ struct WeatherForecast: Decodable, Identifiable {
 }
 
 struct MainModel: Decodable {
-    let temp, feelsLike, tempMin, tempMax, tempKf: Double
-    let pressure, seaLevel, groundLevel, humidity: Int
+    let temp, feelsLike, tempMin, tempMax: Double
+    let tempKf: Double?
+    let pressure, seaLevel, groundLevel, humidity: Int?
     
     enum CodingKeys: String, CodingKey {
         case temp,
@@ -151,8 +152,8 @@ struct Clouds: Decodable {
 }
 
 struct Wind: Decodable {
-    let speed, gust: Double
-    let deg: Int
+    let speed, gust: Double?
+    let deg: Int?
 }
 
 struct Rain: Decodable {
@@ -172,10 +173,11 @@ struct Snow: Decodable {
 }
 
 struct City: Identifiable, Decodable {
-    let id, population, timezone: Int
+    let id: Int
+    let population, timezone: Int?
     let coordinate: CityCoordinate
     let name, country: String
-    let sunrise, sunset: Double
+    let sunrise, sunset: Double?
     
     enum CodingKeys: String, CodingKey {
         case id, 
@@ -186,6 +188,40 @@ struct City: Identifiable, Decodable {
              timezone,
              sunrise,
              sunset
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.coordinate = try container.decode(CityCoordinate.self, forKey: .coordinate)
+        self.country = try container.decode(String.self, forKey: .country)
+        self.population = try container.decodeIfPresent(Int.self, forKey: .population)
+        self.timezone = try container.decodeIfPresent(Int.self, forKey: .timezone)
+        self.sunrise = try container.decodeIfPresent(Double.self, forKey: .sunrise)
+        self.sunset = try container.decodeIfPresent(Double.self, forKey: .sunset)
+    }
+    
+    init(from entity: CityEntity) {
+        self.id = Int(entity.id)
+        self.timezone = Int(entity.timezone)
+        self.coordinate = CityCoordinate(lat: entity.latitude, lon: entity.longitude)
+        self.name = entity.name ?? ""
+        self.country = entity.country ?? ""
+        self.sunrise = nil
+        self.sunset = nil
+        self.population = nil
+    }
+    
+    init(id: Int, population: Int?, timezone: Int?, coordinate: CityCoordinate, name: String, country: String, sunrise: Double?, sunset: Double?) {
+        self.id = id
+        self.population = population
+        self.timezone = timezone
+        self.coordinate = coordinate
+        self.name = name
+        self.country = country
+        self.sunrise = sunrise
+        self.sunset = sunset
     }
 }
 

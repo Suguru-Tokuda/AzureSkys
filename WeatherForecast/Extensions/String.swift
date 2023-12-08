@@ -24,4 +24,8 @@ extension String {
         
         return dateFormatter.string(from: date)
     }
+    
+    func appendDegree() -> String {
+        return "\(self)\u{00B0}"
+    }
 }

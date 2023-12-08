@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-class LocationForecasetViewModel: ObservableObject {
+class LocationForecastViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var isLoading = false
     @Published var isErrorOccured = false

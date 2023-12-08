@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct LocationsView: View {
-    @EnvironmentObject var coordinator: MainCoordinator
-    @StateObject var vm: LocationForecasetViewModel = LocationForecasetViewModel()
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.isSearching) var isSearching: Bool
-    @Environment(\.dismissSearch) var dismissSearch
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @EnvironmentObject private var coordinator: MainCoordinator
+    @StateObject var vm: LocationForecastViewModel = LocationForecastViewModel()
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismissSearch) private var dismissSearch
+    @AppStorage(AppStorageKeys.tempScale) private var tempScale: TempScale = .fahrenheit
+    @State var searchBarPresented = false
+    var onDismiss: ((City?) -> Void)?
     
     var body: some View {
         NavigationStack {
@@ -54,7 +55,14 @@ struct LocationsView: View {
             .navigationBarBackButtonHidden(true)
         }
         .sheet(isPresented: $coordinator.weatherForecastSheetPresented) {
-            WeatherForecastView(placeDetails: coordinator.placeDetails, showTopActionBar: true)
+            WeatherForecastView(
+                city: coordinator.city,
+                showTopActionBar: true) {
+                    DispatchQueue.main.async {
+                        self.vm.searchText = ""
+                        self.dismissSearch()
+                    }
+                }
         }
     }
 }
@@ -69,9 +77,19 @@ extension LocationsView {
         } else {
             VStack {
                 LocationSearchResultListView(predictions: vm.predictions) { prediction in
+                    dismissSearch()
+                    UIApplication.shared.hideKeyboard()
+
                     Task {
                         if let details = await vm.getPlaceDetails(placeId: prediction.placeId) {
-                            self.coordinator.showForecastSheet(location: details)
+                            self.coordinator.showForecastSheet(city: City(id: 0, 
+                                                                          population: 0,
+                                                                          timezone: 0,
+                                                                          coordinate: CityCoordinate(lat: details.geometry.location.latitude, lon: details.geometry.location.longitude),
+                                                                          name: details.formattedAddress,
+                                                                          country: "",
+                                                                          sunrise: 0,
+                                                                          sunset: 0))
                         }
                     }
                 }
@@ -81,7 +99,12 @@ extension LocationsView {
     
     @ViewBuilder
     func locationList() -> some View {
-        Text("")
+        LocationListView() { city in
+            if let onDismiss {
+                onDismiss(city)
+                dismiss()
+            }
+        }
     }
 }
 
@@ -106,4 +129,6 @@ extension LocationsView {
 
 #Preview {
     LocationsView()
+        .environmentObject(LocationManager())
+        .environmentObject(MainCoordinator())
 }

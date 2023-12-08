@@ -18,7 +18,6 @@ class PreviewDataManager: PreviewData {
                 let data = try Data(contentsOf: path)
                 return try JSONDecoder().decode(type.self, from: data)
             } catch {
-                print(error)
                 throw error
             }
         } else {

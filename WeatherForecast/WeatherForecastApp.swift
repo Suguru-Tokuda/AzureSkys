@@ -11,6 +11,7 @@ import SwiftUI
 struct WeatherForecastApp: App {
     @StateObject var locationManager: LocationManager
     @StateObject var mainCoordinator: MainCoordinator
+    let persistenceController = PersistenceController.shared
     
     init() {
         _locationManager = StateObject(wrappedValue: LocationManager())
@@ -22,6 +23,7 @@ struct WeatherForecastApp: App {
             ContentView()
                 .environmentObject(locationManager)
                 .environmentObject(mainCoordinator)
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }

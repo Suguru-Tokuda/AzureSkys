@@ -29,10 +29,10 @@ struct WeatherDailyForecasetListCellView: View {
                             .frame(width: 40, height: 40)
                     }
                 }
-                Text("\(forecast.main.tempMin.kelvinToFahrenheight().formatDouble(maxFractions: 0))&deg;")
+                Text("\(forecast.main.tempMin.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white.opacity(0.5))
                 Spacer()
-                Text("\(forecast.main.tempMax.kelvinToFahrenheight().formatDouble(maxFractions: 0))&deg;")
+                Text("\(forecast.main.tempMax.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white)
             }
             .padding(10)

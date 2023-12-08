@@ -55,6 +55,7 @@
 		BB9064392B226AAD00F16123 /* LocationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064382B226AAD00F16123 /* LocationsViewModel.swift */; };
 		BB90643B2B226EBB00F16123 /* CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90643A2B226EBB00F16123 /* CoreDataError.swift */; };
 		BB90644E2B2358F800F16123 /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90644D2B2358F800F16123 /* UIApplication.swift */; };
+		BB9064502B23688400F16123 /* ApiKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90644F2B23688400F16123 /* ApiKeys.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +108,7 @@
 		BB9064382B226AAD00F16123 /* LocationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsViewModel.swift; sourceTree = "<group>"; };
 		BB90643A2B226EBB00F16123 /* CoreDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataError.swift; sourceTree = "<group>"; };
 		BB90644D2B2358F800F16123 /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
+		BB90644F2B23688400F16123 /* ApiKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeys.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +213,7 @@
 				BB8862722B15029C00EE56B1 /* LocationManager.swift */,
 				BB88626D2B15011900EE56B1 /* NetworkManager.swift */,
 				BB88627D2B15424500EE56B1 /* PreviewManager.swift */,
+				BB90644F2B23688400F16123 /* ApiKeys.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -404,6 +407,7 @@
 				BB0C60C52B1FAE6900359F7D /* LocationsView.swift in Sources */,
 				BB0C60CB2B1FB91B00359F7D /* ContentView.swift in Sources */,
 				BB8862802B16231E00EE56B1 /* LocationSearchViewModel.swift in Sources */,
+				BB9064502B23688400F16123 /* ApiKeys.swift in Sources */,
 				BB0C60CD2B1FBDD400359F7D /* LocationViewCell.swift in Sources */,
 				BB88625C2B1500F300EE56B1 /* WeatherForecastApp.swift in Sources */,
 				BB9064352B224A0100F16123 /* Int.swift in Sources */,

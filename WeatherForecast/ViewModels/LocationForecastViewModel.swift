@@ -108,12 +108,12 @@ class LocationForecastViewModel: ObservableObject {
         isErrorOccured = true
     }
     
-    private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = Constants.googleApiKey) -> String {
+    private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = ApiKeys.googleApiKey) -> String {
         let retVal = "\(endPoint)autocomplete/json?input=\(searchText.replacingOccurrences(of: " ", with: "+"))&types=%28cities%29&fields=place_id%29description&key=\(apiKey)"
         return retVal
     }
     
-    private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = Constants.googleApiKey) -> String {
+    private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = ApiKeys.googleApiKey) -> String {
         let retVal = "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address&key=\(apiKey)"
         return retVal
     }

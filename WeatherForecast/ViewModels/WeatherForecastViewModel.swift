@@ -70,6 +70,8 @@ class WeatherForecastViewModel: ObservableObject {
                 return
             }
             
+            print(url.absoluteString)
+            
             isLoading = true
             
             do {
@@ -94,6 +96,8 @@ class WeatherForecastViewModel: ObservableObject {
                 customError = NetworkError.badUrl
                 return
             }
+            
+            print(url.absoluteString)
             
             isLoading = true
             
@@ -157,7 +161,7 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get url by using the current location
      */
-    private func getWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey) -> String {
+    private func getWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey) -> String {
         guard let currentLocation else { return "" }
         return "\(urlString)forecast?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
     }
@@ -165,7 +169,7 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get url by using City data.
      */
-    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey, city: City) -> String {
+    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
         return "\(urlString)forecast?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&appid=\(apiKey)"
     }
     

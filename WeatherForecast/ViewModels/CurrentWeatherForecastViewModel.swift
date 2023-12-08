@@ -124,7 +124,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     /**
         Get url for current by coordinate
      */
-    private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = Constants.weatherApiKey, coordinate: CLLocationCoordinate2D) -> String {
+    private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, coordinate: CLLocationCoordinate2D) -> String {
         return "\(urlString)weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
     }
 }

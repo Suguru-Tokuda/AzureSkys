@@ -10,6 +10,7 @@ import SwiftUI
 struct LocationSearchResultListView: View {
     var predictions: [Prediction] = []
     var onSelect: ((Prediction) -> ())?
+    @Environment(\.dismissSearch) private var dismissSearch
     
     var body: some View {
         List {
@@ -17,6 +18,7 @@ struct LocationSearchResultListView: View {
                 LocationSearchResultListCellView(prediction: prediction)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .onTapGesture {
+                        dismissSearch()
                         onSelect?(prediction)
                     }
             }

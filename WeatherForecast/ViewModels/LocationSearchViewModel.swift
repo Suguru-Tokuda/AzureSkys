@@ -40,7 +40,7 @@ class LocationSearchViewModel: ObservableObject {
 // api functions
 extension LocationSearchViewModel {
     func getAutoCompletePlaces(query: String) {
-        let urlStr = "\(Constants.googleApiBaseURL)autocomplete/json?input=\(query)&type=%28cities%29&key=\(Constants.googleApiKey)"
+        let urlStr = "\(Constants.googleApiBaseURL)autocomplete/json?input=\(query)&type=%28cities%29&key=\(ApiKeys.googleApiKey)"
         guard let url = URL(string: urlStr) else { return }
         
         self.isLoading = true
@@ -65,7 +65,7 @@ extension LocationSearchViewModel {
     }
     
     private func getPlaceDetails(placeId: String) async throws -> GooglePlaceDetailsResult {
-        let urlStr = "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address&key=\(Constants.googleApiKey)"
+        let urlStr = "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address&key=\(ApiKeys.googleApiKey)"
         guard let url = URL(string: urlStr) else {
             throw NetworkError.badUrl
         }

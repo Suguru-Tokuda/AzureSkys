@@ -9,13 +9,13 @@ import SwiftUI
 
 struct WeatherThreeHourlyForecastListViewCell: View {
     @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
-    var forecast: WeatherForecast
+    var forecast: Forecast
     var isFirst: Bool
     
     var body: some View {
         VStack {
-            Text(isFirst ? "Now" : forecast.dateForecasted.getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
-            if let weather = forecast.weathers.first {
+            Text(isFirst ? "Now" : forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat).getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
+            if let weather = forecast.weather.first {
                 AsyncImage(url: URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: weather.icon))) { img in
                     img
                         .resizable()
@@ -25,14 +25,14 @@ struct WeatherThreeHourlyForecastListViewCell: View {
                         .frame(width: 40, height: 40)
                 }
             }
-            Text("\(forecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+            Text("\(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
         }
         .fontWeight(.bold)
     }
 }
 
 #Preview {
-    WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.weatherForecasetData.list[0],
+    WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.oneCallResponse.current,
                                            isFirst: false
     )
         .preferredColorScheme(.dark)

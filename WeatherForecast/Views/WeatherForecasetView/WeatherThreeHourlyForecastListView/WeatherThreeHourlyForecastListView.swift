@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeatherThreeHourlyForecastListView: View {
-    var forecasts: [WeatherForecast]
+    var forecasts: [Forecast]
     
     var body: some View {
         ScrollView(.horizontal) {
@@ -20,9 +20,12 @@ struct WeatherThreeHourlyForecastListView: View {
             }
         }
         .scrollIndicators(.hidden)
+        .backgroundBlur(radius: 25, opaque: true)
+        .clipShape(RoundedRectangle(cornerRadius: 25))
     }
 }
 
 #Preview {
-    WeatherThreeHourlyForecastListView(forecasts: PreviewManager.weatherForecasetData.list)
+    WeatherThreeHourlyForecastListView(forecasts: PreviewManager.oneCallResponse.hourly)
+        .preferredColorScheme(.dark)
 }

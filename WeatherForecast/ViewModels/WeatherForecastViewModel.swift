@@ -12,8 +12,8 @@ import MapKit
 @MainActor
 class WeatherForecastViewModel: ObservableObject {
     @Published var city: City?
-    @Published var fiveDayForecast: [WeatherForecast] = []
-    @Published var weatherList: [WeatherForecast] = []
+    @Published var forecast: WeatherForecastOneCallResponse?
+    @Published var geocode: WeatherGeocode?
     @Published var isLoading = false
     @Published var isErrorOccured = false
     @Published var customError: Error?
@@ -51,7 +51,7 @@ class WeatherForecastViewModel: ObservableObject {
                     self.currentLocation = receivedVal.1
                     
                     Task {
-                        if callApi { await self.getWeatherForecasetData() }
+                        if callApi { await self.getWeatherForecastData() }
                     }
                 }
                 .store(in: &cancellables)
@@ -59,62 +59,81 @@ class WeatherForecastViewModel: ObservableObject {
     }
     
     /**
-        Get weather forecast data with the user's current location.
+     Get weather forecast & geo location with the current location
      */
-    func getWeatherForecasetData(urlString: String = Constants.weatherApiEndpoint) async {
+    func getWeatherForecastData() async {
         if let _ = currentLocation,
            !isLoading {
-            guard let url = URL(string: getWeatherForecastAPIString(urlString: urlString)) else {
+            guard let forecastUrl = URL(string: getWeatherForecastOnecallAPIString()),
+                  let geocodeUrl = URL(string: getGeocodeAPIString()) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
             }
             
-            print(url.absoluteString)
-            
             isLoading = true
             
             do {
-                let res = try await networkManager.getDataWithAsync(url: url, type: WeatherForecastResponse.self)
-                self.weatherList = res.list
-                self.city = res.city
-                self.fiveDayForecast = res.getDailyForecast()
+                async let forecast = networkManager.getDataWithAsync(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
+                async let geocode = networkManager.getDataWithAsync(url: geocodeUrl, type: [WeatherGeocode].self)
+                
+                let res: [Any] = try await [forecast, geocode]
+                
+                if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
+                    self.forecast = forecastRes
+                }
+                
+                if let geocodeRes = res[1] as? [WeatherGeocode],
+                   let geocode = geocodeRes.first {
+                    self.geocode = geocode
+                }
+                                
                 self.isLoading = false
             } catch {
-                await handleGetWeatherForecasetError(error: error)
+                self.isLoading = false
+                await handleGetWeatherForecastError(error: error)
             }
         }
     }
     
     /**
-        Get weather forecast data by using City data.
+        Get weather forecast & geo location with the city data
      */
-    func getWeatherForecasetData(city: City) async {
+    func getWeatherForecastData(city: City) async {
         if !isLoading {
-            guard let url = URL(string: getWeatherForecaseAPIString(city: city)) else {
+            guard let forecastUrl = URL(string: getWeatherForecastOnecallAPIString(city: city)),
+                  let geocodeUrl = URL(string: getGeocodeAPIString(city: city)) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
             }
             
-            print(url.absoluteString)
-            
-            isLoading = true
+            self.isLoading = true
             
             do {
-                let res = try await networkManager.getDataWithAsync(url: url, type: WeatherForecastResponse.self)
-                self.weatherList = res.list
-                self.city = res.city
-                self.fiveDayForecast = res.getDailyForecast()
+                async let forecast = networkManager.getDataWithAsync(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
+                async let geocode = networkManager.getDataWithAsync(url: geocodeUrl, type: [WeatherGeocode].self)
+                
+                let res: [Any] = try await [forecast, geocode]
+                
+                if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
+                    self.forecast = forecastRes
+                }
+                
+                if let geocodeRes = res[1] as? [WeatherGeocode],
+                   let geocode = geocodeRes.first {
+                    self.geocode = geocode
+                }
+                
                 self.isLoading = false
             } catch {
                 self.isLoading = false
-                await handleGetWeatherForecasetError(error: error)
+                await handleGetWeatherForecastError(error: error)
             }
         }
     }
     
-    private func handleGetWeatherForecasetError(error: Error) async {
+    private func handleGetWeatherForecastError(error: Error) async {
         switch error {
         case NetworkError.badUrl:
             customError = NetworkError.badUrl
@@ -142,7 +161,7 @@ class WeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
     
-    func addCity(completionHandler: @escaping (Result<Bool, Error>) -> Void) {
+    func addCity(city: City?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
         if let city {
             Task {
                 do {
@@ -161,16 +180,31 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get url by using the current location
      */
-    private func getWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey) -> String {
+    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey) -> String {
         guard let currentLocation else { return "" }
-        return "\(urlString)forecast?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
+        return "\(urlString)/data/3.0/onecall?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&exclude=minutely&appid=\(apiKey)"
     }
     
     /**
         Get url by using City data.
      */
-    private func getWeatherForecaseAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
-        return "\(urlString)forecast?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&appid=\(apiKey)"
+    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
+        return "\(urlString)/data/3.0/onecall?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&exclude=minutely&appid=\(apiKey)"
+    }
+    
+    /**
+        Get geocode url by current location
+     */
+    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey) -> String {
+        guard let currentLocation else { return "" }
+        return "\(urlString)/geo/1.0/reverse?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
+    }
+    
+    /**
+        Get geocode url by city
+     */
+    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
+        return "\(urlString)/geo/1.0/reverse?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&appid=\(apiKey)"
     }
     
     func getSQLitePath() {

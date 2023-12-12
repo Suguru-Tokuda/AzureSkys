@@ -129,6 +129,7 @@ extension LocationsView {
 
 #Preview {
     LocationsView()
+        .preferredColorScheme(.dark)
         .environmentObject(LocationManager())
         .environmentObject(MainCoordinator())
 }

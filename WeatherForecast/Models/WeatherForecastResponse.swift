@@ -145,6 +145,31 @@ struct MainModel: Decodable {
 struct Weather: Decodable, Identifiable {
     let id: Int
     let main, description, icon: String
+    let partOfDay: PartOfDay
+    let weatherCondition: WeatherCondition
+    
+    enum CodingKeys: String, CodingKey {
+        case id, main, description, icon
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.main = try container.decode(String.self, forKey: .main)
+        self.description = try container.decode(String.self, forKey: .description)
+        self.icon = try container.decode(String.self, forKey: .icon)
+        self.partOfDay = self.icon.contains("d") ? .day : .night
+        self.weatherCondition = WeatherCondition.getWeatherCondition(str: self.main)
+    }
+    
+    init(id: Int, main: String, description: String, icon: String, partOfDay: PartOfDay, weatherCondition: WeatherCondition) {
+        self.id = id
+        self.main = main
+        self.description = description
+        self.icon = icon
+        self.partOfDay = partOfDay
+        self.weatherCondition = weatherCondition
+    }
 }
 
 struct Clouds: Decodable {

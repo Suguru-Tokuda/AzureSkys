@@ -7,6 +7,7 @@
 
 import Combine
 import MapKit
+import SwiftUI
 
 @MainActor
 class CurrentWeatherForecastViewModel: ObservableObject {
@@ -15,6 +16,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var isErrorOccured = false
     @Published var customError: NetworkError?
     @Published var locationAuthorized: Bool = false
+    @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
     var city: City?
     
     var currentLocation: CLLocation?
@@ -73,10 +75,15 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             
             do {
                 self.currentForecast = try await networkManager.getDataWithAsync(url: url, type: WeatherForecastCurrentResponse.self)
+                if let currentForecast = self.currentForecast,
+                   let weather = currentForecast.weather.first {
+                    self.setRowBackgroundColor(weather: weather)
+                }
+                
                 self.isLoading = false
             } catch {
                 self.isLoading = false
-                await handleGetWeatherForecasetError(error: error)
+                await handleGetWeatherForecastError(error: error)
             }
         }
     }
@@ -94,15 +101,23 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             
             do {
                 self.currentForecast = try await networkManager.getDataWithAsync(url: url, type: WeatherForecastCurrentResponse.self)
+                if let currentForecast = self.currentForecast,
+                   let weather = currentForecast.weather.first {
+                    self.setRowBackgroundColor(weather: weather)
+                }
                 self.isLoading = false
             } catch {
                 self.isLoading = false
-                await handleGetWeatherForecasetError(error: error)
+                await handleGetWeatherForecastError(error: error)
             }
         }
     }
     
-    private func handleGetWeatherForecasetError(error: Error) async {
+    private func setRowBackgroundColor(weather: Weather) {
+        self.listRowBackground = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
+    }
+    
+    private func handleGetWeatherForecastError(error: Error) async {
         switch error {
         case NetworkError.badUrl:
             customError = NetworkError.badUrl
@@ -125,6 +140,6 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         Get url for current by coordinate
      */
     private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, coordinate: CLLocationCoordinate2D) -> String {
-        return "\(urlString)weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
+        return "\(urlString)/data/2.5/weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
     }
 }

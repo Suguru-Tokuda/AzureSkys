@@ -23,4 +23,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(MainCoordinator())
+        .environmentObject(LocationManager())
+        .preferredColorScheme(.dark)
 }

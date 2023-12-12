@@ -50,6 +50,7 @@ struct LocationListView: View {
 
 #Preview {
     LocationListView()
+        .preferredColorScheme(.dark)
         .environmentObject(LocationManager())
         .environmentObject(MainCoordinator())
 }

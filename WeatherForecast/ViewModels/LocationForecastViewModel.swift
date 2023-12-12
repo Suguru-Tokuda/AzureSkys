@@ -1,5 +1,5 @@
 //
-//  LocationForecasetViewModel.swift
+//  LocationForecastViewModel.swift
 //  WeatherForecast
 //
 //  Created by Suguru Tokuda on 12/5/23.
@@ -59,7 +59,7 @@ class LocationForecastViewModel: ObservableObject {
                 self.isLoading = false
             } catch {
                 self.isLoading = false
-                await handleGetWeatherForecasetError(error: error)
+                await handleGetWeatherForecastError(error: error)
             }
         }
     }
@@ -81,7 +81,7 @@ class LocationForecastViewModel: ObservableObject {
                 return res.result
             } catch {
                 self.gettingDetails = false
-                await handleGetWeatherForecasetError(error: error)
+                await handleGetWeatherForecastError(error: error)
                 return nil
             }
         } else {
@@ -89,7 +89,7 @@ class LocationForecastViewModel: ObservableObject {
         }
     }
     
-    private func handleGetWeatherForecasetError(error: Error) async {
+    private func handleGetWeatherForecastError(error: Error) async {
         switch error {
         case NetworkError.badUrl:
             customError = NetworkError.badUrl

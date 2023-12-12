@@ -24,15 +24,18 @@ struct WeatherForecastView: View {
     
     var body: some View {
         ZStack {
-            Color.blue
-                .ignoresSafeArea()
+            if let forecast = vm.forecast?.current,
+               let weather = forecast.weather.first {
+                weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
+                    .ignoresSafeArea()
+            }
             VStack {
                 if showTopActionBar {
                     WeatherForecastAddHeaderView(cancelBtnTapped: {
                         dismiss()
                     },
                     addBtnTapped: {
-                        vm.addCity { result in
+                        vm.addCity(city: city) { result in
                             switch result {
                             case .success(let added):
                                 if added == true {
@@ -56,13 +59,16 @@ struct WeatherForecastView: View {
             .zIndex(2.0)
             if !vm.isLoading {
                 ScrollView {
-                    if let city = vm.city,
-                       let firstForecast = vm.fiveDayForecast.first
+                    if let geocode = vm.geocode,
+                       let forecast = vm.forecast
                     {
                         VStack {
-                            WeatherForecasetHeaderView(city: city, forecast: firstForecast)
-                            WeatherThreeHourlyForecastListView(forecasts: vm.weatherList)
-                            WeatherDailyForecasetListView(list: vm.fiveDayForecast)
+                            WeatherForecastHeaderView(geocode: geocode, currentForecast: forecast.current,
+                                dailyForecast: forecast.daily[0],
+                                isMyLocation: coordinator.city == nil
+                            )
+                            WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
+                            WeatherDailyForecastListView(list: forecast.daily)
                         }
                         .padding(.top, 50)
                         .padding(.horizontal, 20)
@@ -85,11 +91,12 @@ struct WeatherForecastView: View {
                         isPresented: $coordinator.showLocationsFullScreenSheet
                     ) {
                         LocationsView() { city in
+                            coordinator.setCity(city: city)
                             Task {
                                 if let city {
-                                    await vm.getWeatherForecasetData(city: city)
+                                    await vm.getWeatherForecastData(city: city)
                                 } else {
-                                    await vm.getWeatherForecasetData()
+                                    await vm.getWeatherForecastData()
                                 }
                             }
                         }
@@ -102,15 +109,15 @@ struct WeatherForecastView: View {
         }
         .task {
             if let city {
-                await vm.getWeatherForecasetData(city: city)
+                await vm.getWeatherForecastData(city: city)
             }
         }
         .refreshable {
             Task {
                 if let city {
-                    await vm.getWeatherForecasetData(city: city)
+                    await vm.getWeatherForecastData(city: city)
                 } else {
-                    await vm.getWeatherForecasetData()
+                    await vm.getWeatherForecastData()
                 }
             }
         }
@@ -121,12 +128,13 @@ struct WeatherForecastView: View {
     NavigationStack {
         WeatherForecastView()
     }
+        .preferredColorScheme(.dark)
         .environmentObject(MainCoordinator())
         .environmentObject(LocationManager())
 }
 
 //#Preview {
-//    struct WeatherForecasetPreview: View {
+//    struct WeatherForecastPreview: View {
 //        var previewDataManager = PreviewDataManager()
 //        @State var data: WeatherForecastResponse?
 //        @State var count: Int?
@@ -145,5 +153,5 @@ struct WeatherForecastView: View {
 //        }
 //    }
 //    
-//    return WeatherForecasetPreview()
+//    return WeatherForecastPreview()
 //}

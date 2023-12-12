@@ -27,15 +27,18 @@ struct LocationViewCell: View {
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
+                        // MARK: Location Text
                         Text(isMyLocation ? "My Location" : city?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
+                        // MARK: Time
                         Text(isMyLocation ? vm.currentForecast?.name ?? "" : vm.currentForecast?.timezone.getTimeStr(dateFormat: "hh:mm") ?? "")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
                     Spacer()
                     if let currentForecast = vm.currentForecast {
+                        // MARK: Degree
                         Text(currentForecast.main.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                             .font(.largeTitle)
                     }
@@ -43,8 +46,21 @@ struct LocationViewCell: View {
                 Spacer()
                     .frame(height: 25)
                 HStack {
-                    Text(vm.currentForecast?.weather.first?
-                        .main ?? "-")
+                    HStack {
+                        Text(vm.currentForecast?.weather.first?.main ?? "-")
+                        if let currentForecast = vm.currentForecast,
+                           let weather = currentForecast.weather.first {
+                            AsyncImage(url: URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: weather.icon))) { img in
+                                img
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                                
+                            } placeholder: {
+                                ProgressView()
+                            }
+                        }
+                    }
+                    
                     Spacer()
                     HighLowTemperatures(maxTemp: vm.currentForecast?.main.tempMax ?? 0, minTemp: vm.currentForecast?.main.tempMin ?? 0)
                 }
@@ -56,7 +72,7 @@ struct LocationViewCell: View {
         }
         .listRowSeparator(.hidden)
         .listRowBackground(
-            Color.blue
+            vm.listRowBackground
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal, 20)
@@ -79,4 +95,5 @@ struct LocationViewCell: View {
 #Preview {
     LocationViewCell(isMyLocation: true)
         .environmentObject(LocationManager())
+        .preferredColorScheme(.dark)
 }

@@ -20,4 +20,13 @@ extension Int {
         
         return ""
     }
+    
+    func unixTimeToDateStr(dateFormat: String) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(self))
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = dateFormat
+            
+        return dateFormatter.string(from: date)
+    }
 }

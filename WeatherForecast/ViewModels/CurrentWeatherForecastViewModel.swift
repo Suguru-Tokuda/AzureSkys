@@ -17,7 +17,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var customError: NetworkError?
     @Published var locationAuthorized: Bool = false
     @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
-    var city: City?
+    var place: GooglePlaceDetails?
     
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
@@ -39,8 +39,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
     
-    func setCity(city: City) {
-        self.city = city
+    func setPlace(place: GooglePlaceDetails) {
+        self.place = place
     }
     
     func addLocationSubscriptions() {
@@ -89,9 +89,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     }
     
     func getCurrentWeatherDataWithCityData(urlString: String = Constants.weatherApiEndpoint) async {
-        if let city,
+        if let place,
            !isLoading {
-            guard let url = URL(string: getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: city.coordinate.lat, longitude: city.coordinate.lon))) else {
+            guard let url = URL(string: getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude))) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return

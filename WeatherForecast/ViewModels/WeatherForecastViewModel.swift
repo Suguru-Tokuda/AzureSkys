@@ -23,10 +23,10 @@ class WeatherForecastViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
     
     var networkManager: Networking
-    var coreDataManager: CityCoreDataActions
+    var coreDataManager: PlaceCoreDataActions
     var locationManager: LocationManager?
     
-    init(networkManager: Networking = NetworkManager(), coreDataManager: CityCoreDataActions = CityCoreDataManager()) {
+    init(networkManager: Networking = NetworkManager(), coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager()) {
         self.networkManager = networkManager
         self.coreDataManager = coreDataManager
         
@@ -99,10 +99,10 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get weather forecast & geo location with the city data
      */
-    func getWeatherForecastData(city: City) async {
+    func getWeatherForecastData(place: GooglePlaceDetails) async {
         if !isLoading {
-            guard let forecastUrl = URL(string: getWeatherForecastOnecallAPIString(city: city)),
-                  let geocodeUrl = URL(string: getGeocodeAPIString(city: city)) else {
+            guard let forecastUrl = URL(string: getWeatherForecastOnecallAPIString(place: place)),
+                  let geocodeUrl = URL(string: getGeocodeAPIString(place: place)) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -161,11 +161,11 @@ class WeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
     
-    func addCity(city: City?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
-        if let city {
+    func addPlace(place: GooglePlaceDetails?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
+        if let place {
             Task {
                 do {
-                    try await coreDataManager.saveCityIntoDatabase(city: city)
+                    try await coreDataManager.savePlaceIntoDatabase(place: place)
                     completionHandler(.success(true))
                 } catch {
                     self.isErrorOccured = true
@@ -188,8 +188,8 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get url by using City data.
      */
-    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
-        return "\(urlString)/data/3.0/onecall?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&exclude=minutely&appid=\(apiKey)"
+    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, place: GooglePlaceDetails) -> String {
+        return "\(urlString)/data/3.0/onecall?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&exclude=minutely&appid=\(apiKey)"
     }
     
     /**
@@ -203,8 +203,8 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get geocode url by city
      */
-    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, city: City) -> String {
-        return "\(urlString)/geo/1.0/reverse?lat=\(city.coordinate.lat)&lon=\(city.coordinate.lon)&appid=\(apiKey)"
+    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, place: GooglePlaceDetails) -> String {
+        return "\(urlString)/geo/1.0/reverse?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&appid=\(apiKey)"
     }
     
     func getSQLitePath() {

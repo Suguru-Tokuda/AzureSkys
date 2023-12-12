@@ -51,6 +51,7 @@ class NetworkManager: Networking {
                 do {
                     return try JSONDecoder().decode(type, from: rawData)
                 } catch {
+                    print(error)
                     throw NetworkError.dataParsingError
                 }
             } else {

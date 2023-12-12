@@ -13,7 +13,7 @@ class MainCoordinator: ObservableObject {
     @Published var path = NavigationPath()
     @Published var showLocationsFullScreenSheet: Bool = false
     @Published var weatherForecastSheetPresented: Bool = false
-    var city: City?
+    var place: GooglePlaceDetails?
     
     func startCoordinator() {
         path.append(Page.forecast)
@@ -23,20 +23,20 @@ class MainCoordinator: ObservableObject {
         showLocationsFullScreenSheet = true
     }
 
-    func showForecastSheet(city: City) {
-        self.city = city
+    func showForecastSheet(place: GooglePlaceDetails) {
+        self.place = place
         self.weatherForecastSheetPresented = true
     }
     
-    func setCity(city: City?) {
-        self.city = city
+    func setPlace(place: GooglePlaceDetails?) {
+        self.place = place
     }
         
     @ViewBuilder
     func getPage(page: Page) -> some View {
         switch page {
         case .forecast:
-            WeatherForecastView(city: city)
+            WeatherForecastView(place: place)
         }
     }
 }

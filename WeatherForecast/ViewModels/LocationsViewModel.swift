@@ -12,29 +12,29 @@ class LocationsViewModel: ObservableObject {
     @Published var errorOccured = false
     @Published var customError: Error?
     
-    var cityCoreDataManager: CityCoreDataManager
+    var placeCoreDataManager: PlaceCoreDataManager
     
-    init(cityCoreDataManager: CityCoreDataManager = CityCoreDataManager()) {
-        self.cityCoreDataManager = cityCoreDataManager
+    init(placeCoreDataManager: PlaceCoreDataManager = PlaceCoreDataManager()) {
+        self.placeCoreDataManager = placeCoreDataManager
     }
     
-    func removeCity(results: FetchedResults<CityEntity>, indexSet: IndexSet) {
+    func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
         for index in indexSet {
             let indexInt = Int(index)
-            var city: City?
+            var place: GooglePlaceDetails?
             var i = 0
             
             results.forEach { entity in
                 if i == indexInt {
-                    city = City(from: entity)
+                    place = GooglePlaceDetails(from: entity)
                 }
                 i += 1
             }
             
-            if let city {
+            if let place {
                 Task {
                     do {
-                        try await cityCoreDataManager.deleteFromDatabase(city: city)
+                        try await placeCoreDataManager.deleteFromDatabase(place: place)
                     } catch {
                         errorOccured = true
                         customError = error

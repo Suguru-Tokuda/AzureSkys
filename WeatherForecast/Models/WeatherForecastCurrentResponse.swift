@@ -9,7 +9,7 @@ import Foundation
 
 struct WeatherForecastCurrentResponse: Decodable, Identifiable {
     let id: Int
-    let dt: Int
+    let dateTime: Int
     let coordinate: WeatherForecastCoordinate
     let weather: [Weather]
     let main: MainModel
@@ -22,7 +22,8 @@ struct WeatherForecastCurrentResponse: Decodable, Identifiable {
     let cod: Int
     
     enum CodingKeys: String, CodingKey {
-        case id, dt,
+        case id, 
+             dateTime = "dt",
              coordinate = "coord",
              weather,
              main,

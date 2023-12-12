@@ -12,10 +12,10 @@ struct LocationListView: View {
     @EnvironmentObject var mainCoordinator: MainCoordinator
     @Environment(\.isSearching) private var isSearching
     @StateObject var vm: LocationsViewModel = LocationsViewModel()
-    @FetchRequest(entity: CityEntity.entity(), sortDescriptors: [])
-    var results: FetchedResults<CityEntity>
-    var request: NSFetchRequest<CityEntity> = CityEntity.fetchRequest()
-    var onCitySelect: ((City?) -> Void)?
+    @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
+    var results: FetchedResults<PlaceEntity>
+    var request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+    var onCitySelect: ((GooglePlaceDetails?) -> Void)?
     
     var body: some View {
         ZStack {
@@ -32,10 +32,10 @@ struct LocationListView: View {
                     .onTapGesture {
                         onCitySelect?(nil)
                     }
-                ForEach(results) { cityEntity in
-                    LocationViewCell(city: City(from: cityEntity))
+                ForEach(results) { placeEntity in
+                    LocationViewCell(place: GooglePlaceDetails(from: placeEntity))
                         .onTapGesture {
-                            onCitySelect?(City(from: cityEntity))
+                            onCitySelect?(GooglePlaceDetails(from: placeEntity))
                         }
                 }
                 .onDelete { indexSet in

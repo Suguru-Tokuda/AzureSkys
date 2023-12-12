@@ -60,7 +60,7 @@
 		BB90642F2B221DE100F16123 /* LocationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90642E2B221DE100F16123 /* LocationListView.swift */; };
 		BB9064312B222A9600F16123 /* HighLowTemperatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064302B222A9600F16123 /* HighLowTemperatures.swift */; };
 		BB9064352B224A0100F16123 /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064342B224A0100F16123 /* Int.swift */; };
-		BB9064372B22579E00F16123 /* CityCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064362B22579E00F16123 /* CityCoreDataManager.swift */; };
+		BB9064372B22579E00F16123 /* PlaceCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064362B22579E00F16123 /* PlaceCoreDataManager.swift */; };
 		BB9064392B226AAD00F16123 /* LocationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064382B226AAD00F16123 /* LocationsViewModel.swift */; };
 		BB90643B2B226EBB00F16123 /* CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90643A2B226EBB00F16123 /* CoreDataError.swift */; };
 		BB90644E2B2358F800F16123 /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90644D2B2358F800F16123 /* UIApplication.swift */; };
@@ -122,7 +122,7 @@
 		BB90642E2B221DE100F16123 /* LocationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListView.swift; sourceTree = "<group>"; };
 		BB9064302B222A9600F16123 /* HighLowTemperatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighLowTemperatures.swift; sourceTree = "<group>"; };
 		BB9064342B224A0100F16123 /* Int.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
-		BB9064362B22579E00F16123 /* CityCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityCoreDataManager.swift; sourceTree = "<group>"; };
+		BB9064362B22579E00F16123 /* PlaceCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceCoreDataManager.swift; sourceTree = "<group>"; };
 		BB9064382B226AAD00F16123 /* LocationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsViewModel.swift; sourceTree = "<group>"; };
 		BB90643A2B226EBB00F16123 /* CoreDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataError.swift; sourceTree = "<group>"; };
 		BB90644D2B2358F800F16123 /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
@@ -246,7 +246,7 @@
 			children = (
 				BB90644F2B23688400F16123 /* ApiKeys.swift */,
 				BB0C60CE2B1FE3F000359F7D /* AppStorageKeys.swift */,
-				BB9064362B22579E00F16123 /* CityCoreDataManager.swift */,
+				BB9064362B22579E00F16123 /* PlaceCoreDataManager.swift */,
 				BB88626F2B1501D500EE56B1 /* Constants.swift */,
 				BB8862722B15029C00EE56B1 /* LocationManager.swift */,
 				BB88626D2B15011900EE56B1 /* NetworkManager.swift */,
@@ -433,7 +433,7 @@
 				BB8862842B16280000EE56B1 /* GoogleAutoCompleteModel.swift in Sources */,
 				BB7EBC7E2B27A08700978174 /* WeatherCondition.swift in Sources */,
 				BB88627A2B1527D300EE56B1 /* NetworkError.swift in Sources */,
-				BB9064372B22579E00F16123 /* CityCoreDataManager.swift in Sources */,
+				BB9064372B22579E00F16123 /* PlaceCoreDataManager.swift in Sources */,
 				BB7EBC832B27ADC600978174 /* View.swift in Sources */,
 				BB8862942B16669C00EE56B1 /* WeatherDailyForecastListCellView.swift in Sources */,
 				BB0C60C32B1FAD1900359F7D /* WeatherCoreData.xcdatamodeld in Sources */,

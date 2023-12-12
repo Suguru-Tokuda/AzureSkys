@@ -64,7 +64,7 @@ class LocationForecastViewModel: ObservableObject {
         }
     }
     
-    func getPlaceDetails(placeId: String) async -> GooglePlaceDetailsResult? {
+    func getPlaceDetails(placeId: String) async -> GooglePlaceDetails? {
         if !gettingDetails {
             guard let url = URL(string: getGoogleDetailsURL(placeId: placeId)) else {
                 isErrorOccured = true
@@ -114,7 +114,7 @@ class LocationForecastViewModel: ObservableObject {
     }
     
     private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = ApiKeys.googleApiKey) -> String {
-        let retVal = "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address&key=\(apiKey)"
+        let retVal = "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(apiKey)"
         return retVal
     }
 }

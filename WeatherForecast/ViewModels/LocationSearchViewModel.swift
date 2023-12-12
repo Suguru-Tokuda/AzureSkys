@@ -64,8 +64,8 @@ extension LocationSearchViewModel {
             .store(in: &cancellables)
     }
     
-    private func getPlaceDetails(placeId: String) async throws -> GooglePlaceDetailsResult {
-        let urlStr = "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address&key=\(ApiKeys.googleApiKey)"
+    private func getPlaceDetails(placeId: String) async throws -> GooglePlaceDetails {
+        let urlStr = "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(ApiKeys.googleApiKey)"
         guard let url = URL(string: urlStr) else {
             throw NetworkError.badUrl
         }

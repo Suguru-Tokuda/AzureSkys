@@ -11,12 +11,12 @@ struct LocationViewCell: View {
     @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
     @EnvironmentObject var locationManager: LocationManager
     @StateObject var vm: CurrentWeatherForecastViewModel = CurrentWeatherForecastViewModel()
-    var city: City?
+    var place: GooglePlaceDetails?
     var isMyLocation: Bool = false
     
-    init(city: City? = nil, isMyLocation: Bool = false) {
+    init(place: GooglePlaceDetails? = nil, isMyLocation: Bool = false) {
         self.isMyLocation = isMyLocation
-        self.city = city
+        self.place = place
     }
     
     var body: some View {
@@ -28,11 +28,11 @@ struct LocationViewCell: View {
                 HStack {
                     VStack(alignment: .leading) {
                         // MARK: Location Text
-                        Text(isMyLocation ? "My Location" : city?.name ?? "")
+                        Text(isMyLocation ? "My Location" : place?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
                         // MARK: Time
-                        Text(isMyLocation ? vm.currentForecast?.name ?? "" : vm.currentForecast?.timezone.getTimeStr(dateFormat: "hh:mm") ?? "")
+                        Text(isMyLocation ? vm.currentForecast?.name ?? "" : vm.currentForecast?.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat).getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "hh:mm") ?? "")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
@@ -83,8 +83,8 @@ struct LocationViewCell: View {
             if isMyLocation {
                 vm.setLocationManager(locationManager: locationManager)
             } else {
-                if let city {
-                    vm.setCity(city: city)
+                if let place {
+                    vm.setPlace(place: place)
                     await vm.getCurrentWeatherDataWithCityData()
                 }
             }

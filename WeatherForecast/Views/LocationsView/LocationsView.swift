@@ -14,7 +14,7 @@ struct LocationsView: View {
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(AppStorageKeys.tempScale) private var tempScale: TempScale = .fahrenheit
     @State var searchBarPresented = false
-    var onDismiss: ((City?) -> Void)?
+    var onDismiss: ((GooglePlaceDetails?) -> Void)?
     
     var body: some View {
         NavigationStack {
@@ -56,7 +56,7 @@ struct LocationsView: View {
         }
         .sheet(isPresented: $coordinator.weatherForecastSheetPresented) {
             WeatherForecastView(
-                city: coordinator.city,
+                place: coordinator.place,
                 showTopActionBar: true) {
                     DispatchQueue.main.async {
                         self.vm.searchText = ""
@@ -82,14 +82,7 @@ extension LocationsView {
 
                     Task {
                         if let details = await vm.getPlaceDetails(placeId: prediction.placeId) {
-                            self.coordinator.showForecastSheet(city: City(id: 0, 
-                                                                          population: 0,
-                                                                          timezone: 0,
-                                                                          coordinate: CityCoordinate(lat: details.geometry.location.latitude, lon: details.geometry.location.longitude),
-                                                                          name: details.formattedAddress,
-                                                                          country: "",
-                                                                          sunrise: 0,
-                                                                          sunset: 0))
+                            self.coordinator.showForecastSheet(place: details)
                         }
                     }
                 }
@@ -99,9 +92,9 @@ extension LocationsView {
     
     @ViewBuilder
     func locationList() -> some View {
-        LocationListView() { city in
+        LocationListView() { place in
             if let onDismiss {
-                onDismiss(city)
+                onDismiss(place)
                 dismiss()
             }
         }

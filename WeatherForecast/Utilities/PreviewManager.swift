@@ -232,5 +232,11 @@ struct PreviewManager {
         Prediction(id: UUID(), description: "Chicago IL, USA", placeId: "ChIJ7cv00DwsDogRAMDACa2m4K8", structuredFormatting: StructuredFormatting(mainText: "Chicago", secondaryText: "IL, USA"))
     ]
     
-    static let placeDetails: GooglePlaceDetailsResult = GooglePlaceDetailsResult(formattedAddress: "Chicago, IL, USA", geometry: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)))
+    static let placeDetails: GooglePlaceDetails = GooglePlaceDetails(
+        id: "ChIJG2mX3o3QDIgRz791tEd49TA",
+        formattedAddress: "Chicago, IL, USA",
+        geometry: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)),
+        name: "Chicago",
+        addressComponents: []
+    )
 }

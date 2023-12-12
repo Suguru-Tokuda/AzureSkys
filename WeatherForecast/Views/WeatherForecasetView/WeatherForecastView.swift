@@ -12,12 +12,12 @@ struct WeatherForecastView: View {
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.dismiss) var dismiss: DismissAction
     @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
-    var city: City?
+    var place: GooglePlaceDetails?
     var showTopActionBar: Bool = false
     var onLocationAdded: (() -> ())?
         
-    init(city: City? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
-        self.city = city
+    init(place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
+        self.place = place
         self.showTopActionBar = showTopActionBar
         self.onLocationAdded = onLocationAdded
     }
@@ -35,7 +35,7 @@ struct WeatherForecastView: View {
                         dismiss()
                     },
                     addBtnTapped: {
-                        vm.addCity(city: city) { result in
+                        vm.addPlace(place: place) { result in
                             switch result {
                             case .success(let added):
                                 if added == true {
@@ -65,7 +65,7 @@ struct WeatherForecastView: View {
                         VStack {
                             WeatherForecastHeaderView(geocode: geocode, currentForecast: forecast.current,
                                 dailyForecast: forecast.daily[0],
-                                isMyLocation: coordinator.city == nil
+                                isMyLocation: coordinator.place == nil
                             )
                             WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
                             WeatherDailyForecastListView(list: forecast.daily)
@@ -90,11 +90,11 @@ struct WeatherForecastView: View {
                     .fullScreenCover(
                         isPresented: $coordinator.showLocationsFullScreenSheet
                     ) {
-                        LocationsView() { city in
-                            coordinator.setCity(city: city)
+                        LocationsView() { place in
+                            coordinator.setPlace(place: place)
                             Task {
-                                if let city {
-                                    await vm.getWeatherForecastData(city: city)
+                                if let place {
+                                    await vm.getWeatherForecastData(place: place)
                                 } else {
                                     await vm.getWeatherForecastData()
                                 }
@@ -108,14 +108,14 @@ struct WeatherForecastView: View {
             vm.setLocationManager(locationManager: locationManager)
         }
         .task {
-            if let city {
-                await vm.getWeatherForecastData(city: city)
+            if let place {
+                await vm.getWeatherForecastData(place: place)
             }
         }
         .refreshable {
             Task {
-                if let city {
-                    await vm.getWeatherForecastData(city: city)
+                if let place {
+                    await vm.getWeatherForecastData(place: place)
                 } else {
                     await vm.getWeatherForecastData()
                 }

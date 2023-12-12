@@ -227,17 +227,6 @@ struct City: Identifiable, Decodable {
         self.sunset = try container.decodeIfPresent(Double.self, forKey: .sunset)
     }
     
-    init(from entity: CityEntity) {
-        self.id = Int(entity.id)
-        self.timezone = Int(entity.timezone)
-        self.coordinate = CityCoordinate(lat: entity.latitude, lon: entity.longitude)
-        self.name = entity.name ?? ""
-        self.country = entity.country ?? ""
-        self.sunrise = nil
-        self.sunset = nil
-        self.population = nil
-    }
-    
     init(id: Int, population: Int?, timezone: Int?, coordinate: CityCoordinate, name: String, country: String, sunrise: Double?, sunset: Double?) {
         self.id = id
         self.population = population

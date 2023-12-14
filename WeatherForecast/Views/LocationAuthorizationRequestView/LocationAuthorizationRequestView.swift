@@ -11,9 +11,14 @@ struct LocationAuthorizationRequestView: View {
     var body: some View {
         ZStack {
             VStack {
+                Image(systemName: "location.circle.fill")
+                    .resizable()
+                    .frame(width: 75, height: 75)
+                    .padding(.top, 100)
                 Text("Location Authorization Required")
                     .font(.title3.weight(.bold))
-                    .padding(.top, 100)
+                    .padding(.top, 50)
+                    
                 Text("The App requires location information to continue")
                     .font(.callout)
                 Spacer()

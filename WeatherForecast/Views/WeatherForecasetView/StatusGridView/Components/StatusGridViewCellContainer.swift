@@ -47,11 +47,9 @@ struct StatusGridViewCellContainer<Content: View>: View {
                 Image(systemName: "thermometer.medium")
                 Text("FEELS LIKE")
             }
-                .font(.footnote.weight(.semibold))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .foregroundStyle(.white.opacity(0.5))
+                .withStatusGridViewLabelModifier()
             Text("40°")
-                .font(.system(size: 40).weight(.regular))
+                .withStatusGridViewValueLabelModifier()
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer()
         }

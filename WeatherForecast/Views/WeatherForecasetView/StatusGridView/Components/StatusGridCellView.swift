@@ -17,15 +17,9 @@ struct StatusGridCellView: View {
     var body: some View {
         StatusGridViewCellContainer(width: width, background: background) {
             VStack {
-                HStack {
-                    Image(systemName: icon)
-                    Text(title)
-                }
-                    .font(.footnote.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundStyle(.white.opacity(0.5))
+                StatusGridCellTitleView(icon: icon, title: title)
                 Text(value)
-                    .font(.system(size: 40).weight(.regular))
+                    .withStatusGridViewValueLabelModifier()
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
             }

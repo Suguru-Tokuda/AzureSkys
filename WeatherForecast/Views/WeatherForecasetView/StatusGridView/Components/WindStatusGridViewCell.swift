@@ -30,22 +30,27 @@ struct WindStatusGridViewCell: View {
                             }
                             Spacer()
                         }
+                        .padding(.top, 5)
                         .padding(.bottom, 1)
-                        Divider()
-                            .frame(height: 0.8)
-                            .background(.white.opacity(0.8))
-                        HStack {
-                            Text("\(wind.gust, specifier: "%.0f")")
-                                .withStatusGridViewValueLabelModifier()
-                            VStack(alignment: .leading) {
-                                Text("MPH")
-                                    .withStatusGridViewLabelModifier()
-                                Text("Gusts")
-                                    .font(.callout.weight(.semibold))
+                        if let gust = wind.gust {
+                            Divider()
+                                .frame(height: 0.8)
+                                .background(.white.opacity(0.8))
+                            HStack {
+                                Text("\(gust, specifier: "%.0f")")
+                                    .withStatusGridViewValueLabelModifier()
+                                VStack(alignment: .leading) {
+                                    Text("MPH")
+                                        .withStatusGridViewLabelModifier()
+                                    Text("Gusts")
+                                        .font(.callout.weight(.semibold))
+                                }
+                                Spacer()
                             }
+                            .padding(.top, 1)
+                        } else {
                             Spacer()
                         }
-                        .padding(.top, 1)
                     }
                 }
         }

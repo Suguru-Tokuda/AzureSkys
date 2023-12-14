@@ -21,6 +21,7 @@ struct StatusGridCellView: View {
                 Text(value)
                     .withStatusGridViewValueLabelModifier()
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 5)
                 Spacer()
             }
         }

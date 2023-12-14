@@ -62,7 +62,9 @@ struct LocationViewCell: View {
                     }
                     
                     Spacer()
-                    HighLowTemperatures(maxTemp: vm.currentForecast?.main.tempMax ?? 0, minTemp: vm.currentForecast?.main.tempMin ?? 0)
+                    if let currentForecast = vm.currentForecast {
+                        HighLowTemperatures(maxTemp: currentForecast.main.tempMax, minTemp: currentForecast.main.tempMin)
+                    }
                 }
                 .font(.caption)
                 .fontWeight(.semibold)

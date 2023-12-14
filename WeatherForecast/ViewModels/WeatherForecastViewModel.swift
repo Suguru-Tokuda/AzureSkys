@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import Combine
 import MapKit
 
@@ -18,6 +19,7 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var isErrorOccured = false
     @Published var customError: Error?
     @Published var locationAuthorized: Bool = false
+    @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)
 
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
@@ -81,6 +83,7 @@ class WeatherForecastViewModel: ObservableObject {
                 
                 if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
                     self.forecast = forecastRes
+                    self.setBackgroundColor()
                 }
                 
                 if let geocodeRes = res[1] as? [WeatherGeocode],
@@ -113,11 +116,12 @@ class WeatherForecastViewModel: ObservableObject {
             do {
                 async let forecast = networkManager.getDataWithAsync(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
                 async let geocode = networkManager.getDataWithAsync(url: geocodeUrl, type: [WeatherGeocode].self)
-                
+
                 let res: [Any] = try await [forecast, geocode]
                 
                 if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
                     self.forecast = forecastRes
+                    self.setBackgroundColor()
                 }
                 
                 if let geocodeRes = res[1] as? [WeatherGeocode],
@@ -150,6 +154,13 @@ class WeatherForecastViewModel: ObservableObject {
         }
         
         isErrorOccured = true
+    }
+    
+    private func setBackgroundColor() {
+        if let forecast,
+           let weather = forecast.current.weather.first {
+            self.background = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
+        }
     }
     
     /**
@@ -214,6 +225,5 @@ class WeatherForecastViewModel: ObservableObject {
         }
         
         let sqlitePath = url.appendingPathComponent("WeatherCoreData")
-        print(sqlitePath.absoluteString)
     }
 }

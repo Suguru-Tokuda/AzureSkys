@@ -14,7 +14,7 @@ struct PreviewManager {
         longitude: -84.3877,
         timezone: "America/New_York",
         timezoneOffset: -18000,
-        current: Forecast(dateTime: 1702388652, sunrise: 1702384375, sunset: 1702420180, temp: 273.19, feelsLike: 269.21, pressure: 1032, humidity: 76, dewPoint: 269.89, uvi: 0.44, clouds: 0, visibility: 10000, windSpeed: 3.6, windDeg: 40, windGust: nil, weather: [Weather(id: 800, main: "Clear", description: "clear sky", icon: "01d", partOfDay: .day, weatherCondition: .clear)], probabilityOfPrecipitation: nil),
+        current: Forecast(dateTime: 1702388652, sunrise: 1702384375, sunset: 1702420180, temp: 273.19, feelsLike: 269.21, pressure: 1032, humidity: 76, dewPoint: 269.89, uvi: 0.44, clouds: 0, visibility: 10000, windSpeed: 3.6, windDeg: 40, windGust: 1.32, weather: [Weather(id: 800, main: "Clear", description: "clear sky", icon: "01d", partOfDay: .day, weatherCondition: .clear)], probabilityOfPrecipitation: nil),
         hourly: [
             Forecast(dateTime: 1702386000, sunrise: nil, sunset: nil, temp: 273.78, feelsLike: 272.18, pressure: 1032, humidity: 72, dewPoint: 269.76, uvi: 0, clouds: 0, visibility: 10000, windSpeed: 1.46, windDeg: 42, windGust: 3.77, weather: [Weather(id: 800, main: "Clear", description: "clear sky", icon: "01d", partOfDay: .day, weatherCondition: .clear)], probabilityOfPrecipitation: 0),
             Forecast(dateTime: 1702386000, sunrise: nil, sunset: nil, temp: 273.78, feelsLike: 272.18, pressure: 1032, humidity: 72, dewPoint: 269.76, uvi: 0, clouds: 0, visibility: 10000, windSpeed: 1.46, windDeg: 42, windGust: 3.77, weather: [Weather(id: 800, main: "Clear", description: "clear sky", icon: "01d", partOfDay: .day, weatherCondition: .clear)], probabilityOfPrecipitation: 0),
@@ -233,10 +233,15 @@ struct PreviewManager {
     ]
     
     static let placeDetails: GooglePlaceDetails = GooglePlaceDetails(
-        id: "ChIJG2mX3o3QDIgRz791tEd49TA",
+        id: "ChIJ7cv00DwsDogRAMDACa2m4K8",
         formattedAddress: "Chicago, IL, USA",
         geometry: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)),
         name: "Chicago",
-        addressComponents: []
+        addressComponents: [
+            GoolePlaceAddressComponent(longName: "Chicago", shortName: "Chicago", types: ["locality", "political"]),
+            GoolePlaceAddressComponent(longName: "Cook County", shortName: "Cook County", types: ["dministrative_area_level_2", "political"]),
+            GoolePlaceAddressComponent(longName: "Illinois", shortName: "IL", types: ["dministrative_area_level_1", "political"]),
+            GoolePlaceAddressComponent(longName: "United State", shortName: "US", types: ["country", "political"])
+        ]
     )
 }

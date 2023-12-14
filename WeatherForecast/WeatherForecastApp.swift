@@ -16,6 +16,16 @@ struct WeatherForecastApp: App {
     init() {
         _locationManager = StateObject(wrappedValue: LocationManager())
         _mainCoordinator = StateObject(wrappedValue: MainCoordinator())
+        
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithOpaqueBackground()
+        coloredAppearance.backgroundColor = .clear
+        
+        UINavigationBar.appearance().barTintColor = .clear
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
+        UINavigationBar.appearance().tintColor = .white
     }
 
     var body: some Scene {

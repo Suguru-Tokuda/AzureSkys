@@ -33,16 +33,16 @@ struct Forecast: Decodable, Identifiable {
     let sunrise: Int?
     let sunset: Int?
     let temp: Double
-    let feelsLike: Double?
+    let feelsLike: Double
     let pressure: Int?
     let humidity: Int?
     let dewPoint: Double?
     let uvi: Float?
     let clouds: Int?
     let visibility: Int?
-    let windSpeed: Float?
+    let windSpeed: Double
     let windDeg: Int?
-    let windGust: Float?
+    let windGust: Double?
     let weather: [Weather]
     let probabilityOfPrecipitation: Float?
     

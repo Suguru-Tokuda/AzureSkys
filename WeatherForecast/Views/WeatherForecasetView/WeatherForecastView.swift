@@ -24,102 +24,121 @@ struct WeatherForecastView: View {
     
     var body: some View {
         ZStack {
-            if let forecast = vm.forecast?.current,
-               let weather = forecast.weather.first {
-                weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
-                    .ignoresSafeArea()
-            }
-            VStack {
-                if showTopActionBar {
-                    WeatherForecastAddHeaderView(cancelBtnTapped: {
-                        dismiss()
-                    },
-                    addBtnTapped: {
-                        vm.addPlace(place: place) { result in
-                            switch result {
-                            case .success(let added):
-                                if added == true {
-                                    dismiss()
-                                    onLocationAdded?()
-                                }
-                                break
-                            case .failure(_):
-                                break
-                            }
-                        }
-                    })
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                } else {
-                    Spacer()
-                }
-                Spacer(
-                )
-            }
-            .zIndex(2.0)
-            if !vm.isLoading {
-                ScrollView {
-                    if let geocode = vm.geocode,
-                       let forecast = vm.forecast
-                    {
-                        VStack {
-                            WeatherForecastHeaderView(geocode: geocode, currentForecast: forecast.current,
-                                dailyForecast: forecast.daily[0],
-                                isMyLocation: coordinator.place == nil
-                            )
-                            WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
-                            WeatherDailyForecastListView(list: forecast.daily)
-                        }
-                        .padding(.top, 50)
-                        .padding(.horizontal, 20)
-                    }
-                }
+            vm.background.ignoresSafeArea(edges: .all)
+            
+            if vm.locationAuthorized {
+                locationAuthorizedView()
             } else {
-                ProgressView("Loading...")
+                LocationAuthorizationRequestView()
             }
-        }
-        .toolbar {
-            if !showTopActionBar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    Button(action: {
-                        coordinator.goToLocations()
-                    }, label: {
-                        Image(systemName: "list.bullet")
-                    })
-                    .fullScreenCover(
-                        isPresented: $coordinator.showLocationsFullScreenSheet
-                    ) {
-                        LocationsView() { place in
-                            coordinator.setPlace(place: place)
-                            Task {
-                                if let place {
-                                    await vm.getWeatherForecastData(place: place)
-                                } else {
-                                    await vm.getWeatherForecastData()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            
+            footer()
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
         }
         .task {
-            if let place {
+            if let place,
+               vm.locationAuthorized {
                 await vm.getWeatherForecastData(place: place)
             }
         }
-        .refreshable {
-            Task {
-                if let place {
-                    await vm.getWeatherForecastData(place: place)
-                } else {
-                    await vm.getWeatherForecastData()
+    }
+}
+
+extension WeatherForecastView {
+    @ViewBuilder func locationAuthorizedView() -> some View {
+        VStack {
+            if showTopActionBar {
+                WeatherForecastAddHeaderView(cancelBtnTapped: {
+                    dismiss()
+                },
+                addBtnTapped: {
+                    vm.addPlace(place: place) { result in
+                        switch result {
+                        case .success(let added):
+                            if added == true {
+                                dismiss()
+                                onLocationAdded?()
+                            }
+                            break
+                        case .failure(_):
+                            break
+                        }
+                    }
+                })
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+            } else {
+                Spacer()
+            }
+            Spacer()
+        }
+            .zIndex(2.0)
+        
+        if !vm.isLoading {
+            GeometryReader { reader in
+                ScrollView {
+                    if let geocode = vm.geocode,
+                       let forecast = vm.forecast
+                    {
+                        mainView(forecast: forecast, geocode: geocode, parentViewWidth: reader.size.width)
+                        .padding(.top, 50)
+                        .padding(.bottom, 50)
+                        .padding(.horizontal, 20)
+                    }
                 }
             }
+            .refreshable {
+                Task {
+                    if let place {
+                        await vm.getWeatherForecastData(place: place)
+                    } else {
+                        await vm.getWeatherForecastData()
+                    }
+                }
+            }
+        } else {
+            ProgressView("Loading...")
+        }
+    }
+    
+    @ViewBuilder func mainView(forecast: WeatherForecastOneCallResponse, geocode: WeatherGeocode, parentViewWidth: CGFloat) -> some View {
+        VStack {
+            WeatherForecastHeaderView(geocode: geocode, currentForecast: forecast.current,
+                dailyForecast: forecast.daily[0],
+                isMyLocation: coordinator.place == nil
+            )
+            WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
+            WeatherDailyForecastListView(list: forecast.daily)
+            if let weather = forecast.current.weather.first {
+                StatusGridView(
+                    forecast: forecast.current,
+                    background: weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay),
+                    parentViewWidth: parentViewWidth
+                )
+            }
+        }
+    }
+    
+    @ViewBuilder func footer() -> some View {
+        if !showTopActionBar && vm.locationAuthorized {
+            // MARK: Tab Bar
+            WeatherForecastBottomBar(background: vm.background)
+                .fullScreenCover(
+                    isPresented: $coordinator.showLocationsFullScreenSheet
+                ) {
+                    LocationsView() { place in
+                        coordinator.setPlace(place: place)
+                        Task {
+                            if let place {
+                                await vm.getWeatherForecastData(place: place)
+                            } else {
+                                await vm.getWeatherForecastData()
+                            }
+                        }
+                    }
+                }
         }
     }
 }

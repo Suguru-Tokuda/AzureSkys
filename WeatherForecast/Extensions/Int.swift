@@ -29,4 +29,8 @@ extension Int {
             
         return dateFormatter.string(from: date)
     }
+    
+    func toMiles() -> Int {
+        return Int(Double(self) / 1609.44)
+    }
 }

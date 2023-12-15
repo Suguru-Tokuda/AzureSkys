@@ -16,14 +16,7 @@ struct WeatherThreeHourlyForecastListViewCell: View {
         VStack {
             Text(isFirst ? "Now" : forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat).getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
             if let weather = forecast.weather.first {
-                AsyncImage(url: URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: weather.icon))) { img in
-                    img
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                } placeholder: {
-                    ProgressView()
-                        .frame(width: 40, height: 40)
-                }
+                WeatherImageView(icon: weather.icon, width: 40)
             }
             Text("\(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
         }
@@ -35,5 +28,6 @@ struct WeatherThreeHourlyForecastListViewCell: View {
     WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.oneCallResponse.current,
                                            isFirst: false
     )
+        .environmentObject(LocalFileManager())
         .preferredColorScheme(.dark)
 }

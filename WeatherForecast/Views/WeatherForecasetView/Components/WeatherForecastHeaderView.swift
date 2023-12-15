@@ -13,6 +13,7 @@ struct WeatherForecastHeaderView: View {
     var currentForecast: Forecast
     var dailyForecast: DailyForecast
     var isMyLocation: Bool = false
+    var scrollViewOffsetPercentage: CGFloat
     
     var body: some View {
         VStack(alignment: .center, spacing: -10) {
@@ -48,7 +49,8 @@ struct WeatherForecastHeaderView: View {
     WeatherForecastHeaderView(
         geocode: PreviewManager.geocode,
         currentForecast: PreviewManager.oneCallResponse.current,
-        dailyForecast: PreviewManager.oneCallResponse.daily.first!
+        dailyForecast: PreviewManager.oneCallResponse.daily.first!,
+        scrollViewOffsetPercentage: .zero
     )
     .preferredColorScheme(.dark)
 }

@@ -19,15 +19,7 @@ struct WeatherDailyForecastListCellView: View {
                     .foregroundStyle(.white)
                     .frame(width: 50, alignment: .leading)
                 if let weather = forecast.weather.first {
-                    AsyncImage(url: URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: weather.icon))) { img in
-                        img
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .foregroundStyle(.yellow)
-                    } placeholder: {
-                        ProgressView()
-                            .frame(width: 40, height: 40)
-                    }
+                    WeatherImageView(icon: weather.icon, width: 40)
                 }
                 Text("\(forecast.temp.min.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white.opacity(0.5))
@@ -44,5 +36,6 @@ struct WeatherDailyForecastListCellView: View {
 
 #Preview {
     WeatherDailyForecastListCellView(forecast: PreviewManager.oneCallResponse.daily.first!)
+        .environmentObject(LocalFileManager())
         .preferredColorScheme(.dark)
 }

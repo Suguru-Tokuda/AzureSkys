@@ -12,9 +12,11 @@ struct WeatherForecastView: View {
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.dismiss) var dismiss: DismissAction
     @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
+    @State var scrollViewOffset: CGFloat = .zero
     var place: GooglePlaceDetails?
     var showTopActionBar: Bool = false
     var onLocationAdded: (() -> ())?
+    var coordinateSpaceName = "weatherScroll"
         
     init(place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
         self.place = place
@@ -27,7 +29,7 @@ struct WeatherForecastView: View {
             vm.background.ignoresSafeArea(edges: .all)
             
             if vm.locationAuthorized {
-                locationAuthorizedView()
+                forecastView()
             } else {
                 LocationAuthorizationRequestView()
             }
@@ -47,7 +49,7 @@ struct WeatherForecastView: View {
 }
 
 extension WeatherForecastView {
-    @ViewBuilder func locationAuthorizedView() -> some View {
+    @ViewBuilder func forecastView() -> some View {
         VStack {
             if showTopActionBar {
                 WeatherForecastAddHeaderView(cancelBtnTapped: {
@@ -77,17 +79,23 @@ extension WeatherForecastView {
             .zIndex(2.0)
         
         if !vm.isLoading {
-            GeometryReader { reader in
+            GeometryReader { geometry in
                 ScrollView {
                     if let geocode = vm.geocode,
                        let forecast = vm.forecast
                     {
-                        mainView(forecast: forecast, geocode: geocode, parentViewWidth: reader.size.width)
-                        .padding(.top, 50)
-                        .padding(.bottom, 50)
-                        .padding(.horizontal, 20)
+                        mainView(forecast: forecast, geocode: geocode, parentViewWidth: geometry.size.width)
+                            .padding(.top, 50)
+                            .padding(.bottom, 50)
+                            .padding(.horizontal, 20)
+                            .background(GeometryReader {
+                                Color.clear.preference(key: ViewOffsetKey.self, value: -$0.frame(in: .named(coordinateSpaceName)).origin.y)
+                            })
+                            .onPreferenceChange(ViewOffsetKey.self) {
+                                self.scrollViewOffset = $0
+                            }
                     }
-                }
+                }.coordinateSpace(name: coordinateSpaceName)
             }
             .refreshable {
                 Task {
@@ -105,12 +113,18 @@ extension WeatherForecastView {
     
     @ViewBuilder func mainView(forecast: WeatherForecastOneCallResponse, geocode: WeatherGeocode, parentViewWidth: CGFloat) -> some View {
         VStack {
-            WeatherForecastHeaderView(geocode: geocode, currentForecast: forecast.current,
+            WeatherForecastHeaderView(
+                geocode: geocode,
+                currentForecast: forecast.current,
                 dailyForecast: forecast.daily[0],
-                isMyLocation: coordinator.place == nil
+                isMyLocation: coordinator.place == nil,
+                scrollViewOffsetPercentage: .zero
             )
+            
             WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
+            
             WeatherDailyForecastListView(list: forecast.daily)
+            
             if let weather = forecast.current.weather.first {
                 StatusGridView(
                     forecast: forecast.current,
@@ -150,6 +164,7 @@ extension WeatherForecastView {
         .preferredColorScheme(.dark)
         .environmentObject(MainCoordinator())
         .environmentObject(LocationManager())
+        .environmentObject(LocalFileManager())
 }
 
 //#Preview {

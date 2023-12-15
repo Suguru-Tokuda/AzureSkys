@@ -11,21 +11,13 @@ import SwiftUI
 struct WeatherForecastApp: App {
     @StateObject var locationManager: LocationManager
     @StateObject var mainCoordinator: MainCoordinator
+    @StateObject var fileManager: LocalFileManager
     let persistenceController = PersistenceController.shared
     
     init() {
         _locationManager = StateObject(wrappedValue: LocationManager())
         _mainCoordinator = StateObject(wrappedValue: MainCoordinator())
-        
-        let coloredAppearance = UINavigationBarAppearance()
-        coloredAppearance.configureWithOpaqueBackground()
-        coloredAppearance.backgroundColor = .clear
-        
-        UINavigationBar.appearance().barTintColor = .clear
-        UINavigationBar.appearance().standardAppearance = coloredAppearance
-        UINavigationBar.appearance().compactAppearance = coloredAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
-        UINavigationBar.appearance().tintColor = .white
+        _fileManager = StateObject(wrappedValue: LocalFileManager())
     }
 
     var body: some Scene {
@@ -33,6 +25,7 @@ struct WeatherForecastApp: App {
             ContentView()
                 .environmentObject(locationManager)
                 .environmentObject(mainCoordinator)
+                .environmentObject(fileManager)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

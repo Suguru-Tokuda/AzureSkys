@@ -50,14 +50,7 @@ struct LocationViewCell: View {
                         Text(vm.currentForecast?.weather.first?.main ?? "-")
                         if let currentForecast = vm.currentForecast,
                            let weather = currentForecast.weather.first {
-                            AsyncImage(url: URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: weather.icon))) { img in
-                                img
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                
-                            } placeholder: {
-                                ProgressView()
-                            }
+                            WeatherImageView(icon: weather.icon, width: 20)
                         }
                     }
                     
@@ -97,5 +90,6 @@ struct LocationViewCell: View {
 #Preview {
     LocationViewCell(isMyLocation: true)
         .environmentObject(LocationManager())
+        .environmentObject(LocalFileManager())
         .preferredColorScheme(.dark)
 }

@@ -16,7 +16,6 @@ struct WeatherDailyForecastListCellView: View {
                 .blur(radius: 3.0, opaque: false)
             HStack(alignment: .center, spacing: 20) {
                 Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
-                    .foregroundStyle(.white)
                     .frame(width: 50, alignment: .leading)
                 if let weather = forecast.weather.first {
                     WeatherImageView(icon: weather.icon, width: 40)
@@ -26,7 +25,6 @@ struct WeatherDailyForecastListCellView: View {
                 TempBarView(currentTemp: 0, minTemp: forecast.temp.min, maxTemp: forecast.temp.max, height: 5)
                     .padding(.top, 18)
                 Text("\(forecast.temp.max.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
-                    .foregroundStyle(.white)
             }
             .padding(10)
             .fontWeight(.semibold)

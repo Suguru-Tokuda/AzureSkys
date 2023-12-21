@@ -14,7 +14,7 @@ struct WeatherDailyForecastListCellView: View {
         ZStack {
             Color.clear
                 .blur(radius: 3.0, opaque: false)
-            HStack(spacing: 20) {
+            HStack(alignment: .center, spacing: 20) {
                 Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
                     .foregroundStyle(.white)
                     .frame(width: 50, alignment: .leading)
@@ -23,7 +23,8 @@ struct WeatherDailyForecastListCellView: View {
                 }
                 Text("\(forecast.temp.min.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white.opacity(0.5))
-                Spacer()
+                TempBarView(currentTemp: 0, minTemp: forecast.temp.min, maxTemp: forecast.temp.max, height: 5)
+                    .padding(.top, 18)
                 Text("\(forecast.temp.max.kelvinToFahrenheight().formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white)
             }

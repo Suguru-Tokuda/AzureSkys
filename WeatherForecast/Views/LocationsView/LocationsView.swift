@@ -125,4 +125,5 @@ extension LocationsView {
         .preferredColorScheme(.dark)
         .environmentObject(LocationManager())
         .environmentObject(MainCoordinator())
+        .environmentObject(LocalFileManager())
 }

@@ -13,7 +13,7 @@ struct TempBarView: View {
     var maxTemp: Double
     var showCurentTemp: Bool = false
         
-    var cornerRadius: CGFloat = 30
+    var cornerRadius: CGFloat = 50
     var height: CGFloat = 7
     @State var tempGradientColor: LinearGradient?
     @State var colorSet = false

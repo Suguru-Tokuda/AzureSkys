@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LocationViewCell: View {
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     @EnvironmentObject var locationManager: LocationManager
     @StateObject var vm: CurrentWeatherForecastViewModel = CurrentWeatherForecastViewModel()
     var place: GooglePlaceDetails?

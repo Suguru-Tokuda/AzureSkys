@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeatherThreeHourlyForecastListViewCell: View {
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: Forecast
     var isFirst: Bool
     

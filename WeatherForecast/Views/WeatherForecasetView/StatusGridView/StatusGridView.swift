@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatusGridView: View {
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: Forecast
     var background: LinearGradient
     var parentViewWidth: CGFloat

@@ -12,7 +12,7 @@ struct LocationsView: View {
     @StateObject var vm: LocationForecastViewModel = LocationForecastViewModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissSearch) private var dismissSearch
-    @AppStorage(AppStorageKeys.tempScale) private var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
     @State var searchBarPresented = false
     var onDismiss: ((GooglePlaceDetails?) -> Void)?
     

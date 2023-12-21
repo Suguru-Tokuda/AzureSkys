@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HighLowTemperatures: View {
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var maxTemp: Double
     var minTemp: Double
     

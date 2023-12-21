@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeatherForecastHeaderView: View {
-    @AppStorage(AppStorageKeys.tempScale) var tempScale: TempScale = .fahrenheit
+    @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var geocode: WeatherGeocode
     var currentForecast: Forecast
     var dailyForecast: DailyForecast

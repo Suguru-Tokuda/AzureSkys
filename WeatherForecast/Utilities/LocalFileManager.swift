@@ -5,7 +5,7 @@
 //  Created by Suguru Tokuda on 12/15/23.
 //
 
-import SwiftUI
+import UIKit
 
 protocol LocalFileManaging {
     func saveImage(image: UIImage, name: String) throws

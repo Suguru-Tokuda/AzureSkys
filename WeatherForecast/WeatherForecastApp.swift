@@ -12,6 +12,7 @@ struct WeatherForecastApp: App {
     @StateObject var locationManager: LocationManager
     @StateObject var mainCoordinator: MainCoordinator
     @StateObject var fileManager: LocalFileManager
+//    let settingsManager: SettingsManager = SettingsManager()
     let persistenceController = PersistenceController.shared
     
     init() {

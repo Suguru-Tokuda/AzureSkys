@@ -8,11 +8,21 @@
 import SwiftUI
 
 struct TempBarView: View {
+    var currentTemp: Double
+    var minTemp: Double
+    var maxTemp: Double
+    var showCurentTemp: Bool = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            RoundedRectangle(cornerRadius: 30)
+                .fill(.black.opacity(0.4))
+                .frame(height: 7)
+        }
+        .padding()
     }
 }
 
 #Preview {
-    TempBarView()
+    TempBarView(currentTemp: 289.32, minTemp: 285.78, maxTemp: 292.26)
 }

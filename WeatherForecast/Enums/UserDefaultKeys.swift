@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+enum UserDefaultKeys: String {
+    case tempScale = "tempScale"
+}

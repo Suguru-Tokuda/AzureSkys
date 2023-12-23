@@ -80,8 +80,8 @@ class WeatherForecastViewModel: ObservableObject {
             isLoading = true
             
             do {
-                async let forecast = networkManager.getDataWithAsync(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
-                async let geocode = networkManager.getDataWithAsync(url: geocodeUrl, type: [WeatherGeocode].self)
+                async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
+                async let geocode = networkManager.getData(url: geocodeUrl, type: [WeatherGeocode].self)
                 
                 let res: [Any] = try await [forecast, geocode]
                 
@@ -120,8 +120,8 @@ class WeatherForecastViewModel: ObservableObject {
             self.isLoading = true
             
             do {
-                async let forecast = networkManager.getDataWithAsync(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
-                async let geocode = networkManager.getDataWithAsync(url: geocodeUrl, type: [WeatherGeocode].self)
+                async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
+                async let geocode = networkManager.getData(url: geocodeUrl, type: [WeatherGeocode].self)
 
                 let res: [Any] = try await [forecast, geocode]
                 

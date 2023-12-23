@@ -10,12 +10,12 @@ import Combine
 
 protocol Networking {
     func getData<T: Decodable>(url: URL, type: T.Type) -> AnyPublisher<T, Error>
-    func getDataWithClosure<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void)
-    func getDataWithAsync<T: Decodable>(url: URL?, type: T.Type) async throws -> T
+    func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void)
+    func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T
 }
 
 class NetworkManager: Networking {
-    func getDataWithClosure<T>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) where T : Decodable {
+    func getData<T>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) where T : Decodable {
         guard let url else {
             completionHandler(.failure(NetworkError.badUrl))
             return
@@ -39,7 +39,7 @@ class NetworkManager: Networking {
         .resume()
     }
     
-    func getDataWithAsync<T>(url: URL?, type: T.Type) async throws -> T where T : Decodable {
+    func getData<T>(url: URL?, type: T.Type) async throws -> T where T : Decodable {
         guard let url else { throw NetworkError.badUrl }
         
         do {

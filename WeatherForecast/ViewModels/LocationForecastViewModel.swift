@@ -56,7 +56,7 @@ class LocationForecastViewModel: ObservableObject {
             isLoading = true
             
             do {
-                let res = try await self.networkManager.getDataWithAsync(url: url, type: GoogleAutoCompleteModel.self)
+                let res = try await self.networkManager.getData(url: url, type: GoogleAutoCompleteModel.self)
                 
                 self.predictions = res.predictions ?? []
                 self.isLoading = false
@@ -79,7 +79,7 @@ class LocationForecastViewModel: ObservableObject {
             gettingDetails = true
             
             do {
-                let res = try await self.networkManager.getDataWithAsync(url: url, type: GooglePlaceDetailsResponse.self)
+                let res = try await self.networkManager.getData(url: url, type: GooglePlaceDetailsResponse.self)
                 
                 self.gettingDetails = false
                 return res.result

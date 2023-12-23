@@ -73,7 +73,7 @@ extension LocationSearchViewModel {
         }
         
         do {
-            let res = try await networkManager.getDataWithAsync(url: url, type: GooglePlaceDetailsResponse.self)
+            let res = try await networkManager.getData(url: url, type: GooglePlaceDetailsResponse.self)
             return res.result
         } catch {
             if let error = error as? NetworkError {

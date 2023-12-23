@@ -67,7 +67,10 @@
 		BB9064392B226AAD00F16123 /* LocationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9064382B226AAD00F16123 /* LocationsViewModel.swift */; };
 		BB90643B2B226EBB00F16123 /* CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90643A2B226EBB00F16123 /* CoreDataError.swift */; };
 		BB90644E2B2358F800F16123 /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90644D2B2358F800F16123 /* UIApplication.swift */; };
-		BB9064502B23688400F16123 /* ApiKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB90644F2B23688400F16123 /* ApiKeys.swift */; };
+		BB983B862B370B5700161C26 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB983B852B370B5700161C26 /* ApiKeys.plist */; };
+		BB983B882B370BEB00161C26 /* ApiKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB983B872B370BEB00161C26 /* ApiKeyManager.swift */; };
+		BB983B8A2B370DF400161C26 /* ApiKeyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB983B892B370DF400161C26 /* ApiKeyModel.swift */; };
+		BB983B8C2B370E9900161C26 /* PlistError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB983B8B2B370E9900161C26 /* PlistError.swift */; };
 		BB9B8DCD2B33B94200CE9861 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9B8DCC2B33B94200CE9861 /* SettingsManager.swift */; };
 		BB9B8DCF2B33BECA00CE9861 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9B8DCE2B33BECA00CE9861 /* UserDefaultKeys.swift */; };
 		BBC1A3A82B2CA0BE00948E62 /* LocalFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC1A3A72B2CA0BE00948E62 /* LocalFileManager.swift */; };
@@ -144,7 +147,10 @@
 		BB9064382B226AAD00F16123 /* LocationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsViewModel.swift; sourceTree = "<group>"; };
 		BB90643A2B226EBB00F16123 /* CoreDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataError.swift; sourceTree = "<group>"; };
 		BB90644D2B2358F800F16123 /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
-		BB90644F2B23688400F16123 /* ApiKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeys.swift; sourceTree = "<group>"; };
+		BB983B852B370B5700161C26 /* ApiKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ApiKeys.plist; sourceTree = "<group>"; };
+		BB983B872B370BEB00161C26 /* ApiKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyManager.swift; sourceTree = "<group>"; };
+		BB983B892B370DF400161C26 /* ApiKeyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyModel.swift; sourceTree = "<group>"; };
+		BB983B8B2B370E9900161C26 /* PlistError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlistError.swift; sourceTree = "<group>"; };
 		BB9B8DCC2B33B94200CE9861 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		BB9B8DCE2B33BECA00CE9861 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
 		BBC1A3A72B2CA0BE00948E62 /* LocalFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFileManager.swift; sourceTree = "<group>"; };
@@ -280,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				BB537C102B2B5082006BE03C /* Settings.bundle */,
+				BB983B852B370B5700161C26 /* ApiKeys.plist */,
 				BB0C60CA2B1FB91B00359F7D /* ContentView.swift */,
 				BB88625B2B1500F300EE56B1 /* WeatherForecastApp.swift */,
 				BB88625F2B1500F400EE56B1 /* Assets.xcassets */,
@@ -314,7 +321,6 @@
 		BB8862692B1500FA00EE56B1 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				BB90644F2B23688400F16123 /* ApiKeys.swift */,
 				BB88626F2B1501D500EE56B1 /* Constants.swift */,
 				BBC1A3A72B2CA0BE00948E62 /* LocalFileManager.swift */,
 				BB8862722B15029C00EE56B1 /* LocationManager.swift */,
@@ -322,6 +328,7 @@
 				BB9064362B22579E00F16123 /* PlaceCoreDataManager.swift */,
 				BB88627D2B15424500EE56B1 /* PreviewManager.swift */,
 				BB9B8DCC2B33B94200CE9861 /* SettingsManager.swift */,
+				BB983B872B370BEB00161C26 /* ApiKeyManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -335,6 +342,7 @@
 				BB90641B2B21FF3300F16123 /* WeatherForecastCurrentResponse.swift */,
 				BB7EBC8B2B28977200978174 /* WeatherForecastOneCallResponse.swift */,
 				BB7EBC8D2B289CDA00978174 /* WeatherGeocode.swift */,
+				BB983B892B370DF400161C26 /* ApiKeyModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -374,6 +382,7 @@
 				BBC1A3A92B2CA25800948E62 /* FileManagerError.swift */,
 				BBC1A3B02B2CBF7A00948E62 /* TempColor.swift */,
 				BB9B8DCE2B33BECA00CE9861 /* UserDefaultKeys.swift */,
+				BB983B8B2B370E9900161C26 /* PlistError.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -505,6 +514,7 @@
 				BB537C112B2B5082006BE03C /* Settings.bundle in Resources */,
 				BB0C60982B1E4FE200359F7D /* previewWeatherData.json in Resources */,
 				BB8862602B1500F400EE56B1 /* Assets.xcassets in Resources */,
+				BB983B862B370B5700161C26 /* ApiKeys.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +525,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB983B8A2B370DF400161C26 /* ApiKeyModel.swift in Sources */,
 				BB0C60C72B1FAEBF00359F7D /* WeatherForecastAddHeaderView.swift in Sources */,
 				BB537C142B2B66DA006BE03C /* ViewOffsetKey.swift in Sources */,
 				BB88629C2B166AA900EE56B1 /* WeatherForecastView.swift in Sources */,
@@ -557,7 +568,6 @@
 				BB0C60CB2B1FB91B00359F7D /* ContentView.swift in Sources */,
 				BBD8350D2B2A2E6A00630B99 /* StatusGridViewValueLabelModifier.swift in Sources */,
 				BB8862802B16231E00EE56B1 /* LocationSearchViewModel.swift in Sources */,
-				BB9064502B23688400F16123 /* ApiKeys.swift in Sources */,
 				BB0C60CD2B1FBDD400359F7D /* LocationViewCell.swift in Sources */,
 				BBD8350F2B2A2F8700630B99 /* StatusGridView.swift in Sources */,
 				BB7EBC882B27B74200978174 /* WindStatusGridViewCell.swift in Sources */,
@@ -569,6 +579,7 @@
 				BB7EBC8C2B28977200978174 /* WeatherForecastOneCallResponse.swift in Sources */,
 				BB8862922B16669200EE56B1 /* WeatherDailyForecastListView.swift in Sources */,
 				BBC1A3AF2B2CB94E00948E62 /* TempBarView.swift in Sources */,
+				BB983B8C2B370E9900161C26 /* PlistError.swift in Sources */,
 				BB88629A2B1668DB00EE56B1 /* PreviewDataManager.swift in Sources */,
 				BB90644E2B2358F800F16123 /* UIApplication.swift in Sources */,
 				BBC1A3AA2B2CA25800948E62 /* FileManagerError.swift in Sources */,
@@ -576,6 +587,7 @@
 				BBC1A3B12B2CBF7A00948E62 /* TempColor.swift in Sources */,
 				BB7EBC862B27B10100978174 /* StatusGridCellView.swift in Sources */,
 				BB9B8DCD2B33B94200CE9861 /* SettingsManager.swift in Sources */,
+				BB983B882B370BEB00161C26 /* ApiKeyManager.swift in Sources */,
 				BB1A22DE2B1FF898000A723E /* LocationForecastViewModel.swift in Sources */,
 				BB7EBC812B27ACFF00978174 /* Blur.swift in Sources */,
 				BB9064212B22038100F16123 /* CurrentWeatherForecastViewModel.swift in Sources */,

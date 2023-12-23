@@ -20,9 +20,11 @@ class LocationForecastViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
     
     let networkManager: NetworkManager
+    let apiKeyManager: ApiKeyActions
     
-    init(networkManager: NetworkManager = NetworkManager()) {
+    init(networkManager: NetworkManager = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
+        self.apiKeyManager = apiKeyManager
         self.addSubscriptions()
     }
     
@@ -44,7 +46,8 @@ class LocationForecastViewModel: ObservableObject {
     
     func getPredictions(searchText: String) async {
         if !searchText.isEmpty && !isLoading {
-            guard let url = URL(string: getGooglePlacesPrediction(searchText: searchText)) else {
+            guard let urlStr = getGooglePlacesPrediction(searchText: searchText),
+                  let url = URL(string: urlStr) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -66,7 +69,8 @@ class LocationForecastViewModel: ObservableObject {
     
     func getPlaceDetails(placeId: String) async -> GooglePlaceDetails? {
         if !gettingDetails {
-            guard let url = URL(string: getGoogleDetailsURL(placeId: placeId)) else {
+            guard let urlStr = getGoogleDetailsURL(placeId: placeId),
+                  let url = URL(string: urlStr) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return nil
@@ -108,13 +112,13 @@ class LocationForecastViewModel: ObservableObject {
         isErrorOccured = true
     }
     
-    private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = ApiKeys.googleApiKey) -> String {
-        let retVal = "\(endPoint)autocomplete/json?input=\(searchText.replacingOccurrences(of: " ", with: "+"))&types=%28cities%29&fields=place_id%29description&key=\(apiKey)"
-        return retVal
+    private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL) -> String? {
+        guard let apiKey = try? apiKeyManager.getGoogleApiKey() else { return nil }
+        return "\(endPoint)autocomplete/json?input=\(searchText.replacingOccurrences(of: " ", with: "+"))&types=%28cities%29&fields=place_id%29description&key=\(apiKey)"
     }
     
-    private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL, apiKey: String = ApiKeys.googleApiKey) -> String {
-        let retVal = "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(apiKey)"
-        return retVal
+    private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL) -> String? {
+        guard let apiKey = try? apiKeyManager.getGoogleApiKey() else { return nil }
+        return "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(apiKey)"
     }
 }

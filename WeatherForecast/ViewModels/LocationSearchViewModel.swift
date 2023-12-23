@@ -19,10 +19,12 @@ class LocationSearchViewModel: ObservableObject {
     
     var networkManager: Networking
     var locationManager: LocationManager
+    var apiKeyManager: ApiKeyActions
     
-    init(networkManager: Networking = NetworkManager(), locationManager: LocationManager = LocationManager()) {
+    init(networkManager: Networking = NetworkManager(), locationManager: LocationManager = LocationManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
         self.locationManager = locationManager
+        self.apiKeyManager = apiKeyManager
     }
     
     func addSubscriptions() {
@@ -40,8 +42,8 @@ class LocationSearchViewModel: ObservableObject {
 // api functions
 extension LocationSearchViewModel {
     func getAutoCompletePlaces(query: String) {
-        let urlStr = "\(Constants.googleApiBaseURL)autocomplete/json?input=\(query)&type=%28cities%29&key=\(ApiKeys.googleApiKey)"
-        guard let url = URL(string: urlStr) else { return }
+        guard let apiKey = try? apiKeyManager.getGoogleApiKey(),
+              let url = URL(string: "\(Constants.googleApiBaseURL)autocomplete/json?input=\(query)&type=%28cities%29&key=\(apiKey)") else { return }
         
         self.isLoading = true
         
@@ -65,8 +67,8 @@ extension LocationSearchViewModel {
     }
     
     private func getPlaceDetails(placeId: String) async throws -> GooglePlaceDetails {
-        let urlStr = "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(ApiKeys.googleApiKey)"
-        guard let url = URL(string: urlStr) else {
+        guard let apiKey = try? apiKeyManager.getGoogleApiKey(),
+              let url = URL(string: "\(Constants.googleApiBaseURL)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(apiKey)") else {
             throw NetworkError.badUrl
         }
         

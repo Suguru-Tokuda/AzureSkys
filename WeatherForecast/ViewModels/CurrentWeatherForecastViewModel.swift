@@ -23,10 +23,12 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
     
     var networkManager: Networking
+    var apiKeyManager: ApiKeyActions
     var locationManager: LocationManager?
     
-    init(networkManager: Networking = NetworkManager()) {
+    init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
+        self.apiKeyManager = apiKeyManager
     }
     
     deinit {
@@ -65,7 +67,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     func getCurrentWeatherDataWithCurrentLocation(urlString: String = Constants.weatherApiEndpoint) async {
         if let currentLocation,
            !isLoading {
-            guard let url = URL(string: getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate)) else {
+            
+            guard let urlStr = getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate),
+                  let url = URL(string: urlStr) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -91,7 +95,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     func getCurrentWeatherDataWithCityData(urlString: String = Constants.weatherApiEndpoint) async {
         if let place,
            !isLoading {
-            guard let url = URL(string: getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude))) else {
+            guard let urlStr = getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude)),
+                  let url = URL(string: urlStr) else {
                 isErrorOccured = true
                 customError = NetworkError.badUrl
                 return
@@ -139,7 +144,12 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     /**
         Get url for current by coordinate
      */
-    private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, apiKey: String = ApiKeys.weatherApiKey, coordinate: CLLocationCoordinate2D) -> String {
-        return "\(urlString)/data/2.5/weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
+    private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint, coordinate: CLLocationCoordinate2D) -> String? {
+        do {
+            let apiKey = try apiKeyManager.getOpenWeatherApiKey()
+            return "\(urlString)/data/2.5/weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
+        } catch {
+            return nil
+        }
     }
 }

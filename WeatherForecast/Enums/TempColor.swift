@@ -21,7 +21,7 @@ enum TempColor {
             return .hot
         }
         
-        if tempInCelsius >= 23.9 {
+        if tempInCelsius >= 15.0 {
             return .warm
         }
         
@@ -29,7 +29,7 @@ enum TempColor {
             return .cool
         }
         
-        if tempInCelsius >= 9.9 {
+        if tempInCelsius >= 5 {
             return .cold
         }
         
@@ -39,7 +39,7 @@ enum TempColor {
     func getColor() -> Color {
         switch self {
         case .freezing:
-            return Color.freezing
+            return Color.cold
         case .cold:
             return Color.cold
         case .cool:

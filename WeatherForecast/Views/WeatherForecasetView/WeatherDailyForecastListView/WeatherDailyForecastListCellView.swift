@@ -11,7 +11,6 @@ struct WeatherDailyForecastListCellView: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: DailyForecast
     
-
     var body: some View {
         ZStack {
             Color.clear

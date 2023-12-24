@@ -60,7 +60,7 @@ extension TempBarView {
                 tempColors.append(tempColor)
             }
             
-            current += 10
+            current += 1
         }
         
         DispatchQueue.main.async {

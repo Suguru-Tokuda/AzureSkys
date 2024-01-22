@@ -10,7 +10,7 @@ import SwiftUI
 @MainActor
 class LocationsViewModel: ObservableObject {
     @Published var errorOccured = false
-    @Published var customError: Error?
+    @Published var coreDataError: CoreDataError?
     
     var placeCoreDataManager: PlaceCoreDataManager
     
@@ -37,11 +37,17 @@ class LocationsViewModel: ObservableObject {
                         try await placeCoreDataManager.deleteFromDatabase(place: place)
                     } catch {
                         errorOccured = true
-                        customError = error
+                        if let error = error as? CoreDataError {
+                            coreDataError = error
+                        }
                     }
                 }
-
             }
         }
-    }    
+    }
+    
+    func dismissError() {
+        errorOccured = false
+        coreDataError = nil
+    }
 }

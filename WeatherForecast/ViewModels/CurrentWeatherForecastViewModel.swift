@@ -12,7 +12,7 @@ import SwiftUI
 @MainActor
 class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var currentForecast: WeatherForecastCurrentResponse?
-    @Published var isLoading = false
+    @Published var isLoading: LoadingStatus = .inactive
     @Published var isErrorOccured = false
     @Published var customError: NetworkError?
     @Published var locationAuthorized: Bool = false
@@ -29,6 +29,13 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
         self.apiKeyManager = apiKeyManager
+        
+        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customError = !networkAvailable ? NetworkError.networkUnavailable : nil
+            }
+        }
     }
     
     deinit {
@@ -66,7 +73,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     
     func getCurrentWeatherDataWithCurrentLocation(urlString: String = Constants.weatherApiEndpoint) async {
         if let currentLocation,
-           !isLoading {
+           isLoading == .inactive {
             
             guard let urlStr = getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate),
                   let url = URL(string: urlStr) else {
@@ -75,7 +82,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            isLoading = true
+            isLoading = .loading
             
             do {
                 self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
@@ -84,9 +91,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                     self.setRowBackgroundColor(weather: weather)
                 }
                 
-                self.isLoading = false
+                self.isLoading = .inactive
             } catch {
-                self.isLoading = false
+                self.isLoading = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -94,7 +101,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     
     func getCurrentWeatherDataWithCityData(urlString: String = Constants.weatherApiEndpoint) async {
         if let place,
-           !isLoading {
+           isLoading == .inactive {
             guard let urlStr = getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude)),
                   let url = URL(string: urlStr) else {
                 isErrorOccured = true
@@ -102,7 +109,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            isLoading = true
+            isLoading = .loading
             
             do {
                 self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
@@ -110,9 +117,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                    let weather = currentForecast.weather.first {
                     self.setRowBackgroundColor(weather: weather)
                 }
-                self.isLoading = false
+                self.isLoading = .inactive
             } catch {
-                self.isLoading = false
+                self.isLoading = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }

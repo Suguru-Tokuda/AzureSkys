@@ -19,12 +19,30 @@ struct LocationsView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if vm.searchText.isEmpty {
-                    locationList()
+                if let error = vm.networkError,
+                   error == .networkUnavailable {
+                    RetryView(errorMessage: error.localizedDescription) {
+                        Task {
+                            if !vm.searchText.isEmpty {
+                                await vm.getPredictions(searchText: vm.searchText)
+                            }
+                        }
+                    }
                 } else {
-                    locationSearchResult()
+                    if vm.searchText.isEmpty {
+                        locationList()
+                    } else {
+                        locationSearchResult()
+                    }
                 }
             }
+            .alert(isPresented: $vm.isErrorOccured, error: vm.networkError, actions: {
+                Button(action: {
+                    vm.dismissError()
+                }, label: {
+                    Text("OK")
+                })
+            })
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
@@ -70,7 +88,7 @@ struct LocationsView: View {
 extension LocationsView {
     @ViewBuilder
     func locationSearchResult() -> some View {
-        if vm.isLoading {
+        if vm.isLoading == .loading {
             VStack {
                 ProgressView("Loading...")
             }

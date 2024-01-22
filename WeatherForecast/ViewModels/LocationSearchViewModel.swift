@@ -10,7 +10,7 @@ import MapKit
 import Combine
 
 class LocationSearchViewModel: ObservableObject {
-    @Published var isLoading = false
+    @Published var isLoading: LoadingStatus = .inactive
     @Published var searchText = ""
     @Published var predictions: [Prediction] = []
     @Published var errorOcurred: Bool = false
@@ -25,6 +25,13 @@ class LocationSearchViewModel: ObservableObject {
         self.networkManager = networkManager
         self.locationManager = locationManager
         self.apiKeyManager = apiKeyManager
+        
+        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customError = !networkAvailable ? NetworkError.networkUnavailable : nil
+            }
+        }
     }
     
     func addSubscriptions() {
@@ -45,14 +52,14 @@ extension LocationSearchViewModel {
         guard let apiKey = try? apiKeyManager.getGoogleApiKey(),
               let url = URL(string: "\(Constants.googleApiBaseURL)autocomplete/json?input=\(query)&type=%28cities%29&key=\(apiKey)") else { return }
         
-        self.isLoading = true
+        self.isLoading = .loading
         
         networkManager.getData(url: url, type: GoogleAutoCompleteModel.self)
             .receive(on: RunLoop.main)
             .sink { completion in
                 switch completion {
                 case .finished:
-                    self.isLoading = false
+                    self.isLoading = .inactive
                     break
                 case .failure(let error):
                     if let error = error as? NetworkError {

@@ -41,6 +41,13 @@ struct LocationListView: View {
                 .onDelete { indexSet in
                     vm.removeCity(results: results, indexSet: indexSet)
                 }
+                .alert(isPresented: $vm.errorOccured, error: vm.coreDataError) {
+                    Button(action: {
+                        vm.dismissError()
+                    }, label: {
+                        Text("OK")
+                    })
+                }
             }
             .listStyle(.plain)
             .zIndex(1)

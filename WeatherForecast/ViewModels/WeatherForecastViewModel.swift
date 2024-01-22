@@ -15,9 +15,10 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var city: City?
     @Published var forecast: WeatherForecastOneCallResponse?
     @Published var geocode: WeatherGeocode?
-    @Published var isLoading = false
+    @Published var isLoading: LoadingStatus = .inactive
     @Published var isErrorOccured = false
-    @Published var customError: Error?
+    @Published var networkError: NetworkError?
+    @Published var coreDataError: CoreDataError?
     @Published var locationAuthorized: Bool = false
     @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)
 
@@ -35,6 +36,13 @@ class WeatherForecastViewModel: ObservableObject {
         self.apiKeyManager = apiKeyManager
         
         self.getSQLitePath()
+        
+        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.networkError = !networkAvailable ? .networkUnavailable : nil
+            }
+        }
     }
         
     deinit {
@@ -67,17 +75,17 @@ class WeatherForecastViewModel: ObservableObject {
      */
     func getWeatherForecastData() async {
         if let _ = currentLocation,
-           !isLoading {
+           isLoading == .inactive {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(),
                   let geocodeUrlStr = getGeocodeAPIString(),
                   let forecastUrl = URL(string: forecastUrlStr),
                   let geocodeUrl = URL(string: geocodeUrlStr) else {
                 isErrorOccured = true
-                customError = NetworkError.badUrl
+                networkError = NetworkError.badUrl
                 return
             }
             
-            isLoading = true
+            isLoading = .loading
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -95,9 +103,11 @@ class WeatherForecastViewModel: ObservableObject {
                     self.geocode = geocode
                 }
                                 
-                self.isLoading = false
+                self.isLoading = .inactive
+                self.isErrorOccured = false
+                self.networkError = nil
             } catch {
-                self.isLoading = false
+                self.isLoading = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -107,17 +117,17 @@ class WeatherForecastViewModel: ObservableObject {
         Get weather forecast & geo location with the city data
      */
     func getWeatherForecastData(place: GooglePlaceDetails) async {
-        if !isLoading {
+        if isLoading == .inactive {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(place: place),
                   let geocodeUrlStr = getGeocodeAPIString(place: place),
                   let forecastUrl = URL(string: forecastUrlStr),
                   let geocodeUrl = URL(string: geocodeUrlStr) else {
                 isErrorOccured = true
-                customError = NetworkError.badUrl
+                networkError = NetworkError.badUrl
                 return
             }
             
-            self.isLoading = true
+            self.isLoading = .loading
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -135,28 +145,42 @@ class WeatherForecastViewModel: ObservableObject {
                     self.geocode = geocode
                 }
                 
-                self.isLoading = false
+                self.isLoading = .inactive
             } catch {
-                self.isLoading = false
+                self.isLoading = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }
     }
     
+    func dismissError<T: LocalizedError>(error: T?) {
+        if let error {
+            if let nwError = error as? NetworkError {
+                self.networkError = nil
+            }
+            
+            if let cdError = error as? CoreDataError {
+                self.coreDataError = nil
+            }
+        }
+        
+        isErrorOccured = false
+    }
+    
     private func handleGetWeatherForecastError(error: Error) async {
         switch error {
         case NetworkError.badUrl:
-            customError = NetworkError.badUrl
+            networkError = NetworkError.badUrl
         case NetworkError.dataParsingError:
-            customError = NetworkError.dataParsingError
+            networkError = NetworkError.dataParsingError
         case NetworkError.noData:
-            customError = NetworkError.noData
+            networkError = NetworkError.noData
         case NetworkError.serverError:
-            customError = NetworkError.serverError
+            networkError = NetworkError.serverError
         case NetworkError.unknown:
-            customError = NetworkError.unknown
+            networkError = NetworkError.unknown
         default:
-            customError = NetworkError.unknown
+            networkError = NetworkError.unknown
         }
         
         isErrorOccured = true
@@ -186,7 +210,7 @@ class WeatherForecastViewModel: ObservableObject {
                     completionHandler(.success(true))
                 } catch {
                     self.isErrorOccured = true
-                    self.customError = CoreDataError.save
+                    self.coreDataError = CoreDataError.save
                     
                     completionHandler(.failure(error))
                 }
@@ -234,6 +258,6 @@ class WeatherForecastViewModel: ObservableObject {
             return
         }
         
-        let sqlitePath = url.appendingPathComponent("WeatherCoreData")
+        // let sqlitePath = url.appendingPathComponent("WeatherCoreData")
     }
 }

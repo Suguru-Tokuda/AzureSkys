@@ -12,6 +12,7 @@ enum NetworkError: Error {
          dataParsingError,
          serverError,
          noData,
+         networkUnavailable,
          unknown
 }
 
@@ -26,6 +27,8 @@ extension NetworkError: LocalizedError {
             return NSLocalizedString("Server error.", comment: "serverError")
         case .noData:
             return NSLocalizedString("No data found.", comment: "noData")
+        case .networkUnavailable:
+            return NSLocalizedString("Network connection unavailable", comment: "networkUnavailable")
         case .unknown:
             return NSLocalizedString("Unknown error.", comment: "unknown")
         }

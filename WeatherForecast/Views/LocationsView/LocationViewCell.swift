@@ -21,7 +21,7 @@ struct LocationViewCell: View {
     
     var body: some View {
         ZStack {
-            if vm.isLoading {
+            if vm.isLoading == .loading {
                 ProgressView("Loading...")
             }
             VStack {

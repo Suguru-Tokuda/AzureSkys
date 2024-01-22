@@ -29,12 +29,24 @@ struct WeatherForecastView: View {
             vm.background.ignoresSafeArea(edges: .all)
             
             if vm.locationAuthorized {
-                forecastView()
+                if let networkError = vm.networkError,
+                   networkError == .networkUnavailable {
+                    RetryView(errorMessage: networkError.localizedDescription) {
+                        Task {
+                            if let place {
+                                await vm.getWeatherForecastData(place: place)
+                            } else {
+                                await vm.getWeatherForecastData()
+                            }
+                        }
+                    }
+                } else {
+                    forecastView()
+                    footer()
+                }
             } else {
                 LocationAuthorizationRequestView()
             }
-            
-            footer()
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
@@ -44,6 +56,20 @@ struct WeatherForecastView: View {
                vm.locationAuthorized {
                 await vm.getWeatherForecastData(place: place)
             }
+        }
+        .alert(isPresented: $vm.isErrorOccured, error: vm.networkError, actions: {
+            Button(action: {
+                vm.dismissError(error: vm.coreDataError)
+            }, label: {
+                Text("OK")
+            })
+        })
+        .alert(isPresented: $vm.isErrorOccured, error: vm.coreDataError) {
+            Button(action: {
+                vm.dismissError(error: vm.coreDataError)
+            }, label: {
+                Text("OK")
+            })
         }
     }
 }
@@ -78,7 +104,7 @@ extension WeatherForecastView {
         }
             .zIndex(2.0)
         
-        if !vm.isLoading {
+        if vm.isLoading == .inactive {
             GeometryReader { geometry in
                 ScrollView {
                     if let geocode = vm.geocode,
@@ -166,26 +192,3 @@ extension WeatherForecastView {
         .environmentObject(LocationManager())
         .environmentObject(LocalFileManager())
 }
-
-//#Preview {
-//    struct WeatherForecastPreview: View {
-//        var previewDataManager = PreviewDataManager()
-//        @State var data: WeatherForecastResponse?
-//        @State var count: Int?
-//        
-//        var body: some View {
-//            WeatherForecastView(count: count ?? 0)
-//                .environmentObject(LocationManager())
-//                .task {
-//                    data = try? await previewDataManager.getData(resourceName: "previewWeatherData", format: "json", type: WeatherForecastResponse.self)
-//                    
-//                    let fiveDayForecasts = data?.getDailyForecast()
-//                    
-//                    print(fiveDayForecasts)
-//                    count = fiveDayForecasts?.count ?? 0
-//                }
-//        }
-//    }
-//    
-//    return WeatherForecastPreview()
-//}

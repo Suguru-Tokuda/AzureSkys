@@ -11,9 +11,9 @@ import Combine
 @MainActor
 class LocationForecastViewModel: ObservableObject {
     @Published var searchText = ""
-    @Published var isLoading = false
+    @Published var isLoading: LoadingStatus = .inactive
     @Published var isErrorOccured = false
-    @Published var customError: NetworkError?
+    @Published var networkError: NetworkError?
     @Published var predictions: [Prediction] = []
     
     var gettingDetails: Bool = false
@@ -26,6 +26,13 @@ class LocationForecastViewModel: ObservableObject {
         self.networkManager = networkManager
         self.apiKeyManager = apiKeyManager
         self.addSubscriptions()
+        
+        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.networkError = !networkAvailable ? NetworkError.networkUnavailable : nil
+            }
+        }
     }
     
     deinit {
@@ -44,24 +51,29 @@ class LocationForecastViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    func dismissError() {
+        self.networkError = nil
+        self.isErrorOccured = false
+    }
+    
     func getPredictions(searchText: String) async {
-        if !searchText.isEmpty && !isLoading {
+        if !searchText.isEmpty && isLoading == .inactive {
             guard let urlStr = getGooglePlacesPrediction(searchText: searchText),
                   let url = URL(string: urlStr) else {
                 isErrorOccured = true
-                customError = NetworkError.badUrl
+                networkError = NetworkError.badUrl
                 return
             }
             
-            isLoading = true
+            isLoading = .loading
             
             do {
                 let res = try await self.networkManager.getData(url: url, type: GoogleAutoCompleteModel.self)
                 
                 self.predictions = res.predictions ?? []
-                self.isLoading = false
+                self.isLoading = .inactive
             } catch {
-                self.isLoading = false
+                self.isLoading = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -72,7 +84,7 @@ class LocationForecastViewModel: ObservableObject {
             guard let urlStr = getGoogleDetailsURL(placeId: placeId),
                   let url = URL(string: urlStr) else {
                 isErrorOccured = true
-                customError = NetworkError.badUrl
+                networkError = NetworkError.badUrl
                 return nil
             }
             
@@ -96,17 +108,17 @@ class LocationForecastViewModel: ObservableObject {
     private func handleGetWeatherForecastError(error: Error) async {
         switch error {
         case NetworkError.badUrl:
-            customError = NetworkError.badUrl
+            networkError = NetworkError.badUrl
         case NetworkError.dataParsingError:
-            customError = NetworkError.dataParsingError
+            networkError = NetworkError.dataParsingError
         case NetworkError.noData:
-            customError = NetworkError.noData
+            networkError = NetworkError.noData
         case NetworkError.serverError:
-            customError = NetworkError.serverError
+            networkError = NetworkError.serverError
         case NetworkError.unknown:
-            customError = NetworkError.unknown
+            networkError = NetworkError.unknown
         default:
-            customError = NetworkError.unknown
+            networkError = NetworkError.unknown
         }
         
         isErrorOccured = true

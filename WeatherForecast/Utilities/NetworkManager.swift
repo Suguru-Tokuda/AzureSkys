@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import Network
 import Combine
 
 protocol Networking {
     func getData<T: Decodable>(url: URL, type: T.Type) -> AnyPublisher<T, Error>
     func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void)
     func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T
+    func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping ((Bool) -> ()))
 }
 
 class NetworkManager: Networking {
@@ -24,7 +26,7 @@ class NetworkManager: Networking {
         URLSession.shared.dataTask(with: URLRequest(url: url)) { (data, response, error) in
             if let data,
                 let res = response as? HTTPURLResponse,
-                res.statusCode >= 200 && res.statusCode < 300 {
+                200..<300 ~= res.statusCode {
                 do {
                     let parsedData = try JSONDecoder().decode(type.self, from: data)
                     
@@ -85,5 +87,18 @@ class NetworkManager: Networking {
                 }
             })
             .eraseToAnyPublisher()
+    }
+    
+    func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping ((Bool) -> ())) {
+        let monitor = NWPathMonitor()
+        monitor.start(queue: queue)
+        
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                completionHandler(true)
+            } else {
+                completionHandler(false)
+            }
+        }
     }
 }

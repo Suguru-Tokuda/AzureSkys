@@ -17,7 +17,7 @@ protocol Networking {
 }
 
 class NetworkManager: Networking {
-    func getData<T>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) where T : Decodable {
+    func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) {
         guard let url else {
             completionHandler(.failure(NetworkError.badUrl))
             return
@@ -41,7 +41,7 @@ class NetworkManager: Networking {
         .resume()
     }
     
-    func getData<T>(url: URL?, type: T.Type) async throws -> T where T : Decodable {
+    func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T {
         guard let url else { throw NetworkError.badUrl }
         
         do {
@@ -63,7 +63,7 @@ class NetworkManager: Networking {
         }
     }
     
-    func getData<T>(url: URL, type: T.Type) -> AnyPublisher<T, Error> where T : Decodable {
+    func getData<T: Decodable>(url: URL, type: T.Type) -> AnyPublisher<T, Error> {
         return URLSession.shared.dataTaskPublisher(for: url)
             .tryMap { val in
                 if let response = val.response as? HTTPURLResponse,

@@ -49,7 +49,7 @@ class NetworkManager: Networking {
             
             if rawData.isEmpty { throw NetworkError.noData }
             if let res = response as? HTTPURLResponse,
-               res.statusCode >= 200 && res.statusCode < 300 { // consider 2XX status code is success
+               200..<300 ~= res.statusCode { // consider 2XX status code is success
                 do {
                     return try JSONDecoder().decode(type, from: rawData)
                 } catch {
@@ -67,7 +67,7 @@ class NetworkManager: Networking {
         return URLSession.shared.dataTaskPublisher(for: url)
             .tryMap { val in
                 if let response = val.response as? HTTPURLResponse,
-                   response.statusCode >= 200 && response.statusCode < 300 {
+                   200..<300 ~= response.statusCode {
                     throw NetworkError.serverError
                 }
                 

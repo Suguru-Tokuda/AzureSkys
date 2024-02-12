@@ -7,16 +7,16 @@
 
 import Foundation
 
-protocol ApiKeyActions {
-    func getGoogleApiKey() throws -> String
-    func getOpenWeatherApiKey() throws -> String
+protocol PlistActions {
+    func getData<T: Decodable>(resource: String, type: T.Type) throws -> T
 }
 
-class ApiKeyManager: ApiKeyActions {
-    private func getApiModel() throws -> ApiKeyModel {
+extension PlistActions {
+    func getData<T: Decodable>(resource: String = "ApiKeys", type: T.Type = ApiKeyModel.self) throws -> T {
         do {
-            if let url = Bundle.main.url(forResource: "ApiKeys", withExtension: "plist") {
+            if let url = Bundle.main.url(forResource: resource, withExtension: "plist") {
                 var data: Data
+                
                 do {
                     data = try Data(contentsOf: url)
                 } catch {
@@ -24,7 +24,7 @@ class ApiKeyManager: ApiKeyActions {
                 }
                 
                 do {
-                    let retVal = try PropertyListDecoder().decode(ApiKeyModel.self, from: data)
+                    let retVal = try PropertyListDecoder().decode(type.self, from: data)
                     return retVal
                 } catch {
                     throw PlistError.parse
@@ -36,10 +36,18 @@ class ApiKeyManager: ApiKeyActions {
             throw PlistError.url
         }
     }
-    
+
+}
+
+protocol ApiKeyActions {
+    func getGoogleApiKey() throws -> String
+    func getOpenWeatherApiKey() throws -> String
+}
+
+class ApiKeyManager: ApiKeyActions, PlistActions {
     func getGoogleApiKey() throws -> String {
         do {
-            let apiKeyModel = try self.getApiModel()
+            let apiKeyModel = try self.getData()
             return apiKeyModel.googleApiKey
         } catch {
             throw PlistError.dataNotFound
@@ -48,7 +56,7 @@ class ApiKeyManager: ApiKeyActions {
     
     func getOpenWeatherApiKey() throws -> String {
         do {
-            let apiKeyModel = try self.getApiModel()
+            let apiKeyModel = try self.getData()
             return apiKeyModel.openWeatherApiKey
         } catch {
             throw PlistError.dataNotFound

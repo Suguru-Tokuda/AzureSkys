@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum PlistError: Error {
+enum PlistError: String, Error {
     case parse,
          url,
          path,

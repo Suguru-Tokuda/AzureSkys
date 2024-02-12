@@ -341,13 +341,13 @@
 		BB88626A2B15010400EE56B1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				BB983B892B370DF400161C26 /* ApiKeyModel.swift */,
 				BB8862832B16280000EE56B1 /* GoogleAutoCompleteModel.swift */,
 				BB88628D2B165D1500EE56B1 /* GooglePlaceDetailsResponse.swift */,
-				BB8862742B15179C00EE56B1 /* WeatherForecastResponse.swift */,
 				BB90641B2B21FF3300F16123 /* WeatherForecastCurrentResponse.swift */,
 				BB7EBC8B2B28977200978174 /* WeatherForecastOneCallResponse.swift */,
+				BB8862742B15179C00EE56B1 /* WeatherForecastResponse.swift */,
 				BB7EBC8D2B289CDA00978174 /* WeatherGeocode.swift */,
-				BB983B892B370DF400161C26 /* ApiKeyModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";

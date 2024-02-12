@@ -36,7 +36,6 @@ extension PlistActions {
             throw PlistError.url
         }
     }
-
 }
 
 protocol ApiKeyActions {

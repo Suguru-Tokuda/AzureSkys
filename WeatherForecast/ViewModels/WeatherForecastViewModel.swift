@@ -155,11 +155,11 @@ class WeatherForecastViewModel: ObservableObject {
     
     func dismissError<T: LocalizedError>(error: T?) {
         if let error {
-            if let nwError = error as? NetworkError {
+            if error is NetworkError {
                 self.networkError = nil
             }
             
-            if let cdError = error as? CoreDataError {
+            if error is CoreDataError {
                 self.coreDataError = nil
             }
         }
@@ -254,9 +254,9 @@ class WeatherForecastViewModel: ObservableObject {
     
     func getSQLitePath() {
         // .shared, .default, .standard - same thing
-        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            return
-        }
+//        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+//            return
+//        }
         
         // let sqlitePath = url.appendingPathComponent("WeatherCoreData")
     }

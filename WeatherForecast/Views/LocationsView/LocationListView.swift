@@ -25,33 +25,40 @@ struct LocationListView: View {
                     .opacity(0.4)
                     .zIndex(2)
             }
-            
-            List {
-                LocationViewCell(isMyLocation: true)
-                    .deleteDisabled(true)
-                    .onTapGesture {
-                        onCitySelect?(nil)
-                    }
-                ForEach(results) { placeEntity in
-                    LocationViewCell(place: GooglePlaceDetails(from: placeEntity))
-                        .onTapGesture {
-                            onCitySelect?(GooglePlaceDetails(from: placeEntity))
-                        }
-                }
-                .onDelete { indexSet in
-                    vm.removeCity(results: results, indexSet: indexSet)
-                }
-                .alert(isPresented: $vm.errorOccured, error: vm.coreDataError) {
-                    Button(action: {
-                        vm.dismissError()
-                    }, label: {
-                        Text("OK")
-                    })
-                }
-            }
-            .listStyle(.plain)
-            .zIndex(1)
+            getLocationList()
         }
+    }
+}
+
+extension LocationListView {
+    @ViewBuilder
+    private func getLocationList() -> some View {
+        List {
+            LocationViewCell(isMyLocation: true)
+                .deleteDisabled(true)
+                .onTapGesture {
+                    onCitySelect?(nil)
+                }
+            ForEach(results) { placeEntity in
+                LocationViewCell(place: GooglePlaceDetails(from: placeEntity))
+                    .onTapGesture {
+                        onCitySelect?(GooglePlaceDetails(from: placeEntity))
+                    }
+            }
+            .onDelete { indexSet in
+                vm.removeCity(results: results, indexSet: indexSet)
+            }
+            .alert(isPresented: $vm.errorOccured, error: vm.coreDataError) {
+                Button(action: {
+                    vm.dismissError()
+                }, label: {
+                    Text("OK")
+                })
+            }
+        }
+        .listStyle(.plain)
+        .zIndex(1)
+
     }
 }
 

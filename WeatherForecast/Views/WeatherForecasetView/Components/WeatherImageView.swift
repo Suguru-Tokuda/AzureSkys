@@ -57,6 +57,8 @@ extension WeatherImageView {
             do {
                 let (data, _) = try await URLSession.shared.data(from: url)
                 guard let img = UIImage(data: data) else { return }
+                
+                try fileManager.saveImage(image: img, name: icon)
 
                 DispatchQueue.main.async {
                     self.image = img

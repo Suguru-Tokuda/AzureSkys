@@ -47,6 +47,6 @@ class LocalFileManager: LocalFileManaging, ObservableObject {
             .default
             .urls(for: .cachesDirectory, in: .userDomainMask)
             .first?
-            .appendingPathComponent(name, conformingTo: .data)
+            .appending(path: name)
     }
 }

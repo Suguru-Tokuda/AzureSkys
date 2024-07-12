@@ -15,7 +15,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var isLoading: LoadingStatus = .inactive
     @Published var isErrorOccured = false
     @Published var customError: NetworkError?
-    @Published var locationAuthorized: Bool = false
+    @Published var locationAuthorized: Bool?
     @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
     var place: GooglePlaceDetails?
     

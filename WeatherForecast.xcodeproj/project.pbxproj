@@ -26,6 +26,12 @@
 		BB537C0E2B2B4906006BE03C /* OpenSettingsBtnStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB537C0D2B2B4906006BE03C /* OpenSettingsBtnStyle.swift */; };
 		BB537C112B2B5082006BE03C /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = BB537C102B2B5082006BE03C /* Settings.bundle */; };
 		BB537C142B2B66DA006BE03C /* ViewOffsetKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB537C132B2B66DA006BE03C /* ViewOffsetKey.swift */; };
+		BB6C9BB52C2E3A5600F16582 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB6C9BB42C2E3A5600F16582 /* LaunchScreen.storyboard */; };
+		BB7531472C3B6720006DFBE7 /* DismissButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7531462C3B6720006DFBE7 /* DismissButton.swift */; };
+		BB7531492C3B6AB9006DFBE7 /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7531482C3B6AB9006DFBE7 /* LaunchView.swift */; };
+		BB763F342C3746BF00935E89 /* LocationsSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB763F332C3746BF00935E89 /* LocationsSearchView.swift */; };
+		BB763F362C374A4100935E89 /* WeatherForecastMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB763F352C374A4100935E89 /* WeatherForecastMainView.swift */; };
+		BB763F382C374D8100935E89 /* WeatherForecastScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB763F372C374D8100935E89 /* WeatherForecastScrollView.swift */; };
 		BB7EBC7C2B2799D900978174 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7EBC7B2B2799D900978174 /* Color.swift */; };
 		BB7EBC7E2B27A08700978174 /* WeatherCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7EBC7D2B27A08700978174 /* WeatherCondition.swift */; };
 		BB7EBC812B27ACFF00978174 /* Blur.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7EBC802B27ACFF00978174 /* Blur.swift */; };
@@ -87,6 +93,29 @@
 		BBE4E95E2B5DF56D00C83C48 /* LoadingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE4E95D2B5DF56D00C83C48 /* LoadingStatus.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		BB1943A42BFD83D100246362 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB1943BA2BFD847500246362 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		BB0C60972B1E4FE200359F7D /* previewWeatherData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = previewWeatherData.json; sourceTree = "<group>"; };
 		BB0C60992B1E587200359F7D /* TempScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempScale.swift; sourceTree = "<group>"; };
@@ -107,6 +136,12 @@
 		BB537C0D2B2B4906006BE03C /* OpenSettingsBtnStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSettingsBtnStyle.swift; sourceTree = "<group>"; };
 		BB537C102B2B5082006BE03C /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		BB537C132B2B66DA006BE03C /* ViewOffsetKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewOffsetKey.swift; sourceTree = "<group>"; };
+		BB6C9BB42C2E3A5600F16582 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BB7531462C3B6720006DFBE7 /* DismissButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissButton.swift; sourceTree = "<group>"; };
+		BB7531482C3B6AB9006DFBE7 /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
+		BB763F332C3746BF00935E89 /* LocationsSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsSearchView.swift; sourceTree = "<group>"; };
+		BB763F352C374A4100935E89 /* WeatherForecastMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastMainView.swift; sourceTree = "<group>"; };
+		BB763F372C374D8100935E89 /* WeatherForecastScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastScrollView.swift; sourceTree = "<group>"; };
 		BB7EBC7B2B2799D900978174 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		BB7EBC7D2B27A08700978174 /* WeatherCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherCondition.swift; sourceTree = "<group>"; };
 		BB7EBC802B27ACFF00978174 /* Blur.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blur.swift; sourceTree = "<group>"; };
@@ -201,6 +236,7 @@
 			isa = PBXGroup;
 			children = (
 				BB90642E2B221DE100F16123 /* LocationListView.swift */,
+				BB763F332C3746BF00935E89 /* LocationsSearchView.swift */,
 				BB0C60C42B1FAE6900359F7D /* LocationsView.swift */,
 				BB0C60CC2B1FBDD400359F7D /* LocationViewCell.swift */,
 			);
@@ -232,6 +268,7 @@
 		BB537C0A2B2B484E006BE03C /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				BB7531462C3B6720006DFBE7 /* DismissButton.swift */,
 				BB537C0B2B2B4871006BE03C /* LocationAuthorizationRequestView.swift */,
 				BBE4E95B2B5DF47100C83C48 /* RetryView.swift */,
 			);
@@ -252,6 +289,23 @@
 				BB537C132B2B66DA006BE03C /* ViewOffsetKey.swift */,
 			);
 			path = PreferenceKeys;
+			sourceTree = "<group>";
+		};
+		BB6C9BB22C2E3A2800F16582 /* Launch */ = {
+			isa = PBXGroup;
+			children = (
+				BB6C9BB32C2E3A4200F16582 /* Views */,
+			);
+			path = Launch;
+			sourceTree = "<group>";
+		};
+		BB6C9BB32C2E3A4200F16582 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BB6C9BB42C2E3A5600F16582 /* LaunchScreen.storyboard */,
+				BB7531482C3B6AB9006DFBE7 /* LaunchView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		BB7EBC7F2B27ACF000978174 /* Components */ = {
@@ -301,6 +355,7 @@
 				BB0C60C02B1FAD0000359F7D /* CoreData */,
 				BB8862782B1527C600EE56B1 /* Enums */,
 				BB8862962B16684300EE56B1 /* Extensions */,
+				BB6C9BB22C2E3A2800F16582 /* Launch */,
 				BB88626A2B15010400EE56B1 /* Models */,
 				BB537C122B2B66B5006BE03C /* PreferenceKeys */,
 				BB8862612B1500F400EE56B1 /* Preview Content */,
@@ -405,6 +460,8 @@
 		BB8862882B16301C00EE56B1 /* WeatherForecasetView */ = {
 			isa = PBXGroup;
 			children = (
+				BB763F352C374A4100935E89 /* WeatherForecastMainView.swift */,
+				BB763F372C374D8100935E89 /* WeatherForecastScrollView.swift */,
 				BB88629B2B166AA900EE56B1 /* WeatherForecastView.swift */,
 				BB537C092B2B45E0006BE03C /* Components */,
 				BB7EBC842B27B0EE00978174 /* StatusGridView */,
@@ -467,6 +524,8 @@
 				BB8862542B1500F300EE56B1 /* Sources */,
 				BB8862552B1500F300EE56B1 /* Frameworks */,
 				BB8862562B1500F300EE56B1 /* Resources */,
+				BB1943A42BFD83D100246362 /* Embed Frameworks */,
+				BB1943BA2BFD847500246362 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -484,7 +543,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					BB8862572B1500F300EE56B1 = {
@@ -519,6 +578,7 @@
 				BB8862632B1500F400EE56B1 /* Preview Assets.xcassets in Resources */,
 				BB537C112B2B5082006BE03C /* Settings.bundle in Resources */,
 				BB0C60982B1E4FE200359F7D /* previewWeatherData.json in Resources */,
+				BB6C9BB52C2E3A5600F16582 /* LaunchScreen.storyboard in Resources */,
 				BB8862602B1500F400EE56B1 /* Assets.xcassets in Resources */,
 				BB983B862B370B5700161C26 /* ApiKeys.plist in Resources */,
 			);
@@ -548,6 +608,7 @@
 				BB8862842B16280000EE56B1 /* GoogleAutoCompleteModel.swift in Sources */,
 				BB7EBC7E2B27A08700978174 /* WeatherCondition.swift in Sources */,
 				BB88627A2B1527D300EE56B1 /* NetworkError.swift in Sources */,
+				BB763F382C374D8100935E89 /* WeatherForecastScrollView.swift in Sources */,
 				BB9064372B22579E00F16123 /* PlaceCoreDataManager.swift in Sources */,
 				BB537C0E2B2B4906006BE03C /* OpenSettingsBtnStyle.swift in Sources */,
 				BB7EBC832B27ADC600978174 /* View.swift in Sources */,
@@ -560,6 +621,7 @@
 				BB0C609F2B1E743D00359F7D /* WeatherThreeHourlyForecastListViewCell.swift in Sources */,
 				BB90643B2B226EBB00F16123 /* CoreDataError.swift in Sources */,
 				BB0C60A32B1F634E00359F7D /* Date.swift in Sources */,
+				BB7531472C3B6720006DFBE7 /* DismissButton.swift in Sources */,
 				BB0C60AA2B1F708700359F7D /* MainCoordinator.swift in Sources */,
 				BB0C60C92B1FB6F000359F7D /* PersistenceController.swift in Sources */,
 				BB88628C2B163C4E00EE56B1 /* LocationSearchResultListCellView.swift in Sources */,
@@ -574,6 +636,7 @@
 				BB0C60C52B1FAE6900359F7D /* LocationsView.swift in Sources */,
 				BB0C60CB2B1FB91B00359F7D /* ContentView.swift in Sources */,
 				BBD8350D2B2A2E6A00630B99 /* StatusGridViewValueLabelModifier.swift in Sources */,
+				BB7531492C3B6AB9006DFBE7 /* LaunchView.swift in Sources */,
 				BB8862802B16231E00EE56B1 /* LocationSearchViewModel.swift in Sources */,
 				BB0C60CD2B1FBDD400359F7D /* LocationViewCell.swift in Sources */,
 				BBD8350F2B2A2F8700630B99 /* StatusGridView.swift in Sources */,
@@ -589,8 +652,10 @@
 				BB983B8C2B370E9900161C26 /* PlistError.swift in Sources */,
 				BB88629A2B1668DB00EE56B1 /* PreviewDataManager.swift in Sources */,
 				BB90644E2B2358F800F16123 /* UIApplication.swift in Sources */,
+				BB763F342C3746BF00935E89 /* LocationsSearchView.swift in Sources */,
 				BBC1A3AA2B2CA25800948E62 /* FileManagerError.swift in Sources */,
 				BB88627C2B1541EA00EE56B1 /* WeatherForecastHeaderView.swift in Sources */,
+				BB763F362C374A4100935E89 /* WeatherForecastMainView.swift in Sources */,
 				BBC1A3B12B2CBF7A00948E62 /* TempColor.swift in Sources */,
 				BB7EBC862B27B10100978174 /* StatusGridCellView.swift in Sources */,
 				BB9B8DCD2B33B94200CE9861 /* SettingsManager.swift in Sources */,
@@ -661,6 +726,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationTemporaryUsageDescriptionDictionary = "";
+				INFOPLIST_KEY_NSLocationUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -718,6 +790,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationTemporaryUsageDescriptionDictionary = "";
+				INFOPLIST_KEY_NSLocationUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -731,18 +810,26 @@
 		BB8862672B1500F400EE56B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WeatherForecast/Preview Content\"";
-				DEVELOPMENT_TEAM = FVEGF5DQ7U;
+				DEVELOPMENT_TEAM = KJ5YZSV7FU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow the location usage for the application features.";
+				INFOPLIST_KEY_CFBundleDisplayName = AzureSkys;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationTemporaryUsageDescriptionDictionary = "";
+				INFOPLIST_KEY_NSLocationUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Turning on location services allows us to show you the local weather information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -751,30 +838,42 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sugurutokuda.WeatherForecast;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stokuda.weather;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		BB8862682B1500F400EE56B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WeatherForecast/Preview Content\"";
-				DEVELOPMENT_TEAM = FVEGF5DQ7U;
+				DEVELOPMENT_TEAM = KJ5YZSV7FU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow the location usage for the application features.";
+				INFOPLIST_KEY_CFBundleDisplayName = AzureSkys;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationTemporaryUsageDescriptionDictionary = "";
+				INFOPLIST_KEY_NSLocationUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Turning on location services allows us to show you the local weather information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -783,12 +882,16 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sugurutokuda.WeatherForecast;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stokuda.weather;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

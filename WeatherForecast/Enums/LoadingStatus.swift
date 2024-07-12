@@ -9,5 +9,6 @@ import Foundation
 
 enum LoadingStatus {
     case inactive,
-         loading
+         loading,
+         loaded
 }

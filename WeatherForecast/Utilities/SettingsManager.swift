@@ -28,4 +28,12 @@ class SettingsManager: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+
+    func navigateToSettings() {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
+        
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl) { _ in }
+        }
+    }
 }

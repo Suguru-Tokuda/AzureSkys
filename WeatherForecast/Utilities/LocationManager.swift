@@ -10,7 +10,7 @@ import CoreLocation
 
 class LocationManager: NSObject, ObservableObject {
     @Published var currentLocation: CLLocation?
-    @Published var locationAuthorized: Bool = false
+    @Published var locationAuthorized: Bool?
     
     let locationManager = CLLocationManager()
     
@@ -33,7 +33,6 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .notDetermined:
-            locationAuthorized = false
             break
         case .restricted:
             locationAuthorized = false

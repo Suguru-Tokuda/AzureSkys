@@ -9,11 +9,14 @@ import SwiftUI
 
 struct LocationsView: View {
     @EnvironmentObject private var coordinator: MainCoordinator
+    @EnvironmentObject private var locationManager: LocationManager
     @StateObject var vm: LocationForecastViewModel = LocationForecastViewModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
     @State var searchBarPresented = false
+    private let settingsManager = SettingsManager()
+    var showDismiss: Bool = true
     var onDismiss: ((GooglePlaceDetails?) -> Void)?
     
     var body: some View {
@@ -45,12 +48,18 @@ struct LocationsView: View {
             })
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .resizable()
-                            .frame(width: 15, height: 15)
+                    if showDismiss {
+                        DismissButton {
+                            dismiss()
+                        }
+                    }
+                    if let locationAuthorized = locationManager.locationAuthorized,
+                       locationAuthorized == false {
+                        Button(action: {
+                            settingsManager.navigateToSettings()
+                        }, label: {
+                            Image(systemName: "gear")
+                        })
                     }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {

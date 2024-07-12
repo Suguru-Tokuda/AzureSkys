@@ -10,6 +10,7 @@ import CoreData
 
 struct LocationListView: View {
     @EnvironmentObject var mainCoordinator: MainCoordinator
+    @EnvironmentObject var locationManager: LocationManager
     @Environment(\.isSearching) private var isSearching
     @StateObject var vm: LocationsViewModel = LocationsViewModel()
     @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
@@ -34,11 +35,14 @@ extension LocationListView {
     @ViewBuilder
     private func getLocationList() -> some View {
         List {
-            LocationViewCell(isMyLocation: true)
-                .deleteDisabled(true)
-                .onTapGesture {
-                    onCitySelect?(nil)
-                }
+            if let locationAuthorized = locationManager.locationAuthorized,
+               locationAuthorized == true {
+                LocationViewCell(isMyLocation: true)
+                    .deleteDisabled(true)
+                    .onTapGesture {
+                        onCitySelect?(nil)
+                    }
+            }
             ForEach(results) { placeEntity in
                 LocationViewCell(place: GooglePlaceDetails(from: placeEntity))
                     .onTapGesture {

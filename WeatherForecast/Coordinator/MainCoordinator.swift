@@ -13,6 +13,8 @@ class MainCoordinator: ObservableObject {
     @Published var path = NavigationPath()
     @Published var showLocationsFullScreenSheet: Bool = false
     @Published var weatherForecastSheetPresented: Bool = false
+    @Published var showWeatherForecastFullScreenSheet: Bool = false
+    
     var place: GooglePlaceDetails?
     
     func startCoordinator() {
@@ -31,12 +33,17 @@ class MainCoordinator: ObservableObject {
     func setPlace(place: GooglePlaceDetails?) {
         self.place = place
     }
+
+    func setPlaceWithFullScreen(place: GooglePlaceDetails?) {
+        self.place = place
+        showWeatherForecastFullScreenSheet = true
+    }
         
     @ViewBuilder
     func getPage(page: Page) -> some View {
         switch page {
         case .forecast:
-            WeatherForecastView(place: place)
+            WeatherForecastMainView(place: place)
         }
     }
 }

@@ -15,11 +15,11 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var city: City?
     @Published var forecast: WeatherForecastOneCallResponse?
     @Published var geocode: WeatherGeocode?
-    @Published var isLoading: LoadingStatus = .inactive
+    @Published var loadingStatus: LoadingStatus = .inactive
     @Published var isErrorOccured = false
     @Published var networkError: NetworkError?
     @Published var coreDataError: CoreDataError?
-    @Published var locationAuthorized: Bool = false
+    @Published var locationAuthorized: Bool?
     @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)
 
     var currentLocation: CLLocation?
@@ -75,7 +75,7 @@ class WeatherForecastViewModel: ObservableObject {
      */
     func getWeatherForecastData() async {
         if let _ = currentLocation,
-           isLoading == .inactive {
+           loadingStatus != .loading {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(),
                   let geocodeUrlStr = getGeocodeAPIString(),
                   let forecastUrl = URL(string: forecastUrlStr),
@@ -85,7 +85,7 @@ class WeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            isLoading = .loading
+            loadingStatus = .loading
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -103,11 +103,11 @@ class WeatherForecastViewModel: ObservableObject {
                     self.geocode = geocode
                 }
                                 
-                self.isLoading = .inactive
+                self.loadingStatus = .loaded
                 self.isErrorOccured = false
                 self.networkError = nil
             } catch {
-                self.isLoading = .inactive
+                self.loadingStatus = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -117,7 +117,7 @@ class WeatherForecastViewModel: ObservableObject {
         Get weather forecast & geo location with the city data
      */
     func getWeatherForecastData(place: GooglePlaceDetails) async {
-        if isLoading == .inactive {
+        if loadingStatus != .loading {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(place: place),
                   let geocodeUrlStr = getGeocodeAPIString(place: place),
                   let forecastUrl = URL(string: forecastUrlStr),
@@ -127,7 +127,7 @@ class WeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            self.isLoading = .loading
+            self.loadingStatus = .loading
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -145,9 +145,9 @@ class WeatherForecastViewModel: ObservableObject {
                     self.geocode = geocode
                 }
                 
-                self.isLoading = .inactive
+                self.loadingStatus = .loaded
             } catch {
-                self.isLoading = .inactive
+                self.loadingStatus = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
         }

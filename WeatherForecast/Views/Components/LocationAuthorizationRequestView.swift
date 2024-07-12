@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct LocationAuthorizationRequestView: View {
+    private let settingsManager = SettingsManager()
+
     var body: some View {
         ZStack {
             VStack {
@@ -25,7 +27,7 @@ struct LocationAuthorizationRequestView: View {
             }
 
             Button(action: {
-                handleOpenSettingsBtnTap()
+                settingsManager.navigateToSettings()
             }, label: {
                 Text("Open Settings")
             })
@@ -33,16 +35,6 @@ struct LocationAuthorizationRequestView: View {
                 backgroundColor: .night1,
                 foregroundColor: .white)
             )
-        }
-    }
-}
-
-extension LocationAuthorizationRequestView {
-    func handleOpenSettingsBtnTap() {
-        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
-        
-        if UIApplication.shared.canOpenURL(settingsUrl) {
-            UIApplication.shared.open(settingsUrl) { _ in }
         }
     }
 }

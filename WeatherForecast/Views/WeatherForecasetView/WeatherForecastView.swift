@@ -27,25 +27,20 @@ struct WeatherForecastView: View {
     var body: some View {
         ZStack {
             vm.background.ignoresSafeArea(edges: .all)
-            
-            if vm.locationAuthorized {
-                if let networkError = vm.networkError,
-                   networkError == .networkUnavailable {
-                    RetryView(errorMessage: networkError.localizedDescription) {
-                        Task {
-                            if let place {
-                                await vm.getWeatherForecastData(place: place)
-                            } else {
-                                await vm.getWeatherForecastData()
-                            }
+            if let networkError = vm.networkError,
+               networkError == .networkUnavailable {
+                RetryView(errorMessage: networkError.localizedDescription) {
+                    Task {
+                        if let place {
+                            await vm.getWeatherForecastData(place: place)
+                        } else {
+                            await vm.getWeatherForecastData()
                         }
                     }
-                } else {
-                    forecastView()
-                    footer()
                 }
             } else {
-                LocationAuthorizationRequestView()
+                forecastView()
+                footer()
             }
         }
         .onAppear {
@@ -53,7 +48,8 @@ struct WeatherForecastView: View {
         }
         .task {
             if let place,
-               vm.locationAuthorized {
+               let locationAuthorized = vm.locationAuthorized,
+               locationAuthorized == true {
                 await vm.getWeatherForecastData(place: place)
             }
         }
@@ -104,26 +100,12 @@ extension WeatherForecastView {
         }
             .zIndex(2.0)
         
-        if vm.isLoading == .inactive {
-            GeometryReader { geometry in
-                ScrollView {
-                    if let geocode = vm.geocode,
-                       let forecast = vm.forecast
-                    {
-                        mainView(forecast: forecast, geocode: geocode, parentViewWidth: geometry.size.width)
-                            .padding(.top, 50)
-                            .padding(.bottom, 50)
-                            .padding(.horizontal, 20)
-                            .background(GeometryReader {
-                                Color.clear.preference(key: ViewOffsetKey.self, value: -$0.frame(in: .named(coordinateSpaceName)).origin.y)
-                            })
-                            .onPreferenceChange(ViewOffsetKey.self) {
-                                self.scrollViewOffset = $0
-                            }
-                    }
-                }.coordinateSpace(name: coordinateSpaceName)
-            }
-            .refreshable {
+        if vm.loadingStatus == .loaded {
+            WeatherForecastScrollView(forecast: vm.forecast,
+                                      geocode: vm.geocode,
+                                      networkError: vm.networkError,
+                                      loadingStatus: vm.loadingStatus,
+                                      onRefresh: {
                 Task {
                     if let place {
                         await vm.getWeatherForecastData(place: place)
@@ -131,54 +113,47 @@ extension WeatherForecastView {
                         await vm.getWeatherForecastData()
                     }
                 }
-            }
-        } else {
+            })
+            .padding(.top, 20)
+        } else if vm.loadingStatus == .loading {
             ProgressView("Loading...")
         }
     }
     
-    @ViewBuilder func mainView(forecast: WeatherForecastOneCallResponse, geocode: WeatherGeocode, parentViewWidth: CGFloat) -> some View {
-        VStack {
-            WeatherForecastHeaderView(
-                geocode: geocode,
-                currentForecast: forecast.current,
-                dailyForecast: forecast.daily[0],
-                isMyLocation: coordinator.place == nil,
-                scrollViewOffsetPercentage: .zero
-            )
-            
-            WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
-            
-            WeatherDailyForecastListView(list: forecast.daily)
-            
-            if let weather = forecast.current.weather.first {
-                StatusGridView(
-                    forecast: forecast.current,
-                    background: weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay),
-                    parentViewWidth: parentViewWidth
-                )
-            }
-        }
-    }
-    
     @ViewBuilder func footer() -> some View {
-        if !showTopActionBar && vm.locationAuthorized {
-            // MARK: Tab Bar
-            WeatherForecastBottomBar(background: vm.background)
-                .fullScreenCover(
-                    isPresented: $coordinator.showLocationsFullScreenSheet
-                ) {
-                    LocationsView() { place in
-                        coordinator.setPlace(place: place)
-                        Task {
-                            if let place {
-                                await vm.getWeatherForecastData(place: place)
-                            } else {
-                                await vm.getWeatherForecastData()
+        if let locationAuthorized = vm.locationAuthorized {
+            if !showTopActionBar && locationAuthorized {
+                // MARK: Tab Bar
+                WeatherForecastBottomBar(background: vm.background)
+                    .fullScreenCover(
+                        isPresented: $coordinator.showLocationsFullScreenSheet
+                    ) {
+                        LocationsView() { place in
+                            coordinator.setPlace(place: place)
+                            Task {
+                                if let place {
+                                    await vm.getWeatherForecastData(place: place)
+                                } else {
+                                    await vm.getWeatherForecastData()
+                                }
                             }
                         }
                     }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func getLocationsView(showDismiss: Bool = true) -> some View {
+        LocationsView(showDismiss: showDismiss) { place in
+            coordinator.setPlace(place: place)
+            Task {
+                if let place {
+                    await vm.getWeatherForecastData(place: place)
+                } else {
+                    await vm.getWeatherForecastData()
                 }
+            }
         }
     }
 }

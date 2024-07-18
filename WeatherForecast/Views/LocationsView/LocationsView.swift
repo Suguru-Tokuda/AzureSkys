@@ -22,8 +22,7 @@ struct LocationsView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if let error = vm.networkError,
-                   error == .networkUnavailable {
+                if let error = vm.networkError {
                     RetryView(errorMessage: error.localizedDescription) {
                         Task {
                             if !vm.searchText.isEmpty {

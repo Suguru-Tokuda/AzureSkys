@@ -25,6 +25,7 @@ struct LocationsSearchView: View {
         .fullScreenCover(isPresented: $coordinator.showWeatherForecastFullScreenSheet) {
             WeatherForecastScrollView(forecast: vm.forecast,
                                       geocode: vm.geocode,
+                                      networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
                                       dismissible: true)
         }

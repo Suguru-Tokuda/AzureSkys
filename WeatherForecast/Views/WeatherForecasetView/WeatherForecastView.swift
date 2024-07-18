@@ -27,8 +27,7 @@ struct WeatherForecastView: View {
     var body: some View {
         ZStack {
             vm.background.ignoresSafeArea(edges: .all)
-            if let networkError = vm.networkError,
-               networkError == .networkUnavailable {
+            if let networkError = vm.networkError {
                 RetryView(errorMessage: networkError.localizedDescription) {
                     Task {
                         if let place {
@@ -47,9 +46,7 @@ struct WeatherForecastView: View {
             vm.setLocationManager(locationManager: locationManager)
         }
         .task {
-            if let place,
-               let locationAuthorized = vm.locationAuthorized,
-               locationAuthorized == true {
+            if let place {
                 await vm.getWeatherForecastData(place: place)
             }
         }
@@ -93,6 +90,7 @@ extension WeatherForecastView {
                 })
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
+                .padding(.bottom, 40)
             } else {
                 Spacer()
             }

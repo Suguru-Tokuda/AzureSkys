@@ -39,6 +39,7 @@ struct WeatherForecastView: View {
                 }
             } else {
                 forecastView()
+                    .padding(.bottom, 30)
                 footer()
             }
         }
@@ -126,7 +127,7 @@ extension WeatherForecastView {
                     .fullScreenCover(
                         isPresented: $coordinator.showLocationsFullScreenSheet
                     ) {
-                        LocationsView() { place in
+                        LocationsView(showDismiss: false) { place in
                             coordinator.setPlace(place: place)
                             Task {
                                 if let place {

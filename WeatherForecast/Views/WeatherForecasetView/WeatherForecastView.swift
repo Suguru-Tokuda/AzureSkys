@@ -41,6 +41,9 @@ struct WeatherForecastView: View {
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
         }
+        .onDisappear {
+            vm.endDataRefreshTimer()
+        }
         .task {
             if place != nil {
                 vm.startDataRefreshTimer()
@@ -63,7 +66,7 @@ struct WeatherForecastView: View {
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            if let isActive {
+            if isActive != nil {
                 self.isActive = true
                 vm.startDataRefreshTimer()
             }
@@ -126,7 +129,9 @@ extension WeatherForecastView {
         if let locationAuthorized = vm.locationAuthorized {
             if !showTopActionBar && locationAuthorized {
                 // MARK: Tab Bar
-                WeatherForecastBottomBar(background: vm.background)
+                WeatherForecastBottomBar(background: vm.background) {
+                    vm.endDataRefreshTimer()
+                }
                     .fullScreenCover(
                         isPresented: $coordinator.showLocationsFullScreenSheet
                     ) {

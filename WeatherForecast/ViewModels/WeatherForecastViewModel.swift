@@ -73,10 +73,6 @@ class WeatherForecastViewModel: ObservableObject {
                     if callApi {
                         startDataRefreshTimer()
                     }
-                    
-//                    Task {
-//                        if callApi { await self.getWeatherForecastData() }
-//                    }
                 }
                 .store(in: &cancellables)
         }
@@ -167,40 +163,6 @@ class WeatherForecastViewModel: ObservableObject {
                 await handleGetWeatherForecastError(error: error)
             }
         }
-    }
-
-    func startDataRefreshTimer() {
-        if let dataRefreshTimer {
-            dataRefreshTimer.invalidate()
-            self.dataRefreshTimer = nil
-        }
-
-        resetRefreshCount()
-        
-        Task {
-            await self.loadWeatherData(showLoading: self.refreshCount == 0)
-            await self.incrementRefreshCount()
-        }
-
-        dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,
-                                                repeats: true) { _ in
-            Task {
-                await self.incrementRefreshCount()
-                await self.loadWeatherData(showLoading: self.refreshCount == 0)
-            }
-        }
-    }
-
-    func resetRefreshCount() {
-        self.refreshCount = 0
-    }
-
-    func incrementRefreshCount() async  {
-        self.refreshCount += 1
-    }
-
-    func setPlace(place: GooglePlaceDetails? = nil) {
-        self.place = place
     }
 
     func loadWeatherData(showLoading: Bool) async {
@@ -322,5 +284,46 @@ class WeatherForecastViewModel: ObservableObject {
 //        }
         
         // let sqlitePath = url.appendingPathComponent("WeatherCoreData")
+    }
+}
+
+// MARK: Refresh scheduling
+
+extension WeatherForecastViewModel {
+    private func resetRefreshCount() {
+        self.refreshCount = 0
+    }
+
+    private func incrementRefreshCount() async  {
+        self.refreshCount += 1
+    }
+
+    func setPlace(place: GooglePlaceDetails? = nil) {
+        self.place = place
+    }
+
+    func startDataRefreshTimer() {
+        endDataRefreshTimer()
+        
+        Task(priority: .utility) {
+            await self.loadWeatherData(showLoading: self.refreshCount == 0)
+            await self.incrementRefreshCount()
+        }
+
+        dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,
+                                                repeats: true) { _ in
+            Task(priority: .utility) {
+                await self.incrementRefreshCount()
+                await self.loadWeatherData(showLoading: self.refreshCount == 0)
+            }
+        }
+    }
+
+    func endDataRefreshTimer() {
+        if let dataRefreshTimer {
+            dataRefreshTimer.invalidate()
+            self.dataRefreshTimer = nil
+            self.resetRefreshCount()
+        }
     }
 }

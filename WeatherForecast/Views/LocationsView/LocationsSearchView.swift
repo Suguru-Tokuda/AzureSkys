@@ -14,13 +14,8 @@ struct LocationsSearchView: View {
     var body: some View {
         LocationsView(showDismiss: false) { place in
             coordinator.setPlaceWithFullScreen(place: place)
-            Task {
-                if let place {
-                    await vm.getWeatherForecastData(place: place)
-                } else {
-                    await vm.getWeatherForecastData()
-                }
-            }
+            vm.setPlace(place: place)
+            vm.startDataRefreshTimer()
         }
         .fullScreenCover(isPresented: $coordinator.showWeatherForecastFullScreenSheet) {
             WeatherForecastScrollView(forecast: vm.forecast,
@@ -28,6 +23,9 @@ struct LocationsSearchView: View {
                                       networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
                                       dismissible: true)
+            .onDisappear {
+                vm.endDataRefreshTimer()
+            }
         }
     }
 }

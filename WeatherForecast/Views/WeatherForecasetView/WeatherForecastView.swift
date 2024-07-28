@@ -13,29 +13,24 @@ struct WeatherForecastView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
     @State var scrollViewOffset: CGFloat = .zero
+    @State var isActive: Bool?
     var place: GooglePlaceDetails?
     var showTopActionBar: Bool = false
     var onLocationAdded: (() -> ())?
     var coordinateSpaceName = "weatherScroll"
-        
+
     init(place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
         self.place = place
         self.showTopActionBar = showTopActionBar
         self.onLocationAdded = onLocationAdded
     }
-    
+
     var body: some View {
         ZStack {
             vm.background.ignoresSafeArea(edges: .all)
             if let networkError = vm.networkError {
                 RetryView(errorMessage: networkError.localizedDescription) {
-                    Task {
-                        if let place {
-                            await vm.getWeatherForecastData(place: place)
-                        } else {
-                            await vm.getWeatherForecastData()
-                        }
-                    }
+                    vm.startDataRefreshTimer()
                 }
             } else {
                 forecastView()
@@ -47,8 +42,8 @@ struct WeatherForecastView: View {
             vm.setLocationManager(locationManager: locationManager)
         }
         .task {
-            if let place {
-                await vm.getWeatherForecastData(place: place)
+            if place != nil {
+                vm.startDataRefreshTimer()
             }
         }
         .alert(isPresented: $vm.isErrorOccured, error: vm.networkError, actions: {
@@ -64,6 +59,19 @@ struct WeatherForecastView: View {
             }, label: {
                 Text("OK")
             })
+        }
+        .onReceive(NotificationCenter
+                    .default
+                    .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            if let isActive {
+                self.isActive = true
+                vm.startDataRefreshTimer()
+            }
+        }
+        .onReceive(NotificationCenter
+                    .default
+                    .publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                        isActive = false
         }
     }
 }
@@ -98,27 +106,22 @@ extension WeatherForecastView {
             Spacer()
         }
             .zIndex(2.0)
-        
+
         if vm.loadingStatus == .loaded {
             WeatherForecastScrollView(forecast: vm.forecast,
                                       geocode: vm.geocode,
                                       networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
+                                      showAnimation: vm.refreshCount <= 1,
                                       onRefresh: {
-                Task {
-                    if let place {
-                        await vm.getWeatherForecastData(place: place)
-                    } else {
-                        await vm.getWeatherForecastData()
-                    }
-                }
+                vm.startDataRefreshTimer()
             })
             .padding(.top, 20)
         } else if vm.loadingStatus == .loading {
             ProgressView("Loading...")
         }
     }
-    
+
     @ViewBuilder func footer() -> some View {
         if let locationAuthorized = vm.locationAuthorized {
             if !showTopActionBar && locationAuthorized {
@@ -129,13 +132,8 @@ extension WeatherForecastView {
                     ) {
                         LocationsView(showDismiss: false) { place in
                             coordinator.setPlace(place: place)
-                            Task {
-                                if let place {
-                                    await vm.getWeatherForecastData(place: place)
-                                } else {
-                                    await vm.getWeatherForecastData()
-                                }
-                            }
+                            vm.setPlace(place: place)
+                            vm.startDataRefreshTimer()
                         }
                     }
             }
@@ -146,13 +144,8 @@ extension WeatherForecastView {
     func getLocationsView(showDismiss: Bool = true) -> some View {
         LocationsView(showDismiss: showDismiss) { place in
             coordinator.setPlace(place: place)
-            Task {
-                if let place {
-                    await vm.getWeatherForecastData(place: place)
-                } else {
-                    await vm.getWeatherForecastData()
-                }
-            }
+            vm.setPlace(place: place)
+            vm.startDataRefreshTimer()
         }
     }
 }

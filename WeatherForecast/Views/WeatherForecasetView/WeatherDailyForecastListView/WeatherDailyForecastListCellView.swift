@@ -10,6 +10,7 @@ import SwiftUI
 struct WeatherDailyForecastListCellView: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: DailyForecast
+    var showTempBarAnimation: Bool = true
     
     var body: some View {
         ZStack {
@@ -23,7 +24,11 @@ struct WeatherDailyForecastListCellView: View {
                 }
                 Text("\(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white.opacity(0.5))
-                TempBarView(currentTemp: 0, minTemp: forecast.temp.min, maxTemp: forecast.temp.max, height: 5)
+                TempBarView(currentTemp: 0, 
+                            minTemp: forecast.temp.min,
+                            maxTemp: forecast.temp.max,
+                            height: 5,
+                            showAnimation: showTempBarAnimation)
                     .padding(.top, 18)
                 Text("\(forecast.temp.max.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
             }

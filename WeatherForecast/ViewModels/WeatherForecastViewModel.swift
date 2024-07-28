@@ -20,8 +20,10 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var networkError: NetworkError?
     @Published var coreDataError: CoreDataError?
     @Published var locationAuthorized: Bool?
-    @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)
-
+    @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], 
+                                                               startPoint: .topLeading,
+                                                               endPoint: .bottomTrailing)
+    var place: GooglePlaceDetails?
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
     
@@ -29,8 +31,13 @@ class WeatherForecastViewModel: ObservableObject {
     var coreDataManager: PlaceCoreDataActions
     var apiKeyManager: ApiKeyActions
     var locationManager: LocationManager?
+    let refreshInterval: Double = 300 // 5 mins
+    var refreshCount: Int = 0
+    var dataRefreshTimer: Timer?
     
-    init(networkManager: Networking = NetworkManager(), coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
+    init(networkManager: Networking = NetworkManager(), 
+         coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager(),
+         apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
         self.coreDataManager = coreDataManager
         self.apiKeyManager = apiKeyManager
@@ -57,14 +64,19 @@ class WeatherForecastViewModel: ObservableObject {
             locationManager.$locationAuthorized
                 .combineLatest(locationManager.$currentLocation)
                 .receive(on: RunLoop.main)
-                .sink { receivedVal in
+                .sink { [weak self] receivedVal in
+                    guard let self else { return }
                     self.locationAuthorized = receivedVal.0
                     let callApi: Bool = self.currentLocation == nil
                     self.currentLocation = receivedVal.1
-                    
-                    Task {
-                        if callApi { await self.getWeatherForecastData() }
+
+                    if callApi {
+                        startDataRefreshTimer()
                     }
+                    
+//                    Task {
+//                        if callApi { await self.getWeatherForecastData() }
+//                    }
                 }
                 .store(in: &cancellables)
         }
@@ -73,7 +85,7 @@ class WeatherForecastViewModel: ObservableObject {
     /**
      Get weather forecast & geo location with the current location
      */
-    func getWeatherForecastData() async {
+    func getWeatherForecastData(showLoading: Bool = true) async {
         if let _ = currentLocation,
            loadingStatus != .loading {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(),
@@ -85,7 +97,9 @@ class WeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            loadingStatus = .loading
+            if showLoading {
+                loadingStatus = .loading
+            }
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -116,7 +130,7 @@ class WeatherForecastViewModel: ObservableObject {
     /**
         Get weather forecast & geo location with the city data
      */
-    func getWeatherForecastData(place: GooglePlaceDetails) async {
+    func getWeatherForecastData(place: GooglePlaceDetails, showLoading: Bool = true) async {
         if loadingStatus != .loading {
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(place: place),
                   let geocodeUrlStr = getGeocodeAPIString(place: place),
@@ -127,7 +141,9 @@ class WeatherForecastViewModel: ObservableObject {
                 return
             }
             
-            self.loadingStatus = .loading
+            if showLoading {
+                self.loadingStatus = .loading
+            }
             
             do {
                 async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
@@ -150,6 +166,48 @@ class WeatherForecastViewModel: ObservableObject {
                 self.loadingStatus = .inactive
                 await handleGetWeatherForecastError(error: error)
             }
+        }
+    }
+
+    func startDataRefreshTimer() {
+        if let dataRefreshTimer {
+            dataRefreshTimer.invalidate()
+            self.dataRefreshTimer = nil
+        }
+
+        resetRefreshCount()
+        
+        Task {
+            await self.loadWeatherData(showLoading: self.refreshCount == 0)
+            await self.incrementRefreshCount()
+        }
+
+        dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,
+                                                repeats: true) { _ in
+            Task {
+                await self.incrementRefreshCount()
+                await self.loadWeatherData(showLoading: self.refreshCount == 0)
+            }
+        }
+    }
+
+    func resetRefreshCount() {
+        self.refreshCount = 0
+    }
+
+    func incrementRefreshCount() async  {
+        self.refreshCount += 1
+    }
+
+    func setPlace(place: GooglePlaceDetails? = nil) {
+        self.place = place
+    }
+
+    func loadWeatherData(showLoading: Bool) async {
+        if let place {
+            await self.getWeatherForecastData(place: place, showLoading: showLoading)
+        } else {
+            await self.getWeatherForecastData(showLoading: showLoading)
         }
     }
     
@@ -182,7 +240,12 @@ class WeatherForecastViewModel: ObservableObject {
         default:
             networkError = NetworkError.unknown
         }
-        
+
+        if let dataRefreshTimer {
+            dataRefreshTimer.invalidate()
+            self.dataRefreshTimer = nil
+        }
+
         isErrorOccured = true
     }
     

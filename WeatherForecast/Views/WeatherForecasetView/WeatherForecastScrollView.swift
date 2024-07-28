@@ -14,6 +14,7 @@ struct WeatherForecastScrollView: View {
     var geocode: WeatherGeocode?
     var networkError: NetworkError?
     var loadingStatus: LoadingStatus?
+    var showAnimation: Bool = true
     var onRefresh: (() -> ())?
     var onRetryBtnTapped: (() -> ())?
     
@@ -50,7 +51,8 @@ struct WeatherForecastScrollView: View {
                             
                             WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
                             
-                            WeatherDailyForecastListView(list: forecast.daily)
+                            WeatherDailyForecastListView(list: forecast.daily,
+                                                         showAnimation: self.showAnimation)
                             
                             if let weather = forecast.current.weather.first {
                                 StatusGridView(

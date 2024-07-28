@@ -12,9 +12,10 @@ struct TempBarView: View {
     var minTemp: Double
     var maxTemp: Double
     var showCurentTemp: Bool = false
-        
     var cornerRadius: CGFloat = 50
     var height: CGFloat = 7
+
+    var showAnimation: Bool = true
     @State var tempGradientColor: LinearGradient?
     @State var colorSet = false
     @State var tempBarWidth: CGFloat = 0
@@ -34,7 +35,8 @@ struct TempBarView: View {
                             .frame(width: tempBarWidth, alignment: .leading)
                             .zIndex(1.1)
                             .transition(.scale(scale: tempBarWidth))
-                            .animation(.easeIn(duration: 0.8), value: tempBarWidth)
+                            .animation(showAnimation ? .easeIn(duration: 0.8) : .none, 
+                                       value: tempBarWidth)
                             .onAppear {
                                 self.setBarAnimation(width: geometry.size.width)
                             }

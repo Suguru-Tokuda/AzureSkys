@@ -214,7 +214,7 @@ class WeatherForecastViewModel: ObservableObject {
     private func setBackgroundColor() {
         if let forecast,
            let weather = forecast.current.weather.first {
-            self.background = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
+            self.background = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay, clouds: forecast.current.clouds ?? 0)
         }
     }
     

@@ -59,7 +59,8 @@ struct WeatherForecastScrollView: View {
                                     forecast: forecast.current,
                                     background: weather
                                                     .weatherCondition
-                                                    .getBackGroundColor(partOfDay: weather.partOfDay),
+                                        .getBackGroundColor(partOfDay: weather.partOfDay,
+                                                            clouds: forecast.current.clouds ?? 0),
                                     parentViewWidth: geometry.size.width
                                 )
                             }

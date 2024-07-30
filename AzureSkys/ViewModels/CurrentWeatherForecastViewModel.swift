@@ -88,7 +88,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
                 if let currentForecast = self.currentForecast,
                    let weather = currentForecast.weather.first {
-                    self.setRowBackgroundColor(weather: weather)
+                    self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
                 }
                 
                 self.isLoading = .inactive
@@ -115,7 +115,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
                 if let currentForecast = self.currentForecast,
                    let weather = currentForecast.weather.first {
-                    self.setRowBackgroundColor(weather: weather)
+                    self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
                 }
                 self.isLoading = .inactive
             } catch {
@@ -125,8 +125,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         }
     }
     
-    private func setRowBackgroundColor(weather: Weather) {
-        self.listRowBackground = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay)
+    private func setRowBackgroundColor(weather: Weather, clouds: Int) {
+        self.listRowBackground = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay, clouds: clouds)
     }
     
     private func handleGetWeatherForecastError(error: Error) async {

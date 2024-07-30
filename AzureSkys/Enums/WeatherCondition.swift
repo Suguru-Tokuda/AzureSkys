@@ -40,92 +40,19 @@ enum WeatherCondition: String, CaseIterable {
     /**
         Get Color or Gradient
      */
-    func getBackGroundColor(partOfDay: PartOfDay) -> LinearGradient {
-        switch self {
-        case .thunderstorm:
-            switch partOfDay {
-            case .night:
+    func getBackGroundColor(partOfDay: PartOfDay, clouds: Int = 0) -> LinearGradient {
+        switch partOfDay {
+        case .night:
+            if clouds > 40 {
                 return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .drizzel:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .rain:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .snow:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .mist:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .smoke:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .haze:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .dust:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .fog:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
-                return Color.cloudyDay
-            }
-        case .sand:
-            return Color.cloudyNight
-        case .ash:
-            return Color.cloudyNight
-        case .squall:
-            return Color.cloudyNight
-        case .tornado:
-            return Color.cloudyNight
-        case .clear:
-            switch partOfDay {
-            case .night:
+            } else {
                 return Color.clearNight
-            case .day:
-                return Color.skyBlue
             }
-        case .clouds:
-            switch partOfDay {
-            case .night:
-                return Color.cloudyNight
-            case .day:
+        case .day:
+            if clouds > 40 {
                 return Color.cloudyDay
+            } else {
+                return Color.skyBlue
             }
         }
     }

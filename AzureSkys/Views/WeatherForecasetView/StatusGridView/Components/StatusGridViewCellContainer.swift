@@ -40,7 +40,7 @@ struct StatusGridViewCellContainer<Content: View>: View {
 #Preview {
     StatusGridViewCellContainer(
         width: 150,
-        background: Color.skyBlue
+        background: Color.skyBlue100
     ) {
         VStack {
             HStack {

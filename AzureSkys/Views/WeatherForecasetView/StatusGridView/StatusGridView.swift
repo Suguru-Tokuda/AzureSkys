@@ -93,7 +93,7 @@ struct StatusGridView: View {
 #Preview {
     StatusGridView(
         forecast: PreviewManager.oneCallResponse.current,
-        background: Color.skyBlue,
+        background: Color.skyBlue100,
         parentViewWidth: 430
     )
     .preferredColorScheme(.dark)

@@ -60,7 +60,7 @@ struct WindStatusGridViewCell: View {
 #Preview {
     WindStatusGridViewCell(
         width: 150,
-        background: Color.skyBlue,
+        background: Color.skyBlue100,
         wind: PreviewManager.weatherForecastData.list[0].wind!
     )
     .preferredColorScheme(.dark)

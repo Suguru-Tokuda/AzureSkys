@@ -31,7 +31,7 @@ struct StatusGridCellView: View {
 #Preview {
     StatusGridCellView(
         width: 150.0,
-        background: Color.skyBlue,
+        background: Color.skyBlue100,
         icon: "thermometer.medium",
         title: "FEELS LIKE",
         value: "44°"

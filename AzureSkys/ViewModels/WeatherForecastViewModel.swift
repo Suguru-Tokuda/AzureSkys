@@ -294,7 +294,7 @@ extension WeatherForecastViewModel {
         self.refreshCount = 0
     }
 
-    private func incrementRefreshCount() async  {
+    func incrementRefreshCount() async  {
         self.refreshCount += 1
     }
 
@@ -302,11 +302,11 @@ extension WeatherForecastViewModel {
         self.place = place
     }
 
-    func startDataRefreshTimer() {
+    func startDataRefreshTimer(showLoading: Bool = true) {
         endDataRefreshTimer()
         
         Task(priority: .utility) {
-            await self.loadWeatherData(showLoading: self.refreshCount == 0)
+            await self.loadWeatherData(showLoading: showLoading && self.refreshCount == 0)
             await self.incrementRefreshCount()
         }
 
@@ -314,7 +314,7 @@ extension WeatherForecastViewModel {
                                                 repeats: true) { _ in
             Task(priority: .utility) {
                 await self.incrementRefreshCount()
-                await self.loadWeatherData(showLoading: self.refreshCount == 0)
+                await self.loadWeatherData(showLoading: showLoading && self.refreshCount == 0)
             }
         }
     }

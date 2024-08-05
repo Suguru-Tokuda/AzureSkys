@@ -35,7 +35,7 @@ struct WeatherForecastBottomBar: View {
 
 #Preview {
     WeatherForecastBottomBar(
-        background: Color.skyBlue
+        background: Color.skyBlue100
     )
     .environmentObject(MainCoordinator())
     .preferredColorScheme(.dark)

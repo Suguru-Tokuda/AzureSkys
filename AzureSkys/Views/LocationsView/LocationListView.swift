@@ -62,7 +62,7 @@ extension LocationListView {
         }
         .listStyle(.plain)
         .zIndex(1)
-
+        .scrollIndicators(.never)
     }
 }
 

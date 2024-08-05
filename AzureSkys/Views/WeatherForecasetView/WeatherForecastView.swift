@@ -69,7 +69,7 @@ struct WeatherForecastView: View {
                     .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             if isActive != nil {
                 self.isActive = true
-                vm.startDataRefreshTimer()
+                vm.startDataRefreshTimer(showLoading: false)
             }
         }
         .onReceive(NotificationCenter
@@ -116,7 +116,7 @@ extension WeatherForecastView {
                                       geocode: vm.geocode,
                                       networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
-                                      showAnimation: vm.refreshCount <= 1,
+                                      showAnimation: vm.refreshCount < 1,
                                       onRefresh: {
                 vm.startDataRefreshTimer()
             })

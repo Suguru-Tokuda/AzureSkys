@@ -48,10 +48,11 @@ struct WeatherForecastScrollView: View {
                                 isMyLocation: coordinator.place == nil,
                                 scrollViewOffsetPercentage: .zero
                             )
-                            
-                            WeatherThreeHourlyForecastListView(forecasts: forecast.hourly)
+
+                            WeatherThreeHourlyForecastListView(forecast: forecast)
                             
                             WeatherDailyForecastListView(list: forecast.daily,
+                                                         timezoneOffset: forecast.timezoneOffset,
                                                          showAnimation: self.showAnimation)
                             
                             if let weather = forecast.current.weather.first {

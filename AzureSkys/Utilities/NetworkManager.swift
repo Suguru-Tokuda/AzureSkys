@@ -14,6 +14,7 @@ protocol Networking {
     func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void)
     func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T
     func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping ((Bool) -> ()))
+    func checkNetworkAvailability(queue: DispatchQueue) async -> Bool
 }
 
 class NetworkManager: Networking {
@@ -25,8 +26,8 @@ class NetworkManager: Networking {
         
         URLSession.shared.dataTask(with: URLRequest(url: url)) { (data, response, error) in
             if let data,
-                let res = response as? HTTPURLResponse,
-                200..<300 ~= res.statusCode {
+               let res = response as? HTTPURLResponse,
+               200..<300 ~= res.statusCode {
                 do {
                     let parsedData = try JSONDecoder().decode(type.self, from: data)
                     
@@ -88,8 +89,12 @@ class NetworkManager: Networking {
             })
             .eraseToAnyPublisher()
     }
-    
-    func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping ((Bool) -> ())) {
+}
+
+// MARK: Default implementations
+
+extension Networking {
+    func checkNetworkAvailability(queue: DispatchQueue = DispatchQueue.global(qos: .background), completionHandler: @escaping ((Bool) -> ())) {
         let monitor = NWPathMonitor()
         monitor.start(queue: queue)
         
@@ -99,6 +104,20 @@ class NetworkManager: Networking {
             } else {
                 completionHandler(false)
             }
+            monitor.cancel()
+        }
+    }
+
+    func checkNetworkAvailability(queue: DispatchQueue = DispatchQueue.global(qos: .background)) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            let monitor = NWPathMonitor()
+            
+            monitor.pathUpdateHandler = { path in
+                monitor.cancel()  // Stop monitoring after getting the status
+                continuation.resume(returning: path.status == .satisfied)
+            }
+            
+            monitor.start(queue: queue)
         }
     }
 }

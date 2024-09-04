@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct WeatherThreeHourlyForecastListView: View {
-    var forecasts: [Forecast]
+    var forecast: WeatherForecastOneCallResponse
     
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 20) {
-                ForEach(Array(forecasts.enumerated()), id: \.offset) { i, item in
-                    WeatherThreeHourlyForecastListViewCell(forecast: item, isFirst: i == 0)
+                ForEach(Array(forecast.hourly.enumerated()), id: \.offset) { i, item in
+                    WeatherThreeHourlyForecastListViewCell(forecast: item,
+                                                           timezoneOffset: forecast.timezoneOffset,
+                                                           isFirst: i == 0)
                         .frame(minHeight: 150)
                 }
             }
@@ -26,6 +28,6 @@ struct WeatherThreeHourlyForecastListView: View {
 }
 
 #Preview {
-    WeatherThreeHourlyForecastListView(forecasts: PreviewManager.oneCallResponse.hourly)
+    WeatherThreeHourlyForecastListView(forecast: PreviewManager.oneCallResponse)
         .preferredColorScheme(.dark)
 }

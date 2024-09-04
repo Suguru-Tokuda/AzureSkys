@@ -44,7 +44,7 @@ class WeatherForecastViewModel: ObservableObject {
         
         self.getSQLitePath()
         
-        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
+        self.networkManager.checkNetworkAvailability() { [weak self] networkAvailable in
             guard let self else { return }
             DispatchQueue.main.async {
                 self.networkError = !networkAvailable ? .networkUnavailable : nil
@@ -84,6 +84,11 @@ class WeatherForecastViewModel: ObservableObject {
     func getWeatherForecastData(showLoading: Bool = true) async {
         if let _ = currentLocation,
            loadingStatus != .loading {
+            guard await networkManager.checkNetworkAvailability() else {
+                isErrorOccured = true
+                networkError = .networkUnavailable
+                return
+            }
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(),
                   let geocodeUrlStr = getGeocodeAPIString(),
                   let forecastUrl = URL(string: forecastUrlStr),
@@ -128,6 +133,12 @@ class WeatherForecastViewModel: ObservableObject {
      */
     func getWeatherForecastData(place: GooglePlaceDetails, showLoading: Bool = true) async {
         if loadingStatus != .loading {
+            guard await networkManager.checkNetworkAvailability() else {
+                isErrorOccured = true
+                networkError = .networkUnavailable
+                return
+            }
+
             guard let forecastUrlStr = getWeatherForecastOnecallAPIString(place: place),
                   let geocodeUrlStr = getGeocodeAPIString(place: place),
                   let forecastUrl = URL(string: forecastUrlStr),
@@ -294,8 +305,8 @@ extension WeatherForecastViewModel {
         self.refreshCount = 0
     }
 
-    func incrementRefreshCount() async  {
-        self.refreshCount += 1
+    func incrementRefreshCount(_ count: Int = 1) async  {
+        self.refreshCount += count
     }
 
     func setPlace(place: GooglePlaceDetails? = nil) {
@@ -307,7 +318,9 @@ extension WeatherForecastViewModel {
         
         Task(priority: .utility) {
             await self.loadWeatherData(showLoading: showLoading && self.refreshCount == 0)
-            await self.incrementRefreshCount()
+            if !showLoading {
+                await self.incrementRefreshCount(2)
+            }
         }
 
         dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,

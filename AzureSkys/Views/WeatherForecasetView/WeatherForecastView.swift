@@ -50,14 +50,7 @@ struct WeatherForecastView: View {
                 vm.startDataRefreshTimer()
             }
         }
-        .alert(isPresented: $vm.isErrorOccured, error: vm.networkError, actions: {
-            Button(action: {
-                vm.dismissError(error: vm.coreDataError)
-            }, label: {
-                Text("OK")
-            })
-        })
-        .alert(isPresented: $vm.isErrorOccured, error: vm.coreDataError) {
+        .alert(isPresented: .constant(vm.coreDataError != nil), error: vm.coreDataError) {
             Button(action: {
                 vm.dismissError(error: vm.coreDataError)
             }, label: {

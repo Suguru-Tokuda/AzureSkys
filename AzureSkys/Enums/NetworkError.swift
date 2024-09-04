@@ -22,9 +22,9 @@ extension NetworkError: LocalizedError {
         case .badUrl:
             return NSLocalizedString("Bad URL Error. Please make sure the URL is valid.", comment: "badUrl")
         case .dataParsingError:
-            return NSLocalizedString("Data parsing error.", comment: "dataParsingError")
+            return NSLocalizedString("Data Processing Error", comment: "dataParsingError")
         case .serverError:
-            return NSLocalizedString("Server error.", comment: "serverError")
+            return NSLocalizedString("Server Error", comment: "serverError")
         case .noData:
             return NSLocalizedString("No data found.", comment: "noData")
         case .networkUnavailable:

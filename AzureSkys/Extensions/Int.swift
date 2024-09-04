@@ -21,8 +21,10 @@ extension Int {
         return ""
     }
     
-    func unixTimeToDateStr(dateFormat: String) -> String {
-        let date = Date(timeIntervalSince1970: TimeInterval(self))
+    func unixTimeToDateStr(dateFormat: String, timezoneOffset: Int) -> String {
+        let fiveHours = 5 * 60 * 60
+        let currentDateInUnixTimestamp = self + fiveHours + timezoneOffset
+        let date = Date(timeIntervalSince1970: TimeInterval(currentDateInUnixTimestamp))
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormat

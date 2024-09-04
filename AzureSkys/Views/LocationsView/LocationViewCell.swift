@@ -39,7 +39,8 @@ struct LocationViewCell: View {
                                 vm.currentForecast?.name ?? "" :
                                 vm.currentForecast?
                                     .dateTime
-                                    .unixTimeToDateStr(dateFormat: Constants.dateFormat)
+                                    .unixTimeToDateStr(dateFormat: Constants.dateFormat,
+                                                       timezoneOffset: vm.currentForecast?.timezone ?? 0)
                                     .getDateStrinng(dateFormat: Constants.dateFormat,
                                                     newDateFormat: "hh:mm") ?? "")
                             .font(.caption)

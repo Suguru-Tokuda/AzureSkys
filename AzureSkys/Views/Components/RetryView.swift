@@ -13,24 +13,19 @@ struct RetryView: View {
     
     var body: some View {
         ZStack {
-            if let errorMessage {
-                VStack {
-                    Text(errorMessage)
-                        .font(.title3.weight(.bold))
-                        .padding(.top, 100)
-                    Spacer()
-                }
+            VStack {
+                Spacer()
+                Text(errorMessage ?? "Error")
+                    .font(.title3.weight(.bold))
+                    .padding(.bottom, 12)
+                Button(action: {
+                    onRetryBtnTapped?()
+                }, label: {
+                    Image(systemName: "arrow.clockwise")
+                 Text("Retry")
+                })
+                Spacer()
             }
-
-            Button(action: {
-                onRetryBtnTapped?()
-            }, label: {
-             Text("Retry")
-            })
-            .buttonStyle(OpenSettingsBtnStyle(
-                backgroundColor: .night1,
-                foregroundColor: .white)
-            )
         }
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct WeatherDailyForecastListCellView: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: DailyForecast
+    var timezoneOffset: Int
     var showTempBarAnimation: Bool = true
     
     var body: some View {
@@ -17,7 +18,7 @@ struct WeatherDailyForecastListCellView: View {
             Color.clear
                 .blur(radius: 3.0, opaque: false)
             HStack(alignment: .center, spacing: 20) {
-                Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
+                Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
                     .frame(width: 50, alignment: .leading)
                 if let weather = forecast.weather.first {
                     WeatherImageView(icon: weather.icon, width: 40)
@@ -40,7 +41,8 @@ struct WeatherDailyForecastListCellView: View {
 }
 
 #Preview {
-    WeatherDailyForecastListCellView(forecast: PreviewManager.oneCallResponse.daily.first!)
+    WeatherDailyForecastListCellView(forecast: PreviewManager.oneCallResponse.daily.first!,
+                                     timezoneOffset: 0)
         .environmentObject(LocalFileManager())
         .preferredColorScheme(.dark)
 }

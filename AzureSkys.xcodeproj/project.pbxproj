@@ -257,11 +257,11 @@
 			isa = PBXGroup;
 			children = (
 				BB9064302B222A9600F16123 /* HighLowTemperatures.swift */,
+				BBC1A3AE2B2CB94E00948E62 /* TempBarView.swift */,
 				BB0C60C62B1FAEBF00359F7D /* WeatherForecastAddHeaderView.swift */,
 				BBD835112B2AB03D00630B99 /* WeatherForecastBottomBar.swift */,
 				BB88627B2B1541EA00EE56B1 /* WeatherForecastHeaderView.swift */,
 				BBC1A3AC2B2CAA7700948E62 /* WeatherImageView.swift */,
-				BBC1A3AE2B2CB94E00948E62 /* TempBarView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -320,8 +320,8 @@
 		BB7EBC842B27B0EE00978174 /* StatusGridView */ = {
 			isa = PBXGroup;
 			children = (
-				BBD835102B2A2F8C00630B99 /* Components */,
 				BBD8350E2B2A2F8700630B99 /* StatusGridView.swift */,
+				BBD835102B2A2F8C00630B99 /* Components */,
 			);
 			path = StatusGridView;
 			sourceTree = "<group>";
@@ -372,10 +372,10 @@
 		BB8862612B1500F400EE56B1 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				BB8862622B1500F400EE56B1 /* Preview Assets.xcassets */,
-				BB8862992B1668DB00EE56B1 /* PreviewDataManager.swift */,
-				BB0C60972B1E4FE200359F7D /* previewWeatherData.json */,
 				BB90641D2B22002800F16123 /* currentWeatherData.json */,
+				BB0C60972B1E4FE200359F7D /* previewWeatherData.json */,
+				BB8862992B1668DB00EE56B1 /* PreviewDataManager.swift */,
+				BB8862622B1500F400EE56B1 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -383,6 +383,7 @@
 		BB8862692B1500FA00EE56B1 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				BB983B872B370BEB00161C26 /* ApiKeyManager.swift */,
 				BB88626F2B1501D500EE56B1 /* Constants.swift */,
 				BBC1A3A72B2CA0BE00948E62 /* LocalFileManager.swift */,
 				BB8862722B15029C00EE56B1 /* LocationManager.swift */,
@@ -390,7 +391,6 @@
 				BB9064362B22579E00F16123 /* PlaceCoreDataManager.swift */,
 				BB88627D2B15424500EE56B1 /* PreviewManager.swift */,
 				BB9B8DCC2B33B94200CE9861 /* SettingsManager.swift */,
-				BB983B872B370BEB00161C26 /* ApiKeyManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -453,8 +453,8 @@
 		BB8862872B16301200EE56B1 /* LocationSearchView */ = {
 			isa = PBXGroup;
 			children = (
-				BB8862892B163C1200EE56B1 /* LocationSearchResultListView.swift */,
 				BB88628B2B163C4E00EE56B1 /* LocationSearchResultListCellView.swift */,
+				BB8862892B163C1200EE56B1 /* LocationSearchResultListView.swift */,
 			);
 			path = LocationSearchView;
 			sourceTree = "<group>";

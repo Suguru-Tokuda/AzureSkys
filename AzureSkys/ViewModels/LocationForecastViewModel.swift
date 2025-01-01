@@ -43,9 +43,11 @@ class LocationForecastViewModel: ObservableObject {
         $searchText
             .debounce(for: 1.0, scheduler: RunLoop.main)
             .receive(on: DispatchQueue.main)
-            .sink { val in
-                Task {
-                    await self.getPredictions(searchText: val)
+            .sink { [weak self] val in
+                guard let self else { return }
+                Task { [weak self] in
+                    guard let self else { return }
+                    await getPredictions(searchText: val)
                 }
             }
             .store(in: &cancellables)

@@ -46,7 +46,8 @@ class WeatherForecastViewModel: ObservableObject {
         
         self.networkManager.checkNetworkAvailability() { [weak self] networkAvailable in
             guard let self else { return }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 self.networkError = !networkAvailable ? .networkUnavailable : nil
             }
         }
@@ -240,7 +241,8 @@ class WeatherForecastViewModel: ObservableObject {
     
     func addPlace(place: GooglePlaceDetails?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
         if let place {
-            Task {
+            Task { [weak self] in
+                guard let self else { return }
                 do {
                     try await coreDataManager.savePlaceIntoDatabase(place: place)
                     completionHandler(.success(true))

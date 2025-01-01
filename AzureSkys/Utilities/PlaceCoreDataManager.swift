@@ -16,12 +16,18 @@ protocol PlaceCoreDataActions {
 }
 
 class PlaceCoreDataManager: PlaceCoreDataActions {
+    let persistentContainer: NSPersistentContainer
+
+    init(container: NSPersistentContainer = PersistenceController.shared.container) {
+        persistentContainer = container
+    }
+
     func savePlaceIntoDatabase(place: GooglePlaceDetails) async throws {
         do {
             let existinPlace = try await self.getPlaceFromDatabase(id: place.id)
             
             if existinPlace == nil {
-                try await PersistenceController.shared.container.performBackgroundTask { context in
+                try await persistentContainer.performBackgroundTask { context in
                     let placeEntity = PlaceEntity(context: context)
                     
                     placeEntity.id = place.id
@@ -46,7 +52,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
         let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
         var retVal: [GooglePlaceDetails] = []
         
-        try await PersistenceController.shared.container.performBackgroundTask { context in
+        try await persistentContainer.performBackgroundTask { context in
             let allRecords = try context.fetch(request)
             
             retVal = allRecords.map { entity in
@@ -62,7 +68,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
         
         var retVal: GooglePlaceDetails?
         
-        try await PersistenceController.shared.container.performBackgroundTask { context in
+        try await persistentContainer.performBackgroundTask { context in
             do {
                 let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -81,7 +87,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     
     func deleteFromDatabase(place: GooglePlaceDetails) async throws {
         do {
-            try await PersistenceController.shared.container.performBackgroundTask { context in
+            try await persistentContainer.performBackgroundTask { context in
                 let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "id == %@", place.id as CVarArg)
 
@@ -96,7 +102,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
     
     func clearAllFromDatabase() async throws {
-        try await PersistenceController.shared.container.performBackgroundTask { context in
+        try await persistentContainer.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             let allRecords = try context.fetch(request)
             

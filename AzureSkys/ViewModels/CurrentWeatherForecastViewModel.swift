@@ -61,9 +61,10 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             locationManager.$locationAuthorized
                 .combineLatest(locationManager.$currentLocation)
                 .receive(on: DispatchQueue.main)
-                .sink { receiveVal in
-                    self.locationAuthorized = receiveVal.0
-                    self.currentLocation = receiveVal.1
+                .sink { [weak self] receiveVal in
+                    guard let self else { return }
+                    locationAuthorized = receiveVal.0
+                    currentLocation = receiveVal.1
                 }
                 .store(in: &cancellables)
         }

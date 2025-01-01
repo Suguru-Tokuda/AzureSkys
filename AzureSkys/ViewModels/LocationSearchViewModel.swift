@@ -28,7 +28,8 @@ class LocationSearchViewModel: ObservableObject {
         
         self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
             guard let self else { return }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 self.customError = !networkAvailable ? NetworkError.networkUnavailable : nil
             }
         }

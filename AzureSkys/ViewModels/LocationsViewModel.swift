@@ -32,7 +32,8 @@ class LocationsViewModel: ObservableObject {
             }
             
             if let place {
-                Task {
+                Task { [weak self] in
+                    guard let self else { return }
                     do {
                         try await placeCoreDataManager.deleteFromDatabase(place: place)
                     } catch {

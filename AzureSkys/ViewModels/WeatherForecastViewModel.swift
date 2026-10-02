@@ -79,101 +79,52 @@ class WeatherForecastViewModel: ObservableObject {
         }
     }
     
-    /**
-     Get weather forecast & geo location with the current location
-     */
     func getWeatherForecastData(showLoading: Bool = true) async {
-        if let _ = currentLocation,
-           loadingStatus != .loading {
-            guard await networkManager.checkNetworkAvailability() else {
-                isErrorOccured = true
-                networkError = .networkUnavailable
-                return
-            }
-            guard let forecastUrlStr = getWeatherForecastOnecallAPIString(),
-                  let geocodeUrlStr = getGeocodeAPIString(),
-                  let forecastUrl = URL(string: forecastUrlStr),
-                  let geocodeUrl = URL(string: geocodeUrlStr) else {
-                isErrorOccured = true
-                networkError = NetworkError.badUrl
-                return
-            }
-            
-            if showLoading {
-                loadingStatus = .loading
-            }
-            
-            do {
-                async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
-                async let geocode = networkManager.getData(url: geocodeUrl, type: [WeatherGeocode].self)
-                
-                let res: [Any] = try await [forecast, geocode]
-                
-                if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
-                    self.forecast = forecastRes
-                    self.setBackgroundColor()
-                }
-                
-                if let geocodeRes = res[1] as? [WeatherGeocode],
-                   let geocode = geocodeRes.first {
-                    self.geocode = geocode
-                }
-                                
-                self.loadingStatus = .loaded
-                self.isErrorOccured = false
-                self.networkError = nil
-            } catch {
-                self.loadingStatus = .inactive
-                await handleGetWeatherForecastError(error: error)
-            }
-        }
+        guard let currentLocation else { return }
+        await getWeatherForecastData(coordinate: currentLocation.coordinate, showLoading: showLoading)
     }
-    
-    /**
-        Get weather forecast & geo location with the city data
-     */
+
     func getWeatherForecastData(place: GooglePlaceDetails, showLoading: Bool = true) async {
-        if loadingStatus != .loading {
-            guard await networkManager.checkNetworkAvailability() else {
-                isErrorOccured = true
-                networkError = .networkUnavailable
-                return
-            }
+        let coordinate = CLLocationCoordinate2D(latitude: place.geometry.location.latitude,
+                                                longitude: place.geometry.location.longitude)
+        await getWeatherForecastData(coordinate: coordinate, showLoading: showLoading)
+    }
 
-            guard let forecastUrlStr = getWeatherForecastOnecallAPIString(place: place),
-                  let geocodeUrlStr = getGeocodeAPIString(place: place),
-                  let forecastUrl = URL(string: forecastUrlStr),
-                  let geocodeUrl = URL(string: geocodeUrlStr) else {
-                isErrorOccured = true
-                networkError = NetworkError.badUrl
-                return
-            }
-            
-            if showLoading {
-                self.loadingStatus = .loading
-            }
-            
-            do {
-                async let forecast = networkManager.getData(url: forecastUrl, type: WeatherForecastOneCallResponse.self)
-                async let geocode = networkManager.getData(url: geocodeUrl, type: [WeatherGeocode].self)
+    private func getWeatherForecastData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
+        guard loadingStatus != .loading else { return }
+        guard await networkManager.checkNetworkAvailability() else {
+            isErrorOccured = true
+            networkError = .networkUnavailable
+            return
+        }
+        guard let apiKey = try? apiKeyManager.getOpenWeatherApiKey(),
+              let forecastURL = weatherURL(path: "/data/3.0/onecall", coordinate: coordinate,
+                                           apiKey: apiKey, excludeMinutely: true),
+              let geocodeURL = weatherURL(path: "/geo/1.0/reverse", coordinate: coordinate,
+                                          apiKey: apiKey) else {
+            isErrorOccured = true
+            networkError = .badUrl
+            return
+        }
 
-                let res: [Any] = try await [forecast, geocode]
-                
-                if let forecastRes = res[0] as? WeatherForecastOneCallResponse {
-                    self.forecast = forecastRes
-                    self.setBackgroundColor()
-                }
-                
-                if let geocodeRes = res[1] as? [WeatherGeocode],
-                   let geocode = geocodeRes.first {
-                    self.geocode = geocode
-                }
-                
-                self.loadingStatus = .loaded
-            } catch {
-                self.loadingStatus = .inactive
-                await handleGetWeatherForecastError(error: error)
-            }
+        if showLoading {
+            loadingStatus = .loading
+        }
+
+        do {
+            async let forecastResponse = networkManager.getData(url: forecastURL, type: WeatherForecastOneCallResponse.self)
+            async let geocodeResponse = networkManager.getData(url: geocodeURL, type: [WeatherGeocode].self)
+            let (forecast, geocodes) = try await (forecastResponse, geocodeResponse)
+
+            self.forecast = forecast
+            self.geocode = geocodes.first
+            setBackgroundColor()
+            loadingStatus = .loaded
+            networkError = nil
+            isErrorOccured = coreDataError != nil
+        } catch {
+            loadingStatus = .inactive
+            await handleGetWeatherForecastError(error: error)
         }
     }
 
@@ -256,40 +207,21 @@ class WeatherForecastViewModel: ObservableObject {
         }
     }
     
-    /**
-        Get url by using the current location
-     */
-    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint) -> String? {
-        guard let currentLocation,
-              let apiKey = try? apiKeyManager.getOpenWeatherApiKey() else { return nil }
-        return "\(urlString)/data/3.0/onecall?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&exclude=minutely&appid=\(apiKey)"
+    private func weatherURL(path: String, coordinate: CLLocationCoordinate2D,
+                            apiKey: String, excludeMinutely: Bool = false) -> URL? {
+        guard var components = URLComponents(string: Constants.weatherApiEndpoint) else { return nil }
+        components.path = path
+        components.queryItems = [
+            URLQueryItem(name: "lat", value: String(coordinate.latitude)),
+            URLQueryItem(name: "lon", value: String(coordinate.longitude)),
+            URLQueryItem(name: "appid", value: apiKey)
+        ]
+        if excludeMinutely {
+            components.queryItems?.append(URLQueryItem(name: "exclude", value: "minutely"))
+        }
+        return components.url
     }
-    
-    /**
-        Get url by using City data.
-     */
-    private func getWeatherForecastOnecallAPIString(urlString: String = Constants.weatherApiEndpoint, place: GooglePlaceDetails) -> String? {
-        guard let apiKey = try? apiKeyManager.getOpenWeatherApiKey() else { return nil }
-        return "\(urlString)/data/3.0/onecall?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&exclude=minutely&appid=\(apiKey)"
-    }
-    
-    /**
-        Get geocode url by current location
-     */
-    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint) -> String? {
-        guard let currentLocation,
-              let apiKey = try? apiKeyManager.getOpenWeatherApiKey() else { return nil }
-        return "\(urlString)/geo/1.0/reverse?lat=\(currentLocation.coordinate.latitude)&lon=\(currentLocation.coordinate.longitude)&appid=\(apiKey)"
-    }
-    
-    /**
-        Get geocode url by city
-     */
-    private func getGeocodeAPIString(urlString: String = Constants.weatherApiEndpoint, place: GooglePlaceDetails) -> String? {
-        guard let apiKey = try? apiKeyManager.getOpenWeatherApiKey() else { return nil }
-        return "\(urlString)/geo/1.0/reverse?lat=\(place.geometry.location.latitude)&lon=\(place.geometry.location.longitude)&appid=\(apiKey)"
-    }
-    
+
     func getSQLitePath() {
         // .shared, .default, .standard - same thing
 //        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {

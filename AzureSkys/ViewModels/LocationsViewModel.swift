@@ -19,29 +19,16 @@ class LocationsViewModel: ObservableObject {
     }
     
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
-        for index in indexSet {
-            let indexInt = Int(index)
-            var place: GooglePlaceDetails?
-            var i = 0
-            
-            results.forEach { entity in
-                if i == indexInt {
-                    place = GooglePlaceDetails(from: entity)
-                }
-                i += 1
-            }
-            
-            if let place {
-                Task { [weak self] in
-                    guard let self else { return }
-                    do {
-                        try await placeCoreDataManager.deleteFromDatabase(place: place)
-                    } catch {
-                        errorOccured = true
-                        if let error = error as? CoreDataError {
-                            coreDataError = error
-                        }
-                    }
+        // Capture the selected places before deletions update the fetched results.
+        let places = indexSet.compactMap { GooglePlaceDetails(from: results[$0]) }
+        Task { [weak self] in
+            guard let self else { return }
+            for place in places {
+                do {
+                    try await placeCoreDataManager.deleteFromDatabase(place: place)
+                } catch {
+                    errorOccured = true
+                    coreDataError = error as? CoreDataError
                 }
             }
         }

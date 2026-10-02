@@ -23,100 +23,54 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func savePlaceIntoDatabase(place: GooglePlaceDetails) async throws {
-        do {
-            let existinPlace = try await self.getPlaceFromDatabase(id: place.id)
-            
-            if existinPlace == nil {
-                try await persistentContainer.performBackgroundTask { context in
-                    let placeEntity = PlaceEntity(context: context)
-                    
-                    placeEntity.id = place.id
-                    placeEntity.name = place.name
-                    placeEntity.addressComponents = try? JSONEncoder().encode(place.addressComponents)
-                    placeEntity.latitude = place.geometry.location.latitude
-                    placeEntity.longitude = place.geometry.location.longitude
-                                        
-                    do {
-                        try self.save(context: context)
-                    } catch {
-                        throw error
-                    }
-                }
-            }
-        } catch {
-            throw error
+        try await persistentContainer.performBackgroundTask { context in
+            let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", place.id)
+            request.fetchLimit = 1
+            guard try context.fetch(request).isEmpty else { return }
+
+            let entity = PlaceEntity(context: context)
+            entity.id = place.id
+            entity.name = place.name
+            entity.addressComponents = try JSONEncoder().encode(place.addressComponents)
+            entity.latitude = place.geometry.location.latitude
+            entity.longitude = place.geometry.location.longitude
+            try context.save()
         }
     }
-    
+
     func getPlacesFromDatabase() async throws -> [GooglePlaceDetails] {
-        let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
-        var retVal: [GooglePlaceDetails] = []
-        
         try await persistentContainer.performBackgroundTask { context in
-            let allRecords = try context.fetch(request)
-            
-            retVal = allRecords.map { entity in
-                GooglePlaceDetails(from: entity)
-            }
-            .compactMap { $0 }
+            let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+            return try context.fetch(request).compactMap { GooglePlaceDetails(from: $0) }
         }
-        
-        return retVal
     }
 
     func getPlaceFromDatabase(id: String) async throws -> GooglePlaceDetails? {
-        
-        var retVal: GooglePlaceDetails?
-        
         try await persistentContainer.performBackgroundTask { context in
-            do {
-                let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-
-                let allRecords = try context.fetch(request)
-                
-                if let entity = allRecords.first,
-                   let place = GooglePlaceDetails(from: entity) {
-                    retVal = place
-                }
-            }
+            let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", id)
+            request.fetchLimit = 1
+            return try context.fetch(request).first.flatMap { GooglePlaceDetails(from: $0) }
         }
-        
-        return retVal
     }
-    
+
     func deleteFromDatabase(place: GooglePlaceDetails) async throws {
-        do {
-            try await persistentContainer.performBackgroundTask { context in
-                let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@", place.id as CVarArg)
-
-                let allRecords = try context.fetch(request)
-                allRecords.forEach { context.delete($0) }
-                
-                try self.save(context: context)
-            }
-        } catch {
-            throw error
+        try await persistentContainer.performBackgroundTask { context in
+            let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", place.id)
+            let records = try context.fetch(request)
+            records.forEach { context.delete($0) }
+            try context.save()
         }
     }
-    
+
     func clearAllFromDatabase() async throws {
         try await persistentContainer.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
-            let allRecords = try context.fetch(request)
-            
-            allRecords.forEach { context.delete($0) }
-            
-            try self.save(context: context)
-        }
-    }
-    
-    func save(context: NSManagedObjectContext) throws {
-        do {
+            let records = try context.fetch(request)
+            records.forEach { context.delete($0) }
             try context.save()
-        } catch {
-            throw error
         }
     }
 }

@@ -78,28 +78,31 @@ class NetworkManager: Networking {
 extension Networking {
     func checkNetworkAvailability(queue: DispatchQueue = DispatchQueue.global(qos: .background), completionHandler: @escaping ((Bool) -> ())) {
         let monitor = NWPathMonitor()
-        monitor.start(queue: queue)
-        
+        let completionLock = NSLock()
+        var completed = false
+
         monitor.pathUpdateHandler = { path in
-            if path.status == .satisfied {
-                completionHandler(true)
-            } else {
-                completionHandler(false)
+            completionLock.lock()
+            guard !completed else {
+                completionLock.unlock()
+                return
             }
+            completed = true
+            completionLock.unlock()
+
+            // Break monitor -> handler -> monitor before notifying the caller.
+            monitor.pathUpdateHandler = nil
             monitor.cancel()
+            completionHandler(path.status == .satisfied)
         }
+        monitor.start(queue: queue)
     }
 
     func checkNetworkAvailability(queue: DispatchQueue = DispatchQueue.global(qos: .background)) async -> Bool {
-        return await withCheckedContinuation { continuation in
-            let monitor = NWPathMonitor()
-            
-            monitor.pathUpdateHandler = { path in
-                monitor.cancel()  // Stop monitoring after getting the status
-                continuation.resume(returning: path.status == .satisfied)
+        await withCheckedContinuation { continuation in
+            checkNetworkAvailability(queue: queue) { available in
+                continuation.resume(returning: available)
             }
-            
-            monitor.start(queue: queue)
         }
     }
 }

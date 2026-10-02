@@ -41,7 +41,7 @@ struct LocationsView: View {
                     }
                 }
             }
-            .alert(isPresented: $vm.hasError, error: vm.networkError, actions: {
+            .alert(isPresented: Binding(get: { vm.detailsError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.detailsError, actions: {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
@@ -99,7 +99,7 @@ struct LocationsView: View {
 extension LocationsView {
     @ViewBuilder
     func locationSearchResult() -> some View {
-        if vm.isLoading == .loading {
+        if vm.loadingStatus == .loading {
             VStack {
                 ProgressView("Loading...")
             }

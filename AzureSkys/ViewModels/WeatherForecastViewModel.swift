@@ -13,12 +13,12 @@ import MapKit
 @MainActor
 class WeatherForecastViewModel: ObservableObject {
     @Published var showForecastAnimation = true
-    @Published var forecast: WeatherForecastOneCallResponse?
-    @Published var geocode: WeatherGeocode?
-    @Published var loadingStatus: LoadingStatus = .inactive
-    @Published var hasError = false
-    @Published var networkError: NetworkError?
+    @Published private(set) var requestState: RequestState<WeatherForecastData> = .idle
     @Published var coreDataError: CoreDataError?
+    var forecast: WeatherForecastOneCallResponse? { requestState.value?.forecast }
+    var geocode: WeatherGeocode? { requestState.value?.geocode }
+    var networkError: NetworkError? { requestState.error }
+    var loadingStatus: LoadingStatus { requestState.loadingStatus }
     @Published var locationAuthorized: Bool?
     @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], 
                                                                startPoint: .topLeading,
@@ -31,7 +31,6 @@ class WeatherForecastViewModel: ObservableObject {
     private let coreDataManager: PlaceCoreDataActions
     var locationManager: LocationManager?
     private let refreshScheduler = RefreshScheduler()
-    private var isFetching = false
 
     init(weatherService: WeatherServicing,
          coreDataManager: PlaceCoreDataActions) {
@@ -77,26 +76,22 @@ class WeatherForecastViewModel: ObservableObject {
     }
 
     private func getWeatherForecastData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
-        guard !isFetching, !Task.isCancelled else { return }
-        isFetching = true
-        defer { isFetching = false }
-        if showLoading {
-            loadingStatus = .loading
-        }
+        guard !Task.isCancelled else { return }
+        if case .loading = requestState { return }
+        let previous = requestState.value
+        requestState = .loading(previous: showLoading ? nil : previous)
 
         do {
             let data = try await weatherService.getForecast(coordinate: coordinate)
             try Task.checkCancellation()
-            self.forecast = data.forecast
-            self.geocode = data.geocode
+            requestState = .loaded(data)
             setBackgroundColor()
-            loadingStatus = .loaded
-            networkError = nil
-            hasError = coreDataError != nil
         } catch {
-            loadingStatus = .inactive
-            guard !Task.isCancelled else { return }
-            await handleGetWeatherForecastError(error: error)
+            guard !Task.isCancelled else {
+                requestState = previous.map(RequestState.loaded) ?? .idle
+                return
+            }
+            requestState = .failed(NetworkError(error), previous: previous)
         }
     }
 
@@ -108,41 +103,10 @@ class WeatherForecastViewModel: ObservableObject {
         }
     }
     
-    func dismissError<T: LocalizedError>(error: T?) {
-        if let error {
-            if error is NetworkError {
-                self.networkError = nil
-            }
-            
-            if error is CoreDataError {
-                self.coreDataError = nil
-            }
-        }
-        
-        hasError = false
+    func dismissError() {
+        coreDataError = nil
     }
-    
-    private func handleGetWeatherForecastError(error: Error) async {
-        switch error {
-        case NetworkError.badUrl:
-            networkError = NetworkError.badUrl
-        case NetworkError.dataParsingError:
-            networkError = NetworkError.dataParsingError
-        case NetworkError.noData:
-            networkError = NetworkError.noData
-        case NetworkError.serverError:
-            networkError = NetworkError.serverError
-        case NetworkError.networkUnavailable:
-            networkError = .networkUnavailable
-        case NetworkError.unknown:
-            networkError = NetworkError.unknown
-        default:
-            networkError = NetworkError.unknown
-        }
 
-        hasError = true
-    }
-    
     private func setBackgroundColor() {
         if let forecast,
            let weather = forecast.current.weather.first {
@@ -164,10 +128,10 @@ class WeatherForecastViewModel: ObservableObject {
             Task { [weak self] in
                 guard let self else { return }
                 do {
+                    coreDataError = nil
                     try await coreDataManager.savePlaceIntoDatabase(place: place)
                     completionHandler(.success(true))
                 } catch {
-                    self.hasError = true
                     self.coreDataError = CoreDataError.save
                     
                     completionHandler(.failure(error))

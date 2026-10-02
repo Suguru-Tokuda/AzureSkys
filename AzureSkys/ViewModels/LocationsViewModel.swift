@@ -9,7 +9,6 @@ import SwiftUI
 
 @MainActor
 class LocationsViewModel: ObservableObject {
-    @Published var hasError = false
     @Published var coreDataError: CoreDataError?
     
     private let placeCoreDataManager: PlaceCoreDataActions
@@ -19,6 +18,7 @@ class LocationsViewModel: ObservableObject {
     }
     
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
+        coreDataError = nil
         // Capture the selected places before deletions update the fetched results.
         let places = indexSet.compactMap { SavedPlace(from: results[$0]) }
         Task { [weak self] in
@@ -27,15 +27,13 @@ class LocationsViewModel: ObservableObject {
                 do {
                     try await placeCoreDataManager.deleteFromDatabase(place: place)
                 } catch {
-                    hasError = true
-                    coreDataError = error as? CoreDataError
+                    coreDataError = .delete
                 }
             }
         }
     }
     
     func dismissError() {
-        hasError = false
         coreDataError = nil
     }
 }

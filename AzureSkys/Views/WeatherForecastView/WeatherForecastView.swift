@@ -52,9 +52,9 @@ struct WeatherForecastView: View {
             vm.setPlace(place: place)
             vm.startDataRefreshTimer()
         }
-        .alert(isPresented: .constant(vm.coreDataError != nil), error: vm.coreDataError) {
+        .alert(isPresented: Binding(get: { vm.coreDataError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.coreDataError) {
             Button(action: {
-                vm.dismissError(error: vm.coreDataError)
+                vm.dismissError()
             }, label: {
                 Text("OK")
             })
@@ -117,8 +117,6 @@ extension WeatherForecastView {
         if vm.loadingStatus == .loaded {
             WeatherForecastScrollView(forecast: vm.forecast,
                                       geocode: vm.geocode,
-                                      networkError: vm.networkError,
-                                      loadingStatus: vm.loadingStatus,
                                       isMyLocation: place == nil,
                                       showAnimation: vm.showForecastAnimation,
                                       onRefresh: {

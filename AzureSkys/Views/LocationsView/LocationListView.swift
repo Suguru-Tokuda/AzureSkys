@@ -58,7 +58,7 @@ extension LocationListView {
             .onDelete { indexSet in
                 vm.removeCity(results: results, indexSet: indexSet)
             }
-            .alert(isPresented: $vm.hasError, error: vm.coreDataError) {
+            .alert(isPresented: Binding(get: { vm.coreDataError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.coreDataError) {
                 Button(action: {
                     vm.dismissError()
                 }, label: {

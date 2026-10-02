@@ -34,3 +34,24 @@ extension NetworkError: LocalizedError {
         }
     }
 }
+
+extension NetworkError {
+    init(_ error: Error) {
+        if let error = error as? NetworkError {
+            self = error
+        } else if let error = error as? URLError {
+            switch error.code {
+            case .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
+                self = .networkUnavailable
+            case .badURL, .unsupportedURL:
+                self = .badUrl
+            default:
+                self = .unknown
+            }
+        } else if error is DecodingError {
+            self = .dataParsingError
+        } else {
+            self = .unknown
+        }
+    }
+}

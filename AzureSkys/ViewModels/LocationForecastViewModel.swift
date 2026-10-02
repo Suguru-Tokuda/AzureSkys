@@ -11,12 +11,13 @@ import Combine
 @MainActor
 class LocationForecastViewModel: ObservableObject {
     @Published var searchText = ""
-    @Published var isLoading: LoadingStatus = .inactive
-    @Published var hasError = false
-    @Published var networkError: NetworkError?
-    @Published var predictions: [Prediction] = []
-    
-    var gettingDetails: Bool = false
+    @Published private(set) var searchState: RequestState<[Prediction]> = .idle
+    @Published private(set) var detailsState: RequestState<SavedPlace> = .idle
+    var predictions: [Prediction] { searchState.value ?? [] }
+    var loadingStatus: LoadingStatus { searchState.loadingStatus }
+    var networkError: NetworkError? { searchState.error }
+    var detailsError: NetworkError? { detailsState.error }
+
     private var cancellables = Set<AnyCancellable>()
     private var searchTask: Task<Void, Never>?
     private var searchRequestID = UUID()
@@ -43,8 +44,7 @@ class LocationForecastViewModel: ObservableObject {
     }
 
     func dismissError() {
-        self.networkError = nil
-        self.hasError = false
+        detailsState.dismissError()
     }
     
     func getPredictions(searchText: String) async {
@@ -56,9 +56,8 @@ class LocationForecastViewModel: ObservableObject {
         searchTask?.cancel()
         let requestID = UUID()
         searchRequestID = requestID
-        predictions = []
-        isLoading = .inactive
-        dismissError()
+        searchState = .idle
+        detailsState = .idle
 
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
@@ -74,52 +73,39 @@ class LocationForecastViewModel: ObservableObject {
                 }
                 try Task.checkCancellation()
                 guard self?.searchRequestID == requestID else { return }
-                self?.isLoading = .loading
+                self?.searchState = .loading()
                 let predictions = try await placesService.getPredictions(query: query)
                 try Task.checkCancellation()
                 guard self?.searchRequestID == requestID else { return }
 
-                self?.predictions = predictions
-                self?.isLoading = .inactive
-                self?.dismissError()
+                self?.searchState = .loaded(predictions)
             } catch {
                 guard !Task.isCancelled, self?.searchRequestID == requestID else { return }
-                self?.isLoading = .inactive
-                self?.handleGetWeatherForecastError(error: error)
+                self?.searchState = .failed(NetworkError(error))
             }
         }
     }
 
     func getPlaceDetails(placeId: String) async -> SavedPlace? {
-        guard !gettingDetails else { return nil }
-        gettingDetails = true
-        defer { gettingDetails = false }
+        if case .loading = detailsState { return nil }
+        let requestID = searchRequestID
+        detailsState = .loading()
 
         do {
-            return try await placesService.getPlaceDetails(placeID: placeId)
+            let place = try await placesService.getPlaceDetails(placeID: placeId)
+            try Task.checkCancellation()
+            guard searchRequestID == requestID else { return nil }
+            detailsState = .loaded(place)
+            return place
         } catch {
-            guard !Task.isCancelled else { return nil }
-            handleGetWeatherForecastError(error: error)
+            guard searchRequestID == requestID else { return nil }
+            guard !Task.isCancelled else {
+                detailsState = .idle
+                return nil
+            }
+            detailsState = .failed(NetworkError(error))
             return nil
         }
     }
 
-    private func handleGetWeatherForecastError(error: Error) {
-        switch error {
-        case NetworkError.badUrl:
-            networkError = NetworkError.badUrl
-        case NetworkError.dataParsingError:
-            networkError = NetworkError.dataParsingError
-        case NetworkError.noData:
-            networkError = NetworkError.noData
-        case NetworkError.serverError:
-            networkError = NetworkError.serverError
-        case NetworkError.unknown:
-            networkError = NetworkError.unknown
-        default:
-            networkError = NetworkError.unknown
-        }
-        
-        hasError = true
-    }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0DE00000000000000000003 /* RequestState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004 /* RequestState.swift */; };
 		C0DE00000000000000000001 /* SavedPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000002 /* SavedPlace.swift */; };
 		ACD012340000000000000042 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000041 /* AppDependencies.swift */; };
 		ACD012340000000000000022 /* PlacesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000012 /* PlacesService.swift */; };
@@ -116,6 +117,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C0DE00000000000000000004 /* RequestState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestState.swift; sourceTree = "<group>"; };
 		C0DE00000000000000000002 /* SavedPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlace.swift; sourceTree = "<group>"; };
 		ACD012340000000000000041 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		ACD012340000000000000012 /* PlacesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesService.swift; sourceTree = "<group>"; };
@@ -444,6 +446,7 @@
 				BB90643A2B226EBB00F16123 /* CoreDataError.swift */,
 				BBC1A3A92B2CA25800948E62 /* FileManagerError.swift */,
 				BBE4E95D2B5DF56D00C83C48 /* LoadingStatus.swift */,
+				C0DE00000000000000000004 /* RequestState.swift */,
 				BB8862792B1527D300EE56B1 /* NetworkError.swift */,
 				BB983B8B2B370E9900161C26 /* PlistError.swift */,
 				BBC1A3B02B2CBF7A00948E62 /* TempColor.swift */,
@@ -601,6 +604,7 @@
 				ACD012340000000000000021 /* WeatherService.swift in Sources */,
 				ACD012340000000000000001 /* RefreshScheduler.swift in Sources */,
 				BBE4E95E2B5DF56D00C83C48 /* LoadingStatus.swift in Sources */,
+				C0DE00000000000000000003 /* RequestState.swift in Sources */,
 				BB983B8A2B370DF400161C26 /* ApiKeyModel.swift in Sources */,
 				BB0C60C72B1FAEBF00359F7D /* WeatherForecastAddHeaderView.swift in Sources */,
 				BB537C142B2B66DA006BE03C /* ViewOffsetKey.swift in Sources */,

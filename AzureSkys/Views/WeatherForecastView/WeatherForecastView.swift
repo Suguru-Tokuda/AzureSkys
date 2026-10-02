@@ -16,7 +16,7 @@ struct WeatherForecastView: View {
     @State var isActive: Bool?
     let location: ForecastLocation
     let presentation: Presentation
-    private var place: GooglePlaceDetails? { location.place }
+    private var place: SavedPlace? { location.place }
 
     enum Presentation { case main, preview, fullScreen }
     var coordinateSpaceName = "weatherScroll"

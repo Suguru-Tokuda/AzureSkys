@@ -90,7 +90,7 @@ class LocationForecastViewModel: ObservableObject {
         }
     }
 
-    func getPlaceDetails(placeId: String) async -> GooglePlaceDetails? {
+    func getPlaceDetails(placeId: String) async -> SavedPlace? {
         guard !gettingDetails else { return nil }
         gettingDetails = true
         defer { gettingDetails = false }

@@ -12,10 +12,10 @@ struct LocationViewCell: View {
     @EnvironmentObject var locationManager: LocationManager
     @StateObject var vm: CurrentWeatherForecastViewModel
     @State var isActive: Bool?
-    var place: GooglePlaceDetails?
+    var place: SavedPlace?
     var isMyLocation: Bool = false
     
-    init(dependencies: AppDependencies, place: GooglePlaceDetails? = nil, isMyLocation: Bool = false) {
+    init(dependencies: AppDependencies, place: SavedPlace? = nil, isMyLocation: Bool = false) {
         _vm = StateObject(wrappedValue: dependencies.makeCurrentWeatherViewModel())
         self.isMyLocation = isMyLocation
         self.place = place

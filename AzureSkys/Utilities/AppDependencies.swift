@@ -107,5 +107,5 @@ private struct PreviewWeatherService: WeatherServicing {
 
 private struct PreviewPlacesService: PlacesServicing {
     func getPredictions(query: String) async throws -> [Prediction] { PreviewManager.predictions }
-    func getPlaceDetails(placeID: String) async throws -> GooglePlaceDetails { PreviewManager.placeDetails }
+    func getPlaceDetails(placeID: String) async throws -> SavedPlace { SavedPlace(details: PreviewManager.placeDetails) }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 protocol PlacesServicing {
     func getPredictions(query: String) async throws -> [Prediction]
-    func getPlaceDetails(placeID: String) async throws -> GooglePlaceDetails
+    func getPlaceDetails(placeID: String) async throws -> SavedPlace
 }
 
 final class PlacesService: PlacesServicing {
@@ -36,7 +36,7 @@ final class PlacesService: PlacesServicing {
         return response.predictions ?? []
     }
 
-    func getPlaceDetails(placeID: String) async throws -> GooglePlaceDetails {
+    func getPlaceDetails(placeID: String) async throws -> SavedPlace {
         try Task.checkCancellation()
         let url = try placesURL(endpoint: "details/json", queryItems: [
             URLQueryItem(name: "placeid", value: placeID),
@@ -44,7 +44,7 @@ final class PlacesService: PlacesServicing {
         ])
         let response = try await networkManager.getData(url: url, type: GooglePlaceDetailsResponse.self)
         try Task.checkCancellation()
-        return response.result
+        return SavedPlace(details: response.result)
     }
 
     private func placesURL(endpoint: String, queryItems: [URLQueryItem]) throws -> URL {
@@ -53,5 +53,17 @@ final class PlacesService: PlacesServicing {
         components.queryItems = queryItems + [URLQueryItem(name: "key", value: key)]
         guard let url = components.url else { throw NetworkError.badUrl }
         return url
+    }
+}
+
+extension SavedPlace {
+    init(details: GooglePlaceDetails) {
+        self.init(id: details.id, name: details.name,
+                  formattedAddress: details.formattedAddress,
+                  latitude: details.geometry.location.latitude,
+                  longitude: details.geometry.location.longitude,
+                  addressComponents: details.addressComponents.map {
+                      PlaceAddressComponent(longName: $0.longName, shortName: $0.shortName, types: $0.types)
+                  })
     }
 }

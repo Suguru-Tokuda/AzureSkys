@@ -23,7 +23,7 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], 
                                                                startPoint: .topLeading,
                                                                endPoint: .bottomTrailing)
-    var place: GooglePlaceDetails?
+    var place: SavedPlace?
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
     
@@ -70,9 +70,9 @@ class WeatherForecastViewModel: ObservableObject {
         await getWeatherForecastData(coordinate: currentLocation.coordinate, showLoading: showLoading)
     }
 
-    func getWeatherForecastData(place: GooglePlaceDetails, showLoading: Bool = true) async {
-        let coordinate = CLLocationCoordinate2D(latitude: place.geometry.location.latitude,
-                                                longitude: place.geometry.location.longitude)
+    func getWeatherForecastData(place: SavedPlace, showLoading: Bool = true) async {
+        let coordinate = CLLocationCoordinate2D(latitude: place.latitude,
+                                                longitude: place.longitude)
         await getWeatherForecastData(coordinate: coordinate, showLoading: showLoading)
     }
 
@@ -159,7 +159,7 @@ class WeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
     
-    func addPlace(place: GooglePlaceDetails?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
+    func addPlace(place: SavedPlace?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
         if let place {
             Task { [weak self] in
                 guard let self else { return }
@@ -181,7 +181,7 @@ class WeatherForecastViewModel: ObservableObject {
 // MARK: Refresh scheduling
 
 extension WeatherForecastViewModel {
-    func setPlace(place: GooglePlaceDetails? = nil) {
+    func setPlace(place: SavedPlace? = nil) {
         self.place = place
     }
 

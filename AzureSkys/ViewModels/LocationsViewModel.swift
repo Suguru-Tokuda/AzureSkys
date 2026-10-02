@@ -20,7 +20,7 @@ class LocationsViewModel: ObservableObject {
     
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
         // Capture the selected places before deletions update the fetched results.
-        let places = indexSet.compactMap { GooglePlaceDetails(from: results[$0]) }
+        let places = indexSet.compactMap { SavedPlace(from: results[$0]) }
         Task { [weak self] in
             guard let self else { return }
             for place in places {

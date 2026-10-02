@@ -10,7 +10,7 @@ import SwiftUI
 // Each destination carries the location it displays.
 enum ForecastLocation: Identifiable {
     case current
-    case saved(GooglePlaceDetails)
+    case saved(SavedPlace)
 
     var id: String {
         switch self {
@@ -19,7 +19,7 @@ enum ForecastLocation: Identifiable {
         }
     }
 
-    var place: GooglePlaceDetails? {
+    var place: SavedPlace? {
         if case .saved(let place) = self { return place }
         return nil
     }
@@ -39,7 +39,7 @@ enum FullScreenDestination: Identifiable {
 
 struct ForecastPreviewDestination: Identifiable {
     let id = UUID()
-    let place: GooglePlaceDetails
+    let place: SavedPlace
 }
 
 @MainActor
@@ -52,7 +52,7 @@ final class MainCoordinator: ObservableObject {
         fullScreenDestination = .locations
     }
 
-    func selectLocation(_ place: GooglePlaceDetails?) {
+    func selectLocation(_ place: SavedPlace?) {
         let location = place.map(ForecastLocation.saved) ?? .current
         if case .locations = fullScreenDestination {
             selectedLocation = location
@@ -62,7 +62,7 @@ final class MainCoordinator: ObservableObject {
         }
     }
 
-    func previewForecast(place: GooglePlaceDetails) {
+    func previewForecast(place: SavedPlace) {
         forecastPreview = ForecastPreviewDestination(place: place)
     }
 

@@ -11,7 +11,7 @@ struct GooglePlaceDetailsResponse: Decodable {
     let result: GooglePlaceDetails
 }
 
-struct GooglePlaceDetails: Decodable, Identifiable {
+struct GooglePlaceDetails: Decodable {
     let id: String
     let formattedAddress: String
     let geometry: GooglePlaceGeometry
@@ -42,30 +42,9 @@ struct GooglePlaceDetails: Decodable, Identifiable {
         self.name = name
         self.addressComponents = addressComponents
     }
-    
-    init?(from entity: PlaceEntity) {
-        if let id = entity.id {
-            self.id = id
-            self.formattedAddress = entity.formattedAddress ?? ""
-            self.geometry = GooglePlaceGeometry(location: GooglePlaceLocation(latitude: entity.latitude, longitude: entity.longitude))
-            self.name = entity.name ?? ""
-            if let addressComponentsData = entity.addressComponents {
-                do {
-                    let parsedAddressComponentsData = try JSONDecoder().decode([GooglePlaceAddressComponent].self, from: addressComponentsData)
-                    self.addressComponents = parsedAddressComponentsData
-                } catch {
-                    self.addressComponents = []
-                }
-            } else {
-                self.addressComponents = []
-            }
-        } else {
-            return nil
-        }
-    }
 }
 
-struct GooglePlaceAddressComponent: Codable {
+struct GooglePlaceAddressComponent: Decodable {
     let longName, shortName: String
     let types: [String]
     

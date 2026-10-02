@@ -48,9 +48,9 @@ extension LocationListView {
                     }
             }
             ForEach(results) { placeEntity in
-                LocationViewCell(dependencies: dependencies, place: GooglePlaceDetails(from: placeEntity))
+                LocationViewCell(dependencies: dependencies, place: SavedPlace(from: placeEntity))
                     .onTapGesture {
-                        if let place = GooglePlaceDetails(from: placeEntity) {
+                        if let place = SavedPlace(from: placeEntity) {
                             mainCoordinator.selectLocation(place)
                         }
                     }

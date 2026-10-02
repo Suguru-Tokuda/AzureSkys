@@ -17,7 +17,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var customError: NetworkError?
     @Published var locationAuthorized: Bool?
     @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
-    var place: GooglePlaceDetails?
+    var place: SavedPlace?
     
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
@@ -42,7 +42,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         self.addLocationSubscriptions()
     }
 
-    func setPlace(place: GooglePlaceDetails) {
+    func setPlace(place: SavedPlace) {
         self.place = place
     }
 
@@ -71,8 +71,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
 
     func getCurrentWeatherDataWithCityData(showLoading: Bool = true) async {
         guard let place else { return }
-        let coordinate = CLLocationCoordinate2D(latitude: place.geometry.location.latitude,
-                                                longitude: place.geometry.location.longitude)
+        let coordinate = CLLocationCoordinate2D(latitude: place.latitude,
+                                                longitude: place.longitude)
         await getCurrentWeatherData(coordinate: coordinate, showLoading: showLoading)
     }
 

@@ -14,7 +14,6 @@ struct LocationsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
-    @State var searchBarPresented = false
     private let settingsManager = SettingsManager()
     var showDismiss: Bool = true
     var onDismiss: ((GooglePlaceDetails?) -> Void)?

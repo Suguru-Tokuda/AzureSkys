@@ -25,8 +25,7 @@ struct WeatherDailyForecastListCellView: View {
                 }
                 Text("\(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
                     .foregroundStyle(.white.opacity(0.5))
-                TempBarView(currentTemp: 0, 
-                            minTemp: forecast.temp.min,
+                TempBarView(minTemp: forecast.temp.min,
                             maxTemp: forecast.temp.max,
                             height: 5,
                             showAnimation: showTempBarAnimation)

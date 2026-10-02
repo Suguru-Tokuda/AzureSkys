@@ -15,7 +15,6 @@ struct LocationListView: View {
     @StateObject var vm: LocationsViewModel = LocationsViewModel()
     @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
     var results: FetchedResults<PlaceEntity>
-    var request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
     var onCitySelect: ((GooglePlaceDetails?) -> Void)?
     
     var body: some View {

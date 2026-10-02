@@ -13,7 +13,6 @@ import MapKit
 @MainActor
 class WeatherForecastViewModel: ObservableObject {
     @Published var showForecastAnimation = true
-    @Published var city: City?
     @Published var forecast: WeatherForecastOneCallResponse?
     @Published var geocode: WeatherGeocode?
     @Published var loadingStatus: LoadingStatus = .inactive
@@ -41,8 +40,6 @@ class WeatherForecastViewModel: ObservableObject {
         self.networkManager = networkManager
         self.coreDataManager = coreDataManager
         self.apiKeyManager = apiKeyManager
-        
-        self.getSQLitePath()
         
         self.networkManager.checkNetworkAvailability() { [weak self] networkAvailable in
             guard let self else { return }
@@ -221,15 +218,6 @@ class WeatherForecastViewModel: ObservableObject {
             components.queryItems?.append(URLQueryItem(name: "exclude", value: "minutely"))
         }
         return components.url
-    }
-
-    func getSQLitePath() {
-        // .shared, .default, .standard - same thing
-//        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-//            return
-//        }
-        
-        // let sqlitePath = url.appendingPathComponent("WeatherCoreData")
     }
 }
 

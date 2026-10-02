@@ -17,10 +17,6 @@ class MainCoordinator: ObservableObject {
     
     var place: GooglePlaceDetails?
     
-    func startCoordinator() {
-        path.append(Page.forecast)
-    }
-    
     func goToLocations() {
         showLocationsFullScreenSheet = true
     }

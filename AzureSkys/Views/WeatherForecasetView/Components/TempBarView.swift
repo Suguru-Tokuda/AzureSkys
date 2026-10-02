@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct TempBarView: View {
-    var currentTemp: Double
     var minTemp: Double
     var maxTemp: Double
-    var showCurentTemp: Bool = false
     var cornerRadius: CGFloat = 50
     var height: CGFloat = 7
 
     var showAnimation: Bool = true
     @State var tempGradientColor: LinearGradient?
-    @State var colorSet = false
     @State var tempBarWidth: CGFloat = 0
     
     var body: some View {
@@ -68,7 +65,6 @@ extension TempBarView {
         DispatchQueue.main.async {
             self.tempGradientColor = LinearGradient(colors: tempColors.map { $0.getColor() }, startPoint: .leading, endPoint: .trailing)
         }
-        self.colorSet = true
     }
     
     func setBarAnimation(width: CGFloat) {
@@ -86,6 +82,6 @@ extension TempBarView {
 }
 
 #Preview {
-    TempBarView(currentTemp: 289.32, minTemp: 285.78, maxTemp: 292.26)
+    TempBarView(minTemp: 285.78, maxTemp: 292.26)
         .preferredColorScheme(.dark)
 }

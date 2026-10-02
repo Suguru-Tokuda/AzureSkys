@@ -16,7 +16,7 @@ struct GooglePlaceDetails: Decodable, Identifiable {
     let formattedAddress: String
     let geometry: GooglePlaceGeometry
     let name: String
-    let addressComponents: [GoolePlaceAddressComponent]
+    let addressComponents: [GooglePlaceAddressComponent]
     
     enum CodingKeys: String, CodingKey {
         case id = "place_id"
@@ -32,10 +32,10 @@ struct GooglePlaceDetails: Decodable, Identifiable {
         self.formattedAddress = try container.decode(String.self, forKey: .formattedAddress)
         self.geometry = try container.decode(GooglePlaceGeometry.self, forKey: .geometry)
         self.name = try container.decode(String.self, forKey: .name)
-        self.addressComponents = try container.decode([GoolePlaceAddressComponent].self, forKey: .addressComponents)
+        self.addressComponents = try container.decode([GooglePlaceAddressComponent].self, forKey: .addressComponents)
     }
     
-    init(id: String, formattedAddress: String, geometry: GooglePlaceGeometry, name: String, addressComponents: [GoolePlaceAddressComponent]) {
+    init(id: String, formattedAddress: String, geometry: GooglePlaceGeometry, name: String, addressComponents: [GooglePlaceAddressComponent]) {
         self.id = id
         self.formattedAddress = formattedAddress
         self.geometry = geometry
@@ -51,7 +51,7 @@ struct GooglePlaceDetails: Decodable, Identifiable {
             self.name = entity.name ?? ""
             if let addressComponentsData = entity.addressComponents {
                 do {
-                    let parsedAddressComponentsData = try JSONDecoder().decode([GoolePlaceAddressComponent].self, from: addressComponentsData)
+                    let parsedAddressComponentsData = try JSONDecoder().decode([GooglePlaceAddressComponent].self, from: addressComponentsData)
                     self.addressComponents = parsedAddressComponentsData
                 } catch {
                     self.addressComponents = []
@@ -65,7 +65,7 @@ struct GooglePlaceDetails: Decodable, Identifiable {
     }
 }
 
-struct GoolePlaceAddressComponent: Codable {
+struct GooglePlaceAddressComponent: Codable {
     let longName, shortName: String
     let types: [String]
     

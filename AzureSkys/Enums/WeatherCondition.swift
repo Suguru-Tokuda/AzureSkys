@@ -10,10 +10,10 @@ import SwiftUI
 
 enum WeatherCondition: String, CaseIterable {
     case thunderstorm = "Thunderstorm"
-    case drizzel = "Drizzel"
+    case drizzle = "Drizzle"
     case rain = "Rain"
     case snow = "Snow"
-    case mist = "MIst"
+    case mist = "Mist"
     case smoke = "Smoke"
     case haze = "Haze"
     case dust = "Dust"
@@ -40,7 +40,7 @@ enum WeatherCondition: String, CaseIterable {
     /**
         Get Color or Gradient
      */
-    func getBackGroundColor(partOfDay: PartOfDay, clouds: Int = 0) -> LinearGradient {
+    func getBackgroundColor(partOfDay: PartOfDay, clouds: Int = 0) -> LinearGradient {
         switch partOfDay {
         case .night:
             switch clouds {

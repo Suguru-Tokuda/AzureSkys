@@ -37,7 +37,7 @@ struct LocationsView: View {
                     }
                 }
             }
-            .alert(isPresented: $vm.isErrorOccured, error: vm.networkError, actions: {
+            .alert(isPresented: $vm.hasError, error: vm.networkError, actions: {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
@@ -139,9 +139,9 @@ extension LocationsView {
                     .resizable()
                     .frame(width: 10, height: 10)
             }
-            Text(option.rawValue)
+            Text(option.displayName)
             Spacer()
-            Text("&deg;\(option.rawValue.first?.uppercased() ?? "")")
+            Text("°\(option.displayName.first?.uppercased() ?? "")")
         }
     }
 }

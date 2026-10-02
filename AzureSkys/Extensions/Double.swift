@@ -1,5 +1,5 @@
 //
-//  Preview.swift
+//  Double.swift
 //  AzureSkys
 //
 //  Created by Suguru Tokuda on 11/28/23.
@@ -11,18 +11,18 @@ extension Double {
     func getDegree(tempScale: TempScale) -> Double {
         switch tempScale {
         case .fahrenheit:
-            return kelvinToFahrenheight()
+            return kelvinToFahrenheit()
         case .celsius:
             return kelvinToCelsius()
         }
     }
     
-    func kelvinToFahrenheight() -> Double {
+    func kelvinToFahrenheit() -> Double {
         return (self - 273.15) * 9 / 5 + 32
     }
     
     func kelvinToCelsius() -> Double {
-        return self - 273.10
+        return self - 273.15
     }
     
     func formatDouble(maxFractions: Int) -> String {

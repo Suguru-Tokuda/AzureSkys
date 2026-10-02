@@ -1,5 +1,5 @@
 //
-//  AzureSkysViewModel.swift
+//  WeatherForecastViewModel.swift
 //  AzureSkys
 //
 //  Created by Suguru Tokuda on 11/27/23.
@@ -16,7 +16,7 @@ class WeatherForecastViewModel: ObservableObject {
     @Published var forecast: WeatherForecastOneCallResponse?
     @Published var geocode: WeatherGeocode?
     @Published var loadingStatus: LoadingStatus = .inactive
-    @Published var isErrorOccured = false
+    @Published var hasError = false
     @Published var networkError: NetworkError?
     @Published var coreDataError: CoreDataError?
     @Published var locationAuthorized: Bool?
@@ -93,7 +93,7 @@ class WeatherForecastViewModel: ObservableObject {
         defer { isFetching = false }
         guard await networkManager.checkNetworkAvailability() else {
             guard !Task.isCancelled else { return }
-            isErrorOccured = true
+            hasError = true
             networkError = .networkUnavailable
             return
         }
@@ -103,7 +103,7 @@ class WeatherForecastViewModel: ObservableObject {
                                            apiKey: apiKey, excludeMinutely: true),
               let geocodeURL = weatherURL(path: "/geo/1.0/reverse", coordinate: coordinate,
                                           apiKey: apiKey) else {
-            isErrorOccured = true
+            hasError = true
             networkError = .badUrl
             return
         }
@@ -123,7 +123,7 @@ class WeatherForecastViewModel: ObservableObject {
             setBackgroundColor()
             loadingStatus = .loaded
             networkError = nil
-            isErrorOccured = coreDataError != nil
+            hasError = coreDataError != nil
         } catch {
             loadingStatus = .inactive
             guard !Task.isCancelled else { return }
@@ -150,7 +150,7 @@ class WeatherForecastViewModel: ObservableObject {
             }
         }
         
-        isErrorOccured = false
+        hasError = false
     }
     
     private func handleGetWeatherForecastError(error: Error) async {
@@ -169,13 +169,13 @@ class WeatherForecastViewModel: ObservableObject {
             networkError = NetworkError.unknown
         }
 
-        isErrorOccured = true
+        hasError = true
     }
     
     private func setBackgroundColor() {
         if let forecast,
            let weather = forecast.current.weather.first {
-            self.background = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay, clouds: forecast.current.clouds ?? 0)
+            self.background = weather.weatherCondition.getBackgroundColor(partOfDay: weather.partOfDay, clouds: forecast.current.clouds ?? 0)
         }
     }
     
@@ -196,7 +196,7 @@ class WeatherForecastViewModel: ObservableObject {
                     try await coreDataManager.savePlaceIntoDatabase(place: place)
                     completionHandler(.success(true))
                 } catch {
-                    self.isErrorOccured = true
+                    self.hasError = true
                     self.coreDataError = CoreDataError.save
                     
                     completionHandler(.failure(error))

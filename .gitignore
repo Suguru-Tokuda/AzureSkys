@@ -1,3 +1,11 @@
-*/ApiKeys.plist
+# Local API credentials
+**/ApiKeys.plist
+
+# macOS and Xcode user state
 .DS_Store
-AzureSkys.xcodeproj/project.xcworkspace/xcuserdata/*
+**/xcuserdata/
+*.xcuserstate
+
+# Local build output
+/DerivedData/
+/build/

@@ -12,7 +12,7 @@ import Combine
 class LocationForecastViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var isLoading: LoadingStatus = .inactive
-    @Published var isErrorOccured = false
+    @Published var hasError = false
     @Published var networkError: NetworkError?
     @Published var predictions: [Prediction] = []
     
@@ -55,14 +55,14 @@ class LocationForecastViewModel: ObservableObject {
     
     func dismissError() {
         self.networkError = nil
-        self.isErrorOccured = false
+        self.hasError = false
     }
     
     func getPredictions(searchText: String) async {
         if !searchText.isEmpty && isLoading == .inactive {
             guard let urlStr = getGooglePlacesPrediction(searchText: searchText),
                   let url = URL(string: urlStr) else {
-                isErrorOccured = true
+                hasError = true
                 networkError = NetworkError.badUrl
                 return
             }
@@ -85,7 +85,7 @@ class LocationForecastViewModel: ObservableObject {
         if !gettingDetails {
             guard let urlStr = getGoogleDetailsURL(placeId: placeId),
                   let url = URL(string: urlStr) else {
-                isErrorOccured = true
+                hasError = true
                 networkError = NetworkError.badUrl
                 return nil
             }
@@ -123,7 +123,7 @@ class LocationForecastViewModel: ObservableObject {
             networkError = NetworkError.unknown
         }
         
-        isErrorOccured = true
+        hasError = true
     }
     
     private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL) -> String? {

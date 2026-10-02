@@ -13,7 +13,7 @@ import SwiftUI
 class CurrentWeatherForecastViewModel: ObservableObject {
     @Published var currentForecast: WeatherForecastCurrentResponse?
     @Published var loadingStatus: LoadingStatus = .inactive
-    @Published var isErrorOccured = false
+    @Published var hasError = false
     @Published var customError: NetworkError?
     @Published var locationAuthorized: Bool?
     @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -81,7 +81,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             
             guard let urlStr = getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate),
                   let url = URL(string: urlStr) else {
-                isErrorOccured = true
+                hasError = true
                 customError = NetworkError.badUrl
                 return
             }
@@ -101,7 +101,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 
                 self.loadingStatus = .loaded
                 self.customError = nil
-                self.isErrorOccured = false
+                self.hasError = false
             } catch {
                 self.loadingStatus = .inactive
                 guard !Task.isCancelled else { return }
@@ -117,7 +117,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             defer { isFetching = false }
             guard let urlStr = getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude)),
                   let url = URL(string: urlStr) else {
-                isErrorOccured = true
+                hasError = true
                 customError = NetworkError.badUrl
                 return
             }
@@ -136,7 +136,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 }
                 self.loadingStatus = .loaded
                 self.customError = nil
-                self.isErrorOccured = false
+                self.hasError = false
             } catch {
                 self.loadingStatus = .inactive
                 guard !Task.isCancelled else { return }
@@ -154,7 +154,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     }
     
     private func setRowBackgroundColor(weather: Weather, clouds: Int) {
-        self.listRowBackground = weather.weatherCondition.getBackGroundColor(partOfDay: weather.partOfDay, clouds: clouds)
+        self.listRowBackground = weather.weatherCondition.getBackgroundColor(partOfDay: weather.partOfDay, clouds: clouds)
     }
     
     private func handleGetWeatherForecastError(error: Error) async {
@@ -173,7 +173,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             customError = NetworkError.unknown
         }
         
-        isErrorOccured = true
+        hasError = true
     }
     
     /**

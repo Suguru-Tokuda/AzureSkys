@@ -404,7 +404,7 @@
 			children = (
 				BB537C0A2B2B484E006BE03C /* Components */,
 				BB0C60BD2B1FAC6900359F7D /* LocationsView */,
-				BB8862882B16301C00EE56B1 /* WeatherForecasetView */,
+				BB8862882B16301C00EE56B1 /* WeatherForecastView */,
 				BB8862872B16301200EE56B1 /* LocationSearchView */,
 			);
 			path = Views;
@@ -447,7 +447,7 @@
 			path = LocationSearchView;
 			sourceTree = "<group>";
 		};
-		BB8862882B16301C00EE56B1 /* WeatherForecasetView */ = {
+		BB8862882B16301C00EE56B1 /* WeatherForecastView */ = {
 			isa = PBXGroup;
 			children = (
 				BB763F352C374A4100935E89 /* WeatherForecastMainView.swift */,
@@ -458,7 +458,7 @@
 				BB8862952B16669E00EE56B1 /* WeatherDailyForecastListView */,
 				BB0C609B2B1E741500359F7D /* WeatherThreeHourlyForecastListView */,
 			);
-			path = WeatherForecasetView;
+			path = WeatherForecastView;
 			sourceTree = "<group>";
 		};
 		BB8862952B16669E00EE56B1 /* WeatherDailyForecastListView */ = {

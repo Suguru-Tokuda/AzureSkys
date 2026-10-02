@@ -9,7 +9,7 @@ import Foundation
 
 extension Date {
     func getWeekDayStr() -> String {
-        // comapre today and self first
+        // compare today and self first
         let dayComparison = Calendar.current.compare(Date(), to: self, toGranularity: .day)
         
         // if it's the same day then return "Today"

@@ -238,10 +238,10 @@ struct PreviewManager {
         geometry: GooglePlaceGeometry(location: GooglePlaceLocation(latitude: 41.8781136, longitude: -87.6297982)),
         name: "Chicago",
         addressComponents: [
-            GoolePlaceAddressComponent(longName: "Chicago", shortName: "Chicago", types: ["locality", "political"]),
-            GoolePlaceAddressComponent(longName: "Cook County", shortName: "Cook County", types: ["dministrative_area_level_2", "political"]),
-            GoolePlaceAddressComponent(longName: "Illinois", shortName: "IL", types: ["dministrative_area_level_1", "political"]),
-            GoolePlaceAddressComponent(longName: "United State", shortName: "US", types: ["country", "political"])
+            GooglePlaceAddressComponent(longName: "Chicago", shortName: "Chicago", types: ["locality", "political"]),
+            GooglePlaceAddressComponent(longName: "Cook County", shortName: "Cook County", types: ["dministrative_area_level_2", "political"]),
+            GooglePlaceAddressComponent(longName: "Illinois", shortName: "IL", types: ["dministrative_area_level_1", "political"]),
+            GooglePlaceAddressComponent(longName: "United State", shortName: "US", types: ["country", "political"])
         ]
     )
 }

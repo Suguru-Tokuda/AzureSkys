@@ -14,13 +14,15 @@ class LocationManager: NSObject, ObservableObject {
     
     let locationManager = CLLocationManager()
     
-    override init() {
+    init(startAutomatically: Bool = true) {
         super.init()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = kCLDistanceFilterNone
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
         locationManager.delegate = self
+        if startAutomatically {
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.startUpdatingLocation()
+        }
     }
 }
 

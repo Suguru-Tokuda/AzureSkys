@@ -28,13 +28,13 @@ class WeatherForecastViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
     
     private let weatherService: WeatherServicing
-    var coreDataManager: PlaceCoreDataActions
+    private let coreDataManager: PlaceCoreDataActions
     var locationManager: LocationManager?
     private let refreshScheduler = RefreshScheduler()
     private var isFetching = false
 
-    init(weatherService: WeatherServicing = WeatherService(),
-         coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager()) {
+    init(weatherService: WeatherServicing,
+         coreDataManager: PlaceCoreDataActions) {
         self.weatherService = weatherService
         self.coreDataManager = coreDataManager
     }

@@ -10,12 +10,13 @@ import SwiftUI
 struct LocationViewCell: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     @EnvironmentObject var locationManager: LocationManager
-    @StateObject var vm: CurrentWeatherForecastViewModel = CurrentWeatherForecastViewModel()
+    @StateObject var vm: CurrentWeatherForecastViewModel
     @State var isActive: Bool?
     var place: GooglePlaceDetails?
     var isMyLocation: Bool = false
     
-    init(place: GooglePlaceDetails? = nil, isMyLocation: Bool = false) {
+    init(dependencies: AppDependencies, place: GooglePlaceDetails? = nil, isMyLocation: Bool = false) {
+        _vm = StateObject(wrappedValue: dependencies.makeCurrentWeatherViewModel())
         self.isMyLocation = isMyLocation
         self.place = place
     }
@@ -119,8 +120,8 @@ struct LocationViewCell: View {
 }
 
 #Preview {
-    LocationViewCell(isMyLocation: true)
-        .environmentObject(LocationManager())
-        .environmentObject(LocalFileManager())
+    let dependencies = AppDependencies.preview()
+    LocationViewCell(dependencies: dependencies, isMyLocation: true)
+        .appEnvironment(dependencies)
         .preferredColorScheme(.dark)
 }

@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct WeatherForecastMainView: View {
+    let dependencies: AppDependencies
     @EnvironmentObject var locationManager: LocationManager
     var place: GooglePlaceDetails?
 
     var body: some View {
         if let locationAuthorized = locationManager.locationAuthorized {
             if locationAuthorized {
-                WeatherForecastView(place: place)
+                WeatherForecastView(dependencies: dependencies, place: place)
             } else {
-                LocationsSearchView()
+                LocationsSearchView(dependencies: dependencies)
             }
         } else {
             LaunchView()
@@ -25,5 +26,7 @@ struct WeatherForecastMainView: View {
 }
 
 #Preview {
-    WeatherForecastMainView()
+    let dependencies = AppDependencies.preview()
+    WeatherForecastMainView(dependencies: dependencies)
+        .appEnvironment(dependencies)
 }

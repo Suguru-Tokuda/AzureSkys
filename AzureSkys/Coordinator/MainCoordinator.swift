@@ -36,10 +36,10 @@ class MainCoordinator: ObservableObject {
     }
         
     @ViewBuilder
-    func getPage(page: Page) -> some View {
+    func getPage(page: Page, dependencies: AppDependencies) -> some View {
         switch page {
         case .forecast:
-            WeatherForecastMainView(place: place)
+            WeatherForecastMainView(dependencies: dependencies, place: place)
         }
     }
 }

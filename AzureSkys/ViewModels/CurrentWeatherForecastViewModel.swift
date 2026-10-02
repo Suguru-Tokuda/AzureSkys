@@ -28,7 +28,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     private let refreshScheduler = RefreshScheduler()
     private var isFetching = false
 
-    init(weatherService: WeatherServicing = WeatherService()) {
+    init(weatherService: WeatherServicing) {
         self.weatherService = weatherService
     }
 

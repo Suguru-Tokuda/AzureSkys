@@ -11,7 +11,8 @@ struct WeatherForecastView: View {
     @EnvironmentObject var coordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.dismiss) var dismiss: DismissAction
-    @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
+    let dependencies: AppDependencies
+    @StateObject var vm: WeatherForecastViewModel
     @State var scrollViewOffset: CGFloat = .zero
     @State var isActive: Bool?
     var place: GooglePlaceDetails?
@@ -19,7 +20,9 @@ struct WeatherForecastView: View {
     var onLocationAdded: (() -> ())?
     var coordinateSpaceName = "weatherScroll"
 
-    init(place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
+    init(dependencies: AppDependencies, place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
+        self.dependencies = dependencies
+        _vm = StateObject(wrappedValue: dependencies.makeWeatherForecastViewModel())
         self.place = place
         self.showTopActionBar = showTopActionBar
         self.onLocationAdded = onLocationAdded
@@ -128,7 +131,7 @@ extension WeatherForecastView {
                     .fullScreenCover(
                         isPresented: $coordinator.showLocationsFullScreenSheet
                     ) {
-                        LocationsView(showDismiss: false) { place in
+                        LocationsView(dependencies: dependencies, showDismiss: false) { place in
                             coordinator.setPlace(place: place)
                             vm.setPlace(place: place)
                             vm.startDataRefreshTimer()
@@ -140,7 +143,7 @@ extension WeatherForecastView {
 
     @ViewBuilder
     func getLocationsView(showDismiss: Bool = true) -> some View {
-        LocationsView(showDismiss: showDismiss) { place in
+        LocationsView(dependencies: dependencies, showDismiss: showDismiss) { place in
             coordinator.setPlace(place: place)
             vm.setPlace(place: place)
             vm.startDataRefreshTimer()
@@ -149,11 +152,10 @@ extension WeatherForecastView {
 }
 
 #Preview {
+    let dependencies = AppDependencies.preview()
     NavigationStack {
-        WeatherForecastView()
+        WeatherForecastView(dependencies: dependencies)
     }
-        .preferredColorScheme(.dark)
-        .environmentObject(MainCoordinator())
-        .environmentObject(LocationManager())
-        .environmentObject(LocalFileManager())
+    .preferredColorScheme(.dark)
+    .appEnvironment(dependencies)
 }

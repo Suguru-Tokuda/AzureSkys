@@ -12,9 +12,9 @@ class LocationsViewModel: ObservableObject {
     @Published var hasError = false
     @Published var coreDataError: CoreDataError?
     
-    var placeCoreDataManager: PlaceCoreDataManager
+    private let placeCoreDataManager: PlaceCoreDataActions
     
-    init(placeCoreDataManager: PlaceCoreDataManager = PlaceCoreDataManager()) {
+    init(placeCoreDataManager: PlaceCoreDataActions) {
         self.placeCoreDataManager = placeCoreDataManager
     }
     

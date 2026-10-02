@@ -23,7 +23,7 @@ final class WeatherService: WeatherServicing {
     private let apiKeyManager: ApiKeyActions
     private let baseURL: String
 
-    init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager(),
+    init(networkManager: Networking, apiKeyManager: ApiKeyActions,
          baseURL: String = Constants.weatherApiEndpoint) {
         self.networkManager = networkManager
         self.apiKeyManager = apiKeyManager

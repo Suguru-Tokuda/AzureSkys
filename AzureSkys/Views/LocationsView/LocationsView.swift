@@ -10,14 +10,22 @@ import SwiftUI
 struct LocationsView: View {
     @EnvironmentObject private var coordinator: MainCoordinator
     @EnvironmentObject private var locationManager: LocationManager
-    @StateObject var vm: LocationForecastViewModel = LocationForecastViewModel()
+    let dependencies: AppDependencies
+    @StateObject var vm: LocationForecastViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
-    private let settingsManager = SettingsManager()
     var showDismiss: Bool = true
     var onDismiss: ((GooglePlaceDetails?) -> Void)?
     
+    init(dependencies: AppDependencies, showDismiss: Bool = true,
+         onDismiss: ((GooglePlaceDetails?) -> Void)? = nil) {
+        self.dependencies = dependencies
+        self.showDismiss = showDismiss
+        self.onDismiss = onDismiss
+        _vm = StateObject(wrappedValue: dependencies.makeLocationSearchViewModel())
+    }
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -54,7 +62,7 @@ struct LocationsView: View {
                     if let locationAuthorized = locationManager.locationAuthorized,
                        locationAuthorized == false {
                         Button(action: {
-                            settingsManager.navigateToSettings()
+                            dependencies.settingsManager.navigateToSettings()
                         }, label: {
                             Image(systemName: "gear")
                         })
@@ -82,6 +90,7 @@ struct LocationsView: View {
         }
         .sheet(isPresented: $coordinator.weatherForecastSheetPresented) {
             WeatherForecastView(
+                dependencies: dependencies,
                 place: coordinator.place,
                 showTopActionBar: true) {
                     DispatchQueue.main.async {
@@ -118,7 +127,7 @@ extension LocationsView {
     
     @ViewBuilder
     func locationList() -> some View {
-        LocationListView() { place in
+        LocationListView(dependencies: dependencies) { place in
             if let onDismiss {
                 onDismiss(place)
                 dismiss()
@@ -147,9 +156,8 @@ extension LocationsView {
 }
 
 #Preview {
-    LocationsView()
+    let dependencies = AppDependencies.preview()
+    LocationsView(dependencies: dependencies)
         .preferredColorScheme(.dark)
-        .environmentObject(LocationManager())
-        .environmentObject(MainCoordinator())
-        .environmentObject(LocalFileManager())
+        .appEnvironment(dependencies)
 }

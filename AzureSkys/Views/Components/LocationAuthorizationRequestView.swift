@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LocationAuthorizationRequestView: View {
-    private let settingsManager = SettingsManager()
+    let settingsManager: SettingsManager
 
     var body: some View {
         ZStack {
@@ -40,6 +40,6 @@ struct LocationAuthorizationRequestView: View {
 }
 
 #Preview {
-    LocationAuthorizationRequestView()
+    LocationAuthorizationRequestView(settingsManager: AppDependencies.preview().settingsManager)
         .preferredColorScheme(.dark)
 }

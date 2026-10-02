@@ -12,11 +12,18 @@ struct LocationListView: View {
     @EnvironmentObject var mainCoordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.isSearching) private var isSearching
-    @StateObject var vm: LocationsViewModel = LocationsViewModel()
+    let dependencies: AppDependencies
+    @StateObject var vm: LocationsViewModel
     @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
     var results: FetchedResults<PlaceEntity>
     var onCitySelect: ((GooglePlaceDetails?) -> Void)?
     
+    init(dependencies: AppDependencies, onCitySelect: ((GooglePlaceDetails?) -> Void)? = nil) {
+        self.dependencies = dependencies
+        self.onCitySelect = onCitySelect
+        _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
+    }
+
     var body: some View {
         ZStack {
             if isSearching {
@@ -36,14 +43,14 @@ extension LocationListView {
         List {
             if let locationAuthorized = locationManager.locationAuthorized,
                locationAuthorized == true {
-                LocationViewCell(isMyLocation: true)
+                LocationViewCell(dependencies: dependencies, isMyLocation: true)
                     .deleteDisabled(true)
                     .onTapGesture {
                         onCitySelect?(nil)
                     }
             }
             ForEach(results) { placeEntity in
-                LocationViewCell(place: GooglePlaceDetails(from: placeEntity))
+                LocationViewCell(dependencies: dependencies, place: GooglePlaceDetails(from: placeEntity))
                     .onTapGesture {
                         onCitySelect?(GooglePlaceDetails(from: placeEntity))
                     }
@@ -66,8 +73,8 @@ extension LocationListView {
 }
 
 #Preview {
-    LocationListView()
+    let dependencies = AppDependencies.preview()
+    LocationListView(dependencies: dependencies)
         .preferredColorScheme(.dark)
-        .environmentObject(LocationManager())
-        .environmentObject(MainCoordinator())
+        .appEnvironment(dependencies)
 }

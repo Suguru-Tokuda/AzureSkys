@@ -9,11 +9,17 @@ import SwiftUI
 
 struct LocationsSearchView: View {
     @EnvironmentObject var coordinator: MainCoordinator
-    @StateObject var vm: WeatherForecastViewModel = WeatherForecastViewModel()
+    let dependencies: AppDependencies
+    @StateObject var vm: WeatherForecastViewModel
     @State var isActive: Bool?
 
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+        _vm = StateObject(wrappedValue: dependencies.makeWeatherForecastViewModel())
+    }
+
     var body: some View {
-        LocationsView(showDismiss: false) { place in
+        LocationsView(dependencies: dependencies, showDismiss: false) { place in
             coordinator.setPlaceWithFullScreen(place: place)
             vm.setPlace(place: place)
             vm.startDataRefreshTimer()
@@ -46,5 +52,7 @@ struct LocationsSearchView: View {
 }
 
 #Preview {
-    LocationsSearchView()
+    let dependencies = AppDependencies.preview()
+    LocationsSearchView(dependencies: dependencies)
+        .appEnvironment(dependencies)
 }

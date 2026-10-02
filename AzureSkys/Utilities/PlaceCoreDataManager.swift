@@ -18,7 +18,7 @@ protocol PlaceCoreDataActions {
 class PlaceCoreDataManager: PlaceCoreDataActions {
     let persistentContainer: NSPersistentContainer
 
-    init(container: NSPersistentContainer = PersistenceController.shared.container) {
+    init(container: NSPersistentContainer) {
         persistentContainer = container
     }
 

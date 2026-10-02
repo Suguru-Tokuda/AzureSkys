@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACD012340000000000000042 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000041 /* AppDependencies.swift */; };
 		ACD012340000000000000022 /* PlacesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000012 /* PlacesService.swift */; };
 		ACD012340000000000000021 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000011 /* WeatherService.swift */; };
 		ACD012340000000000000001 /* RefreshScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000002 /* RefreshScheduler.swift */; };
@@ -115,6 +116,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		ACD012340000000000000041 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		ACD012340000000000000012 /* PlacesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesService.swift; sourceTree = "<group>"; };
 		ACD012340000000000000011 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		ACD012340000000000000002 /* RefreshScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshScheduler.swift; sourceTree = "<group>"; };
@@ -386,6 +388,7 @@
 		BB8862692B1500FA00EE56B1 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				ACD012340000000000000041 /* AppDependencies.swift */,
 				ACD012340000000000000002 /* RefreshScheduler.swift */,
 				BB983B872B370BEB00161C26 /* ApiKeyManager.swift */,
 				BB88626F2B1501D500EE56B1 /* Constants.swift */,
@@ -593,6 +596,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACD012340000000000000042 /* AppDependencies.swift in Sources */,
 				ACD012340000000000000022 /* PlacesService.swift in Sources */,
 				ACD012340000000000000021 /* WeatherService.swift in Sources */,
 				ACD012340000000000000001 /* RefreshScheduler.swift in Sources */,

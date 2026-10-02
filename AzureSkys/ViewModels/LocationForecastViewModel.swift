@@ -23,7 +23,7 @@ class LocationForecastViewModel: ObservableObject {
     
     private let placesService: PlacesServicing
 
-    init(placesService: PlacesServicing = PlacesService()) {
+    init(placesService: PlacesServicing) {
         self.placesService = placesService
         self.addSubscriptions()
     }

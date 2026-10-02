@@ -31,7 +31,7 @@ final class WeatherService: WeatherServicing {
     }
 
     func getForecast(coordinate: CLLocationCoordinate2D) async throws -> WeatherForecastData {
-        guard await networkManager.checkNetworkAvailability() else {
+        guard await networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) else {
             throw NetworkError.networkUnavailable
         }
         try Task.checkCancellation()
@@ -49,7 +49,9 @@ final class WeatherService: WeatherServicing {
     func getCurrentWeather(coordinate: CLLocationCoordinate2D) async throws -> WeatherForecastCurrentResponse {
         try Task.checkCancellation()
         let url = try weatherURL(path: "/data/2.5/weather", coordinate: coordinate, apiKey: getAPIKey())
-        return try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+        let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+        try Task.checkCancellation()
+        return response
     }
 
     private func getAPIKey() throws -> String {

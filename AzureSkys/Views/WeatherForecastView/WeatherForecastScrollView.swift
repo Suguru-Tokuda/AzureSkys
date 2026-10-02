@@ -8,19 +8,16 @@
 import SwiftUI
 
 struct WeatherForecastScrollView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var coordinator: MainCoordinator
     var forecast: WeatherForecastOneCallResponse?
     var geocode: WeatherGeocode?
     var networkError: NetworkError?
     var loadingStatus: LoadingStatus?
+    var isMyLocation: Bool = true
     var showAnimation: Bool = true
     var onRefresh: (() -> ())?
     var onRetryBtnTapped: (() -> ())?
     
     let coordinateSpaceName = "weatherScroll"
-    var dismissible: Bool = false
-    
     var body: some View {
         if networkError != nil {
             RetryView(errorMessage: networkError!.localizedDescription) {
@@ -33,19 +30,11 @@ struct WeatherForecastScrollView: View {
                        let forecast = forecast
                     {
                         VStack {
-                            if dismissible {
-                                HStack {
-                                    DismissButton {
-                                        dismiss()
-                                    }
-                                    Spacer()
-                                }
-                            }
                             WeatherForecastHeaderView(
                                 geocode: geocode,
                                 currentForecast: forecast.current,
                                 dailyForecast: forecast.daily[0],
-                                isMyLocation: coordinator.place == nil,
+                                isMyLocation: isMyLocation,
                                 scrollViewOffsetPercentage: .zero
                             )
 

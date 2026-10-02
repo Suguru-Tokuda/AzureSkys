@@ -12,12 +12,15 @@ struct ContentView: View {
     @EnvironmentObject var coordinator: MainCoordinator
     
     var body: some View {
-        NavigationStack(path: $coordinator.path) {
-            coordinator.getPage(page: .forecast, dependencies: dependencies)
-                .navigationDestination(for: Page.self) { page in
-                    coordinator.getPage(page: page, dependencies: dependencies)
+        WeatherForecastMainView(dependencies: dependencies)
+            .fullScreenCover(item: $coordinator.fullScreenDestination) { destination in
+                switch destination {
+                case .locations:
+                    LocationsView(dependencies: dependencies, showDismiss: true)
+                case .forecast(let location):
+                    WeatherForecastView(dependencies: dependencies, location: location, presentation: .fullScreen)
                 }
-        }
+            }
     }
 }
 

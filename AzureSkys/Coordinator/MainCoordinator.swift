@@ -5,46 +5,76 @@
 //  Created by Suguru Tokuda on 12/5/23.
 //
 
-import Foundation
 import SwiftUI
 
-@MainActor
-class MainCoordinator: ObservableObject {
-    @Published var path = NavigationPath()
-    @Published var showLocationsFullScreenSheet: Bool = false
-    @Published var weatherForecastSheetPresented: Bool = false
-    @Published var showWeatherForecastFullScreenSheet: Bool = false
-    
-    var place: GooglePlaceDetails?
-    
-    func goToLocations() {
-        showLocationsFullScreenSheet = true
+// Each destination carries the location it displays.
+enum ForecastLocation: Identifiable {
+    case current
+    case saved(GooglePlaceDetails)
+
+    var id: String {
+        switch self {
+        case .current: return "current"
+        case .saved(let place): return "saved:\(place.id)"
+        }
     }
 
-    func showForecastSheet(place: GooglePlaceDetails) {
-        self.place = place
-        self.weatherForecastSheetPresented = true
+    var place: GooglePlaceDetails? {
+        if case .saved(let place) = self { return place }
+        return nil
     }
-    
-    func setPlace(place: GooglePlaceDetails?) {
-        self.place = place
-    }
+}
 
-    func setPlaceWithFullScreen(place: GooglePlaceDetails?) {
-        self.place = place
-        showWeatherForecastFullScreenSheet = true
-    }
-        
-    @ViewBuilder
-    func getPage(page: Page, dependencies: AppDependencies) -> some View {
-        switch page {
-        case .forecast:
-            WeatherForecastMainView(dependencies: dependencies, place: place)
+enum FullScreenDestination: Identifiable {
+    case locations
+    case forecast(ForecastLocation)
+
+    var id: String {
+        switch self {
+        case .locations: return "locations"
+        case .forecast(let location): return "forecast:\(location.id)"
         }
     }
 }
 
-enum Page: String, CaseIterable, Identifiable {
-    case forecast
-    var id: String { self.rawValue }
+struct ForecastPreviewDestination: Identifiable {
+    let id = UUID()
+    let place: GooglePlaceDetails
+}
+
+@MainActor
+final class MainCoordinator: ObservableObject {
+    @Published private(set) var selectedLocation: ForecastLocation = .current
+    @Published var fullScreenDestination: FullScreenDestination?
+    @Published var forecastPreview: ForecastPreviewDestination?
+
+    func goToLocations() {
+        fullScreenDestination = .locations
+    }
+
+    func selectLocation(_ place: GooglePlaceDetails?) {
+        let location = place.map(ForecastLocation.saved) ?? .current
+        if case .locations = fullScreenDestination {
+            selectedLocation = location
+            fullScreenDestination = nil
+        } else {
+            fullScreenDestination = .forecast(location)
+        }
+    }
+
+    func previewForecast(place: GooglePlaceDetails) {
+        forecastPreview = ForecastPreviewDestination(place: place)
+    }
+
+    func dismissLocations() {
+        if case .locations = fullScreenDestination { fullScreenDestination = nil }
+    }
+
+    func dismissForecast() {
+        if forecastPreview != nil {
+            forecastPreview = nil
+        } else if case .forecast = fullScreenDestination {
+            fullScreenDestination = nil
+        }
+    }
 }

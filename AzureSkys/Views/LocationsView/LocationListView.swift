@@ -16,11 +16,9 @@ struct LocationListView: View {
     @StateObject var vm: LocationsViewModel
     @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
     var results: FetchedResults<PlaceEntity>
-    var onCitySelect: ((GooglePlaceDetails?) -> Void)?
     
-    init(dependencies: AppDependencies, onCitySelect: ((GooglePlaceDetails?) -> Void)? = nil) {
+    init(dependencies: AppDependencies) {
         self.dependencies = dependencies
-        self.onCitySelect = onCitySelect
         _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
     }
 
@@ -46,13 +44,15 @@ extension LocationListView {
                 LocationViewCell(dependencies: dependencies, isMyLocation: true)
                     .deleteDisabled(true)
                     .onTapGesture {
-                        onCitySelect?(nil)
+                        mainCoordinator.selectLocation(nil)
                     }
             }
             ForEach(results) { placeEntity in
                 LocationViewCell(dependencies: dependencies, place: GooglePlaceDetails(from: placeEntity))
                     .onTapGesture {
-                        onCitySelect?(GooglePlaceDetails(from: placeEntity))
+                        if let place = GooglePlaceDetails(from: placeEntity) {
+                            mainCoordinator.selectLocation(place)
+                        }
                     }
             }
             .onDelete { indexSet in

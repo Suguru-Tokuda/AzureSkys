@@ -12,17 +12,13 @@ struct LocationsView: View {
     @EnvironmentObject private var locationManager: LocationManager
     let dependencies: AppDependencies
     @StateObject var vm: LocationForecastViewModel
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
     var showDismiss: Bool = true
-    var onDismiss: ((GooglePlaceDetails?) -> Void)?
     
-    init(dependencies: AppDependencies, showDismiss: Bool = true,
-         onDismiss: ((GooglePlaceDetails?) -> Void)? = nil) {
+    init(dependencies: AppDependencies, showDismiss: Bool = true) {
         self.dependencies = dependencies
         self.showDismiss = showDismiss
-        self.onDismiss = onDismiss
         _vm = StateObject(wrappedValue: dependencies.makeLocationSearchViewModel())
     }
 
@@ -56,7 +52,7 @@ struct LocationsView: View {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     if showDismiss {
                         DismissButton {
-                            dismiss()
+                            coordinator.dismissLocations()
                         }
                     }
                     if let locationAuthorized = locationManager.locationAuthorized,
@@ -88,16 +84,14 @@ struct LocationsView: View {
             .autocorrectionDisabled()
             .navigationBarBackButtonHidden(true)
         }
-        .sheet(isPresented: $coordinator.weatherForecastSheetPresented) {
-            WeatherForecastView(
-                dependencies: dependencies,
-                place: coordinator.place,
-                showTopActionBar: true) {
-                    DispatchQueue.main.async {
-                        self.vm.searchText = ""
-                        self.dismissSearch()
-                    }
-                }
+        .sheet(item: $coordinator.forecastPreview) { destination in
+            WeatherForecastView(dependencies: dependencies, location: .saved(destination.place), presentation: .preview)
+        }
+        .onChange(of: coordinator.forecastPreview?.id) { previous, current in
+            if previous != nil && current == nil {
+                vm.searchText = ""
+                dismissSearch()
+            }
         }
     }
 }
@@ -117,7 +111,7 @@ extension LocationsView {
 
                     Task {
                         if let details = await vm.getPlaceDetails(placeId: prediction.placeId) {
-                            self.coordinator.showForecastSheet(place: details)
+                            self.coordinator.previewForecast(place: details)
                         }
                     }
                 }
@@ -127,12 +121,7 @@ extension LocationsView {
     
     @ViewBuilder
     func locationList() -> some View {
-        LocationListView(dependencies: dependencies) { place in
-            if let onDismiss {
-                onDismiss(place)
-                dismiss()
-            }
-        }
+        LocationListView(dependencies: dependencies)
     }
 }
 

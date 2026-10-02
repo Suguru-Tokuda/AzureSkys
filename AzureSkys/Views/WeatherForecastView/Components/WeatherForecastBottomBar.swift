@@ -9,7 +9,6 @@ import SwiftUI
 
 struct WeatherForecastBottomBar: View {
     var background: LinearGradient
-    var onListButtonTap: (() -> ())?
     @EnvironmentObject var coordinator: MainCoordinator
 
     var body: some View {
@@ -21,7 +20,6 @@ struct WeatherForecastBottomBar: View {
                 Spacer()
                 Button(action: {
                     coordinator.goToLocations()
-                    onListButtonTap?()
                 }, label: {
                     Image(systemName: "list.bullet")
                 })

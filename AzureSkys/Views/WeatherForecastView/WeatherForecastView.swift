@@ -10,22 +10,22 @@ import SwiftUI
 struct WeatherForecastView: View {
     @EnvironmentObject var coordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
-    @Environment(\.dismiss) var dismiss: DismissAction
     let dependencies: AppDependencies
     @StateObject var vm: WeatherForecastViewModel
     @State var scrollViewOffset: CGFloat = .zero
     @State var isActive: Bool?
-    var place: GooglePlaceDetails?
-    var showTopActionBar: Bool = false
-    var onLocationAdded: (() -> ())?
+    let location: ForecastLocation
+    let presentation: Presentation
+    private var place: GooglePlaceDetails? { location.place }
+
+    enum Presentation { case main, preview, fullScreen }
     var coordinateSpaceName = "weatherScroll"
 
-    init(dependencies: AppDependencies, place: GooglePlaceDetails? = nil, showTopActionBar: Bool = false, onLocationAdded: (() -> ())? = nil) {
+    init(dependencies: AppDependencies, location: ForecastLocation = .current, presentation: Presentation = .main) {
         self.dependencies = dependencies
+        self.location = location
+        self.presentation = presentation
         _vm = StateObject(wrappedValue: dependencies.makeWeatherForecastViewModel())
-        self.place = place
-        self.showTopActionBar = showTopActionBar
-        self.onLocationAdded = onLocationAdded
     }
 
     var body: some View {
@@ -38,8 +38,9 @@ struct WeatherForecastView: View {
             } else {
                 forecastView()
                     .padding(.bottom, 30)
-                footer()
             }
+            navigationControls()
+            footer()
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
@@ -47,7 +48,7 @@ struct WeatherForecastView: View {
         .onDisappear {
             vm.endDataRefreshTimer()
         }
-        .task {
+        .task(id: location.id) {
             vm.setPlace(place: place)
             vm.startDataRefreshTimer()
         }
@@ -76,19 +77,18 @@ struct WeatherForecastView: View {
 }
 
 extension WeatherForecastView {
-    @ViewBuilder func forecastView() -> some View {
+    @ViewBuilder func navigationControls() -> some View {
         VStack {
-            if showTopActionBar {
+            if presentation == .preview {
                 WeatherForecastAddHeaderView(cancelBtnTapped: {
-                    dismiss()
+                    coordinator.dismissForecast()
                 },
                 addBtnTapped: {
                     vm.addPlace(place: place) { result in
                         switch result {
                         case .success(let added):
                             if added == true {
-                                dismiss()
-                                onLocationAdded?()
+                                coordinator.dismissForecast()
                             }
                             break
                         case .failure(_):
@@ -99,18 +99,27 @@ extension WeatherForecastView {
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
                 .padding(.bottom, 40)
+            } else if presentation == .fullScreen {
+                HStack {
+                    DismissButton { coordinator.dismissForecast() }
+                    Spacer()
+                }
+                .padding(20)
             } else {
                 Spacer()
             }
             Spacer()
         }
             .zIndex(2.0)
+    }
 
+    @ViewBuilder func forecastView() -> some View {
         if vm.loadingStatus == .loaded {
             WeatherForecastScrollView(forecast: vm.forecast,
                                       geocode: vm.geocode,
                                       networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
+                                      isMyLocation: place == nil,
                                       showAnimation: vm.showForecastAnimation,
                                       onRefresh: {
                 vm.startDataRefreshTimer()
@@ -122,31 +131,8 @@ extension WeatherForecastView {
     }
 
     @ViewBuilder func footer() -> some View {
-        if let locationAuthorized = vm.locationAuthorized {
-            if !showTopActionBar && locationAuthorized {
-                // MARK: Tab Bar
-                WeatherForecastBottomBar(background: vm.background) {
-                    vm.endDataRefreshTimer()
-                }
-                    .fullScreenCover(
-                        isPresented: $coordinator.showLocationsFullScreenSheet
-                    ) {
-                        LocationsView(dependencies: dependencies, showDismiss: false) { place in
-                            coordinator.setPlace(place: place)
-                            vm.setPlace(place: place)
-                            vm.startDataRefreshTimer()
-                        }
-                    }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func getLocationsView(showDismiss: Bool = true) -> some View {
-        LocationsView(dependencies: dependencies, showDismiss: showDismiss) { place in
-            coordinator.setPlace(place: place)
-            vm.setPlace(place: place)
-            vm.startDataRefreshTimer()
+        if presentation == .main, vm.locationAuthorized == true {
+            WeatherForecastBottomBar(background: vm.background)
         }
     }
 }

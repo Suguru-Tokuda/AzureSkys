@@ -27,29 +27,18 @@ class WeatherForecastViewModel: ObservableObject {
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
     
-    var networkManager: Networking
+    private let weatherService: WeatherServicing
     var coreDataManager: PlaceCoreDataActions
-    var apiKeyManager: ApiKeyActions
     var locationManager: LocationManager?
     private let refreshScheduler = RefreshScheduler()
     private var isFetching = false
 
-    init(networkManager: Networking = NetworkManager(), 
-         coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager(),
-         apiKeyManager: ApiKeyActions = ApiKeyManager()) {
-        self.networkManager = networkManager
+    init(weatherService: WeatherServicing = WeatherService(),
+         coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager()) {
+        self.weatherService = weatherService
         self.coreDataManager = coreDataManager
-        self.apiKeyManager = apiKeyManager
-        
-        self.networkManager.checkNetworkAvailability() { [weak self] networkAvailable in
-            guard let self else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.networkError = !networkAvailable ? .networkUnavailable : nil
-            }
-        }
     }
-        
+
     deinit {
         self.cancellables.removeAll()
     }
@@ -91,35 +80,15 @@ class WeatherForecastViewModel: ObservableObject {
         guard !isFetching, !Task.isCancelled else { return }
         isFetching = true
         defer { isFetching = false }
-        guard await networkManager.checkNetworkAvailability() else {
-            guard !Task.isCancelled else { return }
-            hasError = true
-            networkError = .networkUnavailable
-            return
-        }
-        guard !Task.isCancelled else { return }
-        guard let apiKey = try? apiKeyManager.getOpenWeatherApiKey(),
-              let forecastURL = weatherURL(path: "/data/3.0/onecall", coordinate: coordinate,
-                                           apiKey: apiKey, excludeMinutely: true),
-              let geocodeURL = weatherURL(path: "/geo/1.0/reverse", coordinate: coordinate,
-                                          apiKey: apiKey) else {
-            hasError = true
-            networkError = .badUrl
-            return
-        }
-
         if showLoading {
             loadingStatus = .loading
         }
 
         do {
-            async let forecastResponse = networkManager.getData(url: forecastURL, type: WeatherForecastOneCallResponse.self)
-            async let geocodeResponse = networkManager.getData(url: geocodeURL, type: [WeatherGeocode].self)
-            let (forecast, geocodes) = try await (forecastResponse, geocodeResponse)
-
+            let data = try await weatherService.getForecast(coordinate: coordinate)
             try Task.checkCancellation()
-            self.forecast = forecast
-            self.geocode = geocodes.first
+            self.forecast = data.forecast
+            self.geocode = data.geocode
             setBackgroundColor()
             loadingStatus = .loaded
             networkError = nil
@@ -163,6 +132,8 @@ class WeatherForecastViewModel: ObservableObject {
             networkError = NetworkError.noData
         case NetworkError.serverError:
             networkError = NetworkError.serverError
+        case NetworkError.networkUnavailable:
+            networkError = .networkUnavailable
         case NetworkError.unknown:
             networkError = NetworkError.unknown
         default:
@@ -205,20 +176,6 @@ class WeatherForecastViewModel: ObservableObject {
         }
     }
     
-    private func weatherURL(path: String, coordinate: CLLocationCoordinate2D,
-                            apiKey: String, excludeMinutely: Bool = false) -> URL? {
-        guard var components = URLComponents(string: Constants.weatherApiEndpoint) else { return nil }
-        components.path = path
-        components.queryItems = [
-            URLQueryItem(name: "lat", value: String(coordinate.latitude)),
-            URLQueryItem(name: "lon", value: String(coordinate.longitude)),
-            URLQueryItem(name: "appid", value: apiKey)
-        ]
-        if excludeMinutely {
-            components.queryItems?.append(URLQueryItem(name: "exclude", value: "minutely"))
-        }
-        return components.url
-    }
 }
 
 // MARK: Refresh scheduling

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACD012340000000000000022 /* PlacesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000012 /* PlacesService.swift */; };
+		ACD012340000000000000021 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000011 /* WeatherService.swift */; };
 		ACD012340000000000000001 /* RefreshScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD012340000000000000002 /* RefreshScheduler.swift */; };
 		BB0C609A2B1E587200359F7D /* TempScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0C60992B1E587200359F7D /* TempScale.swift */; };
 		BB0C609D2B1E743600359F7D /* WeatherThreeHourlyForecastListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0C609C2B1E743600359F7D /* WeatherThreeHourlyForecastListView.swift */; };
@@ -113,6 +115,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		ACD012340000000000000012 /* PlacesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesService.swift; sourceTree = "<group>"; };
+		ACD012340000000000000011 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		ACD012340000000000000002 /* RefreshScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshScheduler.swift; sourceTree = "<group>"; };
 		BB0C60992B1E587200359F7D /* TempScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempScale.swift; sourceTree = "<group>"; };
 		BB0C609C2B1E743600359F7D /* WeatherThreeHourlyForecastListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherThreeHourlyForecastListView.swift; sourceTree = "<group>"; };
@@ -208,6 +212,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+        ACD012340000000000000031 /* Services */ = {
+            isa = PBXGroup;
+            children = (
+                ACD012340000000000000011 /* WeatherService.swift */,
+                ACD012340000000000000012 /* PlacesService.swift */,
+            );
+            path = Services;
+            sourceTree = "<group>";
+        };
 		BB0C609B2B1E741500359F7D /* WeatherThreeHourlyForecastListView */ = {
 			isa = PBXGroup;
 			children = (
@@ -337,6 +350,7 @@
 		BB88625A2B1500F300EE56B1 /* AzureSkys */ = {
 			isa = PBXGroup;
 			children = (
+				ACD012340000000000000031 /* Services */,
 				BB946FFF2C572A0500CA9608 /* Info.plist */,
 				BB537C102B2B5082006BE03C /* Settings.bundle */,
 				BB983B852B370B5700161C26 /* ApiKeys.plist */,
@@ -579,6 +593,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACD012340000000000000022 /* PlacesService.swift in Sources */,
+				ACD012340000000000000021 /* WeatherService.swift in Sources */,
 				ACD012340000000000000001 /* RefreshScheduler.swift in Sources */,
 				BBE4E95E2B5DF56D00C83C48 /* LoadingStatus.swift in Sources */,
 				BB983B8A2B370DF400161C26 /* ApiKeyModel.swift in Sources */,

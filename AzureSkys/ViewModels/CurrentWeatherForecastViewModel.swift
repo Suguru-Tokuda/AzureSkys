@@ -22,23 +22,14 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
 
-    var networkManager: Networking
-    var apiKeyManager: ApiKeyActions
+    private let weatherService: WeatherServicing
     var locationManager: LocationManager?
 
     private let refreshScheduler = RefreshScheduler()
     private var isFetching = false
 
-    init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
-        self.networkManager = networkManager
-        self.apiKeyManager = apiKeyManager
-        
-        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                self.customError = !networkAvailable ? NetworkError.networkUnavailable : nil
-            }
-        }
+    init(weatherService: WeatherServicing = WeatherService()) {
+        self.weatherService = weatherService
     }
 
     deinit {
@@ -73,75 +64,40 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         }
     }
 
-    func getCurrentWeatherDataWithCurrentLocation(urlString: String = Constants.weatherApiEndpoint, showLoading: Bool = true) async {
-        if let currentLocation,
-           !isFetching, !Task.isCancelled {
-            isFetching = true
-            defer { isFetching = false }
-            
-            guard let urlStr = getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate),
-                  let url = URL(string: urlStr) else {
-                hasError = true
-                customError = NetworkError.badUrl
-                return
-            }
-
-            if showLoading {
-                loadingStatus = .loading
-            }
-            
-            do {
-                let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
-                try Task.checkCancellation()
-                self.currentForecast = response
-                if let currentForecast = self.currentForecast,
-                   let weather = currentForecast.weather.first {
-                    self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
-                }
-                
-                self.loadingStatus = .loaded
-                self.customError = nil
-                self.hasError = false
-            } catch {
-                self.loadingStatus = .inactive
-                guard !Task.isCancelled else { return }
-                await handleGetWeatherForecastError(error: error)
-            }
-        }
+    func getCurrentWeatherDataWithCurrentLocation(showLoading: Bool = true) async {
+        guard let currentLocation else { return }
+        await getCurrentWeatherData(coordinate: currentLocation.coordinate, showLoading: showLoading)
     }
-    
-    func getCurrentWeatherDataWithCityData(urlString: String = Constants.weatherApiEndpoint, showLoading: Bool = true) async {
-        if let place,
-           !isFetching, !Task.isCancelled {
-            isFetching = true
-            defer { isFetching = false }
-            guard let urlStr = getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude)),
-                  let url = URL(string: urlStr) else {
-                hasError = true
-                customError = NetworkError.badUrl
-                return
-            }
 
-            if showLoading {
-                loadingStatus = .loading
+    func getCurrentWeatherDataWithCityData(showLoading: Bool = true) async {
+        guard let place else { return }
+        let coordinate = CLLocationCoordinate2D(latitude: place.geometry.location.latitude,
+                                                longitude: place.geometry.location.longitude)
+        await getCurrentWeatherData(coordinate: coordinate, showLoading: showLoading)
+    }
+
+    private func getCurrentWeatherData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
+        guard !isFetching, !Task.isCancelled else { return }
+        isFetching = true
+        defer { isFetching = false }
+        if showLoading {
+            loadingStatus = .loading
+        }
+
+        do {
+            let response = try await weatherService.getCurrentWeather(coordinate: coordinate)
+            try Task.checkCancellation()
+            currentForecast = response
+            if let weather = response.weather.first {
+                setRowBackgroundColor(weather: weather, clouds: response.clouds.all)
             }
-            
-            do {
-                let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
-                try Task.checkCancellation()
-                self.currentForecast = response
-                if let currentForecast = self.currentForecast,
-                   let weather = currentForecast.weather.first {
-                    self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
-                }
-                self.loadingStatus = .loaded
-                self.customError = nil
-                self.hasError = false
-            } catch {
-                self.loadingStatus = .inactive
-                guard !Task.isCancelled else { return }
-                await handleGetWeatherForecastError(error: error)
-            }
+            loadingStatus = .loaded
+            customError = nil
+            hasError = false
+        } catch {
+            loadingStatus = .inactive
+            guard !Task.isCancelled else { return }
+            await handleGetWeatherForecastError(error: error)
         }
     }
 
@@ -176,18 +132,6 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         hasError = true
     }
     
-    /**
-        Get url for current by coordinate
-     */
-    private func getCurrentWeatherForecastAPIString(urlString: String = Constants.weatherApiEndpoint,
-                                                    coordinate: CLLocationCoordinate2D) -> String? {
-        do {
-            let apiKey = try apiKeyManager.getOpenWeatherApiKey()
-            return "\(urlString)/data/2.5/weather?lat=\(coordinate.latitude)&lon=\(coordinate.longitude)&appid=\(apiKey)"
-        } catch {
-            return nil
-        }
-    }
 }
 
 // MARK: Refresh scheduling

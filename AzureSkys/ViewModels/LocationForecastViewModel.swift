@@ -21,22 +21,13 @@ class LocationForecastViewModel: ObservableObject {
     private var searchTask: Task<Void, Never>?
     private var searchRequestID = UUID()
     
-    let networkManager: Networking
-    let apiKeyManager: ApiKeyActions
-    
-    init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
-        self.networkManager = networkManager
-        self.apiKeyManager = apiKeyManager
+    private let placesService: PlacesServicing
+
+    init(placesService: PlacesServicing = PlacesService()) {
+        self.placesService = placesService
         self.addSubscriptions()
-        
-        self.networkManager.checkNetworkAvailability(queue: DispatchQueue.global(qos: .background)) { [weak self] networkAvailable in
-            guard let self else { return }
-            DispatchQueue.main.async { [weak self] in
-                self?.networkError = !networkAvailable ? NetworkError.networkUnavailable : nil
-            }
-        }
     }
-    
+
     deinit {
         searchTask?.cancel()
         cancellables.removeAll()
@@ -75,7 +66,7 @@ class LocationForecastViewModel: ObservableObject {
             return
         }
 
-        searchTask = Task { [weak self, networkManager] in
+        searchTask = Task { [weak self, placesService] in
             do {
                 // Cancel as soon as input changes, including during the debounce.
                 if debounce {
@@ -83,17 +74,12 @@ class LocationForecastViewModel: ObservableObject {
                 }
                 try Task.checkCancellation()
                 guard self?.searchRequestID == requestID else { return }
-                guard let urlString = self?.getGooglePlacesPrediction(searchText: query),
-                      let url = URL(string: urlString) else {
-                    throw NetworkError.badUrl
-                }
-
                 self?.isLoading = .loading
-                let response = try await networkManager.getData(url: url, type: GoogleAutoCompleteModel.self)
+                let predictions = try await placesService.getPredictions(query: query)
                 try Task.checkCancellation()
                 guard self?.searchRequestID == requestID else { return }
 
-                self?.predictions = response.predictions ?? []
+                self?.predictions = predictions
                 self?.isLoading = .inactive
                 self?.dismissError()
             } catch {
@@ -105,31 +91,19 @@ class LocationForecastViewModel: ObservableObject {
     }
 
     func getPlaceDetails(placeId: String) async -> GooglePlaceDetails? {
-        if !gettingDetails {
-            guard let urlStr = getGoogleDetailsURL(placeId: placeId),
-                  let url = URL(string: urlStr) else {
-                hasError = true
-                networkError = NetworkError.badUrl
-                return nil
-            }
-            
-            gettingDetails = true
-            
-            do {
-                let res = try await self.networkManager.getData(url: url, type: GooglePlaceDetailsResponse.self)
-                
-                self.gettingDetails = false
-                return res.result
-            } catch {
-                self.gettingDetails = false
-                handleGetWeatherForecastError(error: error)
-                return nil
-            }
-        } else {
+        guard !gettingDetails else { return nil }
+        gettingDetails = true
+        defer { gettingDetails = false }
+
+        do {
+            return try await placesService.getPlaceDetails(placeID: placeId)
+        } catch {
+            guard !Task.isCancelled else { return nil }
+            handleGetWeatherForecastError(error: error)
             return nil
         }
     }
-    
+
     private func handleGetWeatherForecastError(error: Error) {
         switch error {
         case NetworkError.badUrl:
@@ -147,22 +121,5 @@ class LocationForecastViewModel: ObservableObject {
         }
         
         hasError = true
-    }
-    
-    private func getGooglePlacesPrediction(searchText: String, endPoint: String = Constants.googleApiBaseURL) -> String? {
-        guard let apiKey = try? apiKeyManager.getGoogleApiKey() else { return nil }
-        guard var components = URLComponents(string: endPoint + "autocomplete/json") else { return nil }
-        components.queryItems = [
-            URLQueryItem(name: "input", value: searchText),
-            URLQueryItem(name: "types", value: "(cities)"),
-            URLQueryItem(name: "fields", value: "place_id,description"),
-            URLQueryItem(name: "key", value: apiKey)
-        ]
-        return components.url?.absoluteString
-    }
-    
-    private func getGoogleDetailsURL(placeId: String, endPoint: String = Constants.googleApiBaseURL) -> String? {
-        guard let apiKey = try? apiKeyManager.getGoogleApiKey() else { return nil }
-        return "\(endPoint)details/json?placeid=\(placeId)&fields=geometry%2Cformatted_address%2Cname%2Cplace_id%2Caddress_components&key=\(apiKey)"
     }
 }

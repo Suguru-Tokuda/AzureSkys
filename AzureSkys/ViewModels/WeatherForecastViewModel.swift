@@ -12,6 +12,7 @@ import MapKit
 
 @MainActor
 class WeatherForecastViewModel: ObservableObject {
+    @Published var showForecastAnimation = true
     @Published var city: City?
     @Published var forecast: WeatherForecastOneCallResponse?
     @Published var geocode: WeatherGeocode?
@@ -31,10 +32,9 @@ class WeatherForecastViewModel: ObservableObject {
     var coreDataManager: PlaceCoreDataActions
     var apiKeyManager: ApiKeyActions
     var locationManager: LocationManager?
-    let refreshInterval: Double = 300 // 5 mins
-    var refreshCount: Int = 0
-    var dataRefreshTimer: Timer?
-    
+    private let refreshScheduler = RefreshScheduler()
+    private var isFetching = false
+
     init(networkManager: Networking = NetworkManager(), 
          coreDataManager: PlaceCoreDataActions = PlaceCoreDataManager(),
          apiKeyManager: ApiKeyActions = ApiKeyManager()) {
@@ -68,10 +68,10 @@ class WeatherForecastViewModel: ObservableObject {
                 .sink { [weak self] receivedVal in
                     guard let self else { return }
                     self.locationAuthorized = receivedVal.0
-                    let callApi: Bool = self.currentLocation == nil
+                    let callApi = self.currentLocation == nil && receivedVal.1 != nil
                     self.currentLocation = receivedVal.1
 
-                    if callApi {
+                    if callApi && refreshScheduler.isRunning {
                         startDataRefreshTimer()
                     }
                 }
@@ -91,12 +91,16 @@ class WeatherForecastViewModel: ObservableObject {
     }
 
     private func getWeatherForecastData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
-        guard loadingStatus != .loading else { return }
+        guard !isFetching, !Task.isCancelled else { return }
+        isFetching = true
+        defer { isFetching = false }
         guard await networkManager.checkNetworkAvailability() else {
+            guard !Task.isCancelled else { return }
             isErrorOccured = true
             networkError = .networkUnavailable
             return
         }
+        guard !Task.isCancelled else { return }
         guard let apiKey = try? apiKeyManager.getOpenWeatherApiKey(),
               let forecastURL = weatherURL(path: "/data/3.0/onecall", coordinate: coordinate,
                                            apiKey: apiKey, excludeMinutely: true),
@@ -116,6 +120,7 @@ class WeatherForecastViewModel: ObservableObject {
             async let geocodeResponse = networkManager.getData(url: geocodeURL, type: [WeatherGeocode].self)
             let (forecast, geocodes) = try await (forecastResponse, geocodeResponse)
 
+            try Task.checkCancellation()
             self.forecast = forecast
             self.geocode = geocodes.first
             setBackgroundColor()
@@ -124,6 +129,7 @@ class WeatherForecastViewModel: ObservableObject {
             isErrorOccured = coreDataError != nil
         } catch {
             loadingStatus = .inactive
+            guard !Task.isCancelled else { return }
             await handleGetWeatherForecastError(error: error)
         }
     }
@@ -164,11 +170,6 @@ class WeatherForecastViewModel: ObservableObject {
             networkError = NetworkError.unknown
         default:
             networkError = NetworkError.unknown
-        }
-
-        if let dataRefreshTimer {
-            dataRefreshTimer.invalidate()
-            self.dataRefreshTimer = nil
         }
 
         isErrorOccured = true
@@ -235,42 +236,18 @@ class WeatherForecastViewModel: ObservableObject {
 // MARK: Refresh scheduling
 
 extension WeatherForecastViewModel {
-    private func resetRefreshCount() {
-        self.refreshCount = 0
-    }
-
-    func incrementRefreshCount(_ count: Int = 1) async  {
-        self.refreshCount += count
-    }
-
     func setPlace(place: GooglePlaceDetails? = nil) {
         self.place = place
     }
 
     func startDataRefreshTimer(showLoading: Bool = true) {
-        endDataRefreshTimer()
-        
-        Task(priority: .utility) {
-            await self.loadWeatherData(showLoading: showLoading && self.refreshCount == 0)
-            if !showLoading {
-                await self.incrementRefreshCount(2)
-            }
-        }
-
-        dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,
-                                                repeats: true) { _ in
-            Task(priority: .utility) {
-                await self.incrementRefreshCount()
-                await self.loadWeatherData(showLoading: showLoading && self.refreshCount == 0)
-            }
+        refreshScheduler.start(showLoading: showLoading) { [weak self] showLoading in
+            self?.showForecastAnimation = showLoading
+            await self?.loadWeatherData(showLoading: showLoading)
         }
     }
 
     func endDataRefreshTimer() {
-        if let dataRefreshTimer {
-            dataRefreshTimer.invalidate()
-            self.dataRefreshTimer = nil
-            self.resetRefreshCount()
-        }
+        refreshScheduler.stop()
     }
 }

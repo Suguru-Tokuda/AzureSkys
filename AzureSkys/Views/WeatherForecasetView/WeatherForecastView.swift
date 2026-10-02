@@ -45,10 +45,8 @@ struct WeatherForecastView: View {
             vm.endDataRefreshTimer()
         }
         .task {
-            if place != nil {
-                vm.setPlace(place: place)
-                vm.startDataRefreshTimer()
-            }
+            vm.setPlace(place: place)
+            vm.startDataRefreshTimer()
         }
         .alert(isPresented: .constant(vm.coreDataError != nil), error: vm.coreDataError) {
             Button(action: {
@@ -68,7 +66,8 @@ struct WeatherForecastView: View {
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                        isActive = false
+            isActive = false
+            vm.endDataRefreshTimer()
         }
     }
 }
@@ -109,7 +108,7 @@ extension WeatherForecastView {
                                       geocode: vm.geocode,
                                       networkError: vm.networkError,
                                       loadingStatus: vm.loadingStatus,
-                                      showAnimation: vm.refreshCount < 1,
+                                      showAnimation: vm.showForecastAnimation,
                                       onRefresh: {
                 vm.startDataRefreshTimer()
             })

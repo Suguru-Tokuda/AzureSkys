@@ -26,9 +26,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     var apiKeyManager: ApiKeyActions
     var locationManager: LocationManager?
 
-    let refreshInterval: Double = 300 // 5 mins
-    var refreshCount: Int = 0
-    var dataRefreshTimer: Timer?
+    private let refreshScheduler = RefreshScheduler()
+    private var isFetching = false
 
     init(networkManager: Networking = NetworkManager(), apiKeyManager: ApiKeyActions = ApiKeyManager()) {
         self.networkManager = networkManager
@@ -64,7 +63,11 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 .sink { [weak self] receiveVal in
                     guard let self else { return }
                     locationAuthorized = receiveVal.0
+                    let receivedFirstLocation = currentLocation == nil && receiveVal.1 != nil
                     currentLocation = receiveVal.1
+                    if receivedFirstLocation && refreshScheduler.isRunning {
+                        startDataRefreshTimer()
+                    }
                 }
                 .store(in: &cancellables)
         }
@@ -72,7 +75,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
 
     func getCurrentWeatherDataWithCurrentLocation(urlString: String = Constants.weatherApiEndpoint, showLoading: Bool = true) async {
         if let currentLocation,
-           loadingStatus == .inactive {
+           !isFetching, !Task.isCancelled {
+            isFetching = true
+            defer { isFetching = false }
             
             guard let urlStr = getCurrentWeatherForecastAPIString(urlString: urlString, coordinate: currentLocation.coordinate),
                   let url = URL(string: urlStr) else {
@@ -86,15 +91,20 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             }
             
             do {
-                self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+                let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+                try Task.checkCancellation()
+                self.currentForecast = response
                 if let currentForecast = self.currentForecast,
                    let weather = currentForecast.weather.first {
                     self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
                 }
                 
                 self.loadingStatus = .loaded
+                self.customError = nil
+                self.isErrorOccured = false
             } catch {
                 self.loadingStatus = .inactive
+                guard !Task.isCancelled else { return }
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -102,7 +112,9 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     
     func getCurrentWeatherDataWithCityData(urlString: String = Constants.weatherApiEndpoint, showLoading: Bool = true) async {
         if let place,
-           loadingStatus == .inactive {
+           !isFetching, !Task.isCancelled {
+            isFetching = true
+            defer { isFetching = false }
             guard let urlStr = getCurrentWeatherForecastAPIString(coordinate: CLLocationCoordinate2D(latitude: place.geometry.location.latitude, longitude: place.geometry.location.longitude)),
                   let url = URL(string: urlStr) else {
                 isErrorOccured = true
@@ -115,14 +127,19 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             }
             
             do {
-                self.currentForecast = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+                let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
+                try Task.checkCancellation()
+                self.currentForecast = response
                 if let currentForecast = self.currentForecast,
                    let weather = currentForecast.weather.first {
                     self.setRowBackgroundColor(weather: weather, clouds: currentForecast.clouds.all)
                 }
                 self.loadingStatus = .loaded
+                self.customError = nil
+                self.isErrorOccured = false
             } catch {
                 self.loadingStatus = .inactive
+                guard !Task.isCancelled else { return }
                 await handleGetWeatherForecastError(error: error)
             }
         }
@@ -177,35 +194,12 @@ class CurrentWeatherForecastViewModel: ObservableObject {
 
 extension CurrentWeatherForecastViewModel {
     func startDataRefreshTimer(showLoading: Bool = true) {
-        endDataRefreshTimer()
-
-        Task(priority: .utility) {
-            await self.loadCurrentWeatherData(showLoading: showLoading && self.refreshCount == 0)
-            await self.incrementRefreshCount()
-        }
-
-        dataRefreshTimer = Timer.scheduledTimer(withTimeInterval: refreshInterval,
-                                                repeats: true) { _ in
-            Task(priority: .utility) {
-                await self.incrementRefreshCount()
-                await self.loadCurrentWeatherData(showLoading: showLoading && self.refreshCount == 0)
-            }
+        refreshScheduler.start(showLoading: showLoading) { [weak self] showLoading in
+            await self?.loadCurrentWeatherData(showLoading: showLoading)
         }
     }
 
     func endDataRefreshTimer() {
-        if let dataRefreshTimer {
-            dataRefreshTimer.invalidate()
-            self.dataRefreshTimer = nil
-            self.resetRefreshCount()
-        }
-    }
-
-    func resetRefreshCount() {
-        self.refreshCount = 0
-    }
-
-    func incrementRefreshCount() async {
-        self.refreshCount += 1
+        refreshScheduler.stop()
     }
 }

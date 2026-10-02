@@ -38,7 +38,8 @@ struct LocationsSearchView: View {
             .onReceive(NotificationCenter
                         .default
                         .publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                            isActive = false
+                isActive = false
+                vm.endDataRefreshTimer()
             }
         }
     }

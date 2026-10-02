@@ -78,6 +78,7 @@ struct LocationsView: View {
             .navigationBarTitleDisplayMode(.large)
             .navigationTitle("Weather")
             .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always))
+            .autocorrectionDisabled()
             .navigationBarBackButtonHidden(true)
         }
         .sheet(isPresented: $coordinator.weatherForecastSheetPresented) {

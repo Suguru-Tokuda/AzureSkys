@@ -15,6 +15,7 @@ struct WeatherImageView: View {
 
     let icon: String
     let width: CGFloat
+    var session: URLSession = .shared
 
     var body: some View {
         ZStack {
@@ -51,6 +52,13 @@ struct WeatherImageView: View {
             }
         }
 
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+            image = UIImage(systemName: "cloud")
+            return
+        }
+        #endif
+
         // Missing or corrupt cache entries fall through to a download.
         if let cachedImage = try? fileManager.getImage(name: icon) {
             image = cachedImage
@@ -63,7 +71,7 @@ struct WeatherImageView: View {
 
         do {
             let request = URLRequest(url: url, timeoutInterval: 15)
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: request)
             try Task.checkCancellation()
             guard let response = response as? HTTPURLResponse,
                   (200..<300).contains(response.statusCode),

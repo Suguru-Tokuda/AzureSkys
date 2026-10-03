@@ -29,7 +29,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
             request.fetchLimit = 1
             guard try context.fetch(request).isEmpty else { return }
 
-            let entity = PlaceEntity(context: context)
+            let entity = PlaceEntity(entity: NSEntityDescription.entity(forEntityName: "PlaceEntity", in: context)!, insertInto: context)
             entity.id = place.id
             entity.name = place.name
             entity.formattedAddress = place.formattedAddress

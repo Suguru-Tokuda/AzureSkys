@@ -18,6 +18,8 @@ struct DismissButton: View {
                 .resizable()
                 .frame(width: 15, height: 15)
         }
+        .accessibilityLabel("Dismiss")
+        .accessibilityIdentifier("dismissButton")
     }
 }
 

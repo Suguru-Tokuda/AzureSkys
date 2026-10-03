@@ -1,0 +1,50 @@
+//
+//  LocationManagerTests.swift
+//  AzureSkys
+//
+//  Created by Suguru Tokuda on 10/3/26.
+//
+
+import XCTest
+import CoreLocation
+@testable import AzureSkys
+
+private final class LocationDriver: CLLocationManager {
+    var status: CLAuthorizationStatus = .notDetermined
+    var requested = false
+    var started = false
+    override var authorizationStatus: CLAuthorizationStatus { status }
+
+    override func requestWhenInUseAuthorization() { requested = true }
+
+    override func startUpdatingLocation() { started = true }
+}
+
+@MainActor
+final class LocationManagerTests: XCTestCase {
+    func testStartupAndPermissionMappingWithoutSystemPrompts() {
+        let driver = LocationDriver()
+        let manager = LocationManager(locationManager: driver)
+        XCTAssertTrue(driver.requested)
+        XCTAssertTrue(driver.started)
+        XCTAssertTrue(driver.delegate === manager)
+        for (status, expected) in [(CLAuthorizationStatus.notDetermined, Optional<Bool>.none), (.restricted, false), (.denied, false), (.authorizedAlways, true), (.authorizedWhenInUse, true)] {
+            driver.status = status
+            manager.locationAuthorized = nil
+            manager.locationManagerDidChangeAuthorization(driver)
+            XCTAssertEqual(manager.locationAuthorized, expected)
+        }
+    }
+
+    func testLatestLocationAndDisabledAutomaticStart() {
+        let driver = LocationDriver()
+        let manager = LocationManager(startAutomatically: false, locationManager: driver)
+        XCTAssertFalse(driver.requested)
+        XCTAssertFalse(driver.started)
+        let first = CLLocation(latitude: 1, longitude: 2), last = CLLocation(latitude: 3, longitude: 4)
+        manager.locationManager(driver, didUpdateLocations: [first, last])
+        XCTAssertEqual(manager.currentLocation, last)
+        manager.locationManager(driver, didUpdateLocations: [])
+        XCTAssertEqual(manager.currentLocation, last)
+    }
+}

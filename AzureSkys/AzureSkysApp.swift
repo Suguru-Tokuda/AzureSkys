@@ -9,7 +9,17 @@ import SwiftUI
 
 @main
 struct AzureSkysApp: App {
-    @StateObject private var dependencies = AppDependencies.live()
+    @StateObject private var dependencies: AppDependencies
+
+    init() {
+        #if DEBUG
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("--ui-testing")
+        let isUnitTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        _dependencies = StateObject(wrappedValue: isUITesting ? .uiTesting() : (isUnitTesting ? .preview() : .live()))
+        #else
+        _dependencies = StateObject(wrappedValue: .live())
+        #endif
+    }
 
     var body: some Scene {
         WindowGroup {

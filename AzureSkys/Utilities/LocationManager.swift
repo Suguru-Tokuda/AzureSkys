@@ -12,9 +12,10 @@ class LocationManager: NSObject, ObservableObject {
     @Published var currentLocation: CLLocation?
     @Published var locationAuthorized: Bool?
     
-    let locationManager = CLLocationManager()
+    let locationManager: CLLocationManager
     
-    init(startAutomatically: Bool = true) {
+    init(startAutomatically: Bool = true, locationManager: CLLocationManager = CLLocationManager()) {
+        self.locationManager = locationManager
         super.init()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = kCLDistanceFilterNone

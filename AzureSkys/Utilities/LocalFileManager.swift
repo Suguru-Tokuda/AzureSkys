@@ -13,6 +13,12 @@ protocol LocalFileManaging {
 }
 
 class LocalFileManager: LocalFileManaging, ObservableObject {
+    private let directory: URL?
+
+    init(directory: URL? = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first) {
+        self.directory = directory
+    }
+
     func saveImage(image: UIImage, name: String) throws {
         guard let data = image.pngData() else {
             throw FileManagerError.data
@@ -43,10 +49,6 @@ class LocalFileManager: LocalFileManaging, ObservableObject {
     }
     
     func getPath(name: String) -> URL? {
-        return FileManager
-            .default
-            .urls(for: .cachesDirectory, in: .userDomainMask)
-            .first?
-            .appending(path: name)
+        directory?.appending(path: name)
     }
 }

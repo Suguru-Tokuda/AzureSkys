@@ -8,13 +8,15 @@
 import Foundation
 
 protocol PlistActions {
+    var resourceBundle: Bundle { get }
     func getData<T: Decodable>(resource: String, type: T.Type) throws -> T
 }
 
 extension PlistActions {
+    var resourceBundle: Bundle { .main }
     func getData<T: Decodable>(resource: String = "ApiKeys", type: T.Type = ApiKeyModel.self) throws -> T {
         do {
-            if let url = Bundle.main.url(forResource: resource, withExtension: "plist") {
+            if let url = resourceBundle.url(forResource: resource, withExtension: "plist") {
                 var data: Data
                 
                 do {
@@ -44,9 +46,17 @@ protocol ApiKeyActions {
 }
 
 class ApiKeyManager: ApiKeyActions, PlistActions {
+    let resourceBundle: Bundle
+    private let resource: String
+
+    init(bundle: Bundle = .main, resource: String = "ApiKeys") {
+        self.resourceBundle = bundle
+        self.resource = resource
+    }
+
     func getGoogleApiKey() throws -> String {
         do {
-            let apiKeyModel = try self.getData()
+            let apiKeyModel = try self.getData(resource: resource, type: ApiKeyModel.self)
             return apiKeyModel.googleApiKey
         } catch {
             throw PlistError.dataNotFound
@@ -55,7 +65,7 @@ class ApiKeyManager: ApiKeyActions, PlistActions {
     
     func getOpenWeatherApiKey() throws -> String {
         do {
-            let apiKeyModel = try self.getData()
+            let apiKeyModel = try self.getData(resource: resource, type: ApiKeyModel.self)
             return apiKeyModel.openWeatherApiKey
         } catch {
             throw PlistError.dataNotFound

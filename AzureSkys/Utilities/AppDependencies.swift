@@ -45,13 +45,13 @@ final class AppDependencies: ObservableObject {
             coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager())
     }
 
-    static func preview() -> AppDependencies {
+    static func preview(placesService: PlacesServicing? = nil) -> AppDependencies {
         let persistenceController = PersistenceController(inMemory: true)
         let locationManager = LocationManager(startAutomatically: false)
         locationManager.locationAuthorized = true
         locationManager.currentLocation = CLLocation(latitude: 33.7488, longitude: -84.3877)
         return AppDependencies(
-            weatherService: PreviewWeatherService(), placesService: PreviewPlacesService(),
+            weatherService: PreviewWeatherService(), placesService: placesService ?? PreviewPlacesService(),
             placeStore: PlaceCoreDataManager(container: persistenceController.container),
             persistenceController: persistenceController, locationManager: locationManager,
             coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager())
@@ -109,3 +109,27 @@ private struct PreviewPlacesService: PlacesServicing {
     func getPredictions(query: String) async throws -> [Prediction] { PreviewManager.predictions }
     func getPlaceDetails(placeID: String) async throws -> SavedPlace { SavedPlace(details: PreviewManager.placeDetails) }
 }
+
+#if DEBUG
+extension AppDependencies {
+    static func uiTesting() -> AppDependencies {
+        preview(placesService: UITestPlacesService())
+    }
+}
+
+private final class UITestPlacesService: PlacesServicing {
+    private var failedSearch = false
+
+    func getPredictions(query: String) async throws -> [Prediction] {
+        if ProcessInfo.processInfo.arguments.contains("--search-fails-once"), !failedSearch {
+            failedSearch = true
+            throw NetworkError.networkUnavailable
+        }
+        return Array(PreviewManager.predictions.prefix(1))
+    }
+
+    func getPlaceDetails(placeID: String) async throws -> SavedPlace {
+        SavedPlace(details: PreviewManager.placeDetails)
+    }
+}
+#endif

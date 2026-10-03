@@ -20,24 +20,60 @@
                ReferencedContainer = "container:AzureSkys.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting="YES"
+            buildForRunning="NO"
+            buildForProfiling="NO"
+            buildForArchiving="NO"
+            buildForAnalyzing="YES">
+            <BuildableReference
+               BuildableIdentifier="primary"
+               BlueprintIdentifier="52F43E43C4F448A58425C502"
+               BuildableName="AzureSkysTests.xctest"
+               BlueprintName="AzureSkysTests"
+               ReferencedContainer="container:AzureSkys.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting="YES"
+            buildForRunning="NO"
+            buildForProfiling="NO"
+            buildForArchiving="NO"
+            buildForAnalyzing="YES">
+            <BuildableReference
+               BuildableIdentifier="primary"
+               BlueprintIdentifier="6A1565A942A74CBABD4138A4"
+               BuildableName="AzureSkysUITests.xctest"
+               BlueprintName="AzureSkysUITests"
+               ReferencedContainer="container:AzureSkys.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      codeCoverageEnabled="YES"
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
+         <TestableReference skipped="NO" parallelizable="NO">
             <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BB1943962BFD83D100246362"
-               BuildableName = "MyResourceTests"
-               BlueprintName = "MyResourceTests"
-               ReferencedContainer = "container:AzureSkys.xcodeproj">
+               BuildableIdentifier="primary"
+               BlueprintIdentifier="52F43E43C4F448A58425C502"
+               BuildableName="AzureSkysTests.xctest"
+               BlueprintName="AzureSkysTests"
+               ReferencedContainer="container:AzureSkys.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference skipped="NO" parallelizable="NO">
+            <BuildableReference
+               BuildableIdentifier="primary"
+               BlueprintIdentifier="6A1565A942A74CBABD4138A4"
+               BuildableName="AzureSkysUITests.xctest"
+               BlueprintName="AzureSkysUITests"
+               ReferencedContainer="container:AzureSkys.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

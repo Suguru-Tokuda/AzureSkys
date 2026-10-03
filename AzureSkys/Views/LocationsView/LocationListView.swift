@@ -14,11 +14,13 @@ struct LocationListView: View {
     @Environment(\.isSearching) private var isSearching
     let dependencies: AppDependencies
     @StateObject var vm: LocationsViewModel
-    @FetchRequest(entity: PlaceEntity.entity(), sortDescriptors: [])
+    @FetchRequest
     var results: FetchedResults<PlaceEntity>
     
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
+        let entity = dependencies.persistenceController.container.managedObjectModel.entitiesByName["PlaceEntity"]!
+        _results = FetchRequest(entity: entity, sortDescriptors: [])
         _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
     }
 

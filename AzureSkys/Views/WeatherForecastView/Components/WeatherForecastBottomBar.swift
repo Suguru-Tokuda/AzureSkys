@@ -23,6 +23,8 @@ struct WeatherForecastBottomBar: View {
                 }, label: {
                     Image(systemName: "list.bullet")
                 })
+                .accessibilityLabel("Locations")
+                .accessibilityIdentifier("locationsButton")
             }
             .padding(EdgeInsets(top: 20, leading: 32, bottom: 24, trailing: 32))
         }

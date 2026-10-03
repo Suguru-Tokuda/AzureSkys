@@ -18,21 +18,24 @@ class LocationsViewModel: ObservableObject {
     }
     
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
-        coreDataError = nil
         // Capture the selected places before deletions update the fetched results.
         let places = indexSet.compactMap { SavedPlace(from: results[$0]) }
         Task { [weak self] in
-            guard let self else { return }
-            for place in places {
-                do {
-                    try await placeCoreDataManager.deleteFromDatabase(place: place)
-                } catch {
-                    coreDataError = .delete
-                }
+            await self?.removePlaces(places)
+        }
+    }
+
+    func removePlaces(_ places: [SavedPlace]) async {
+        coreDataError = nil
+        for place in places {
+            do {
+                try await placeCoreDataManager.deleteFromDatabase(place: place)
+            } catch {
+                coreDataError = .delete
             }
         }
     }
-    
+
     func dismissError() {
         coreDataError = nil
     }

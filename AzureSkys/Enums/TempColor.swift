@@ -15,21 +15,19 @@ enum TempColor {
          hot
     
     static func getTempColor(tempInKelvin: Double) -> TempColor {
-        let tempInCelsius = tempInKelvin.getDegree(tempScale: .celsius)
-    
-        if tempInCelsius > 37.8 {
+        if tempInKelvin > 273.15 + 37.8 {
             return .hot
         }
         
-        if tempInCelsius >= 15.0 {
+        if tempInKelvin >= 273.15 + 15.0 {
             return .warm
         }
         
-        if tempInCelsius >= 10.0 {
+        if tempInKelvin >= 273.15 + 10.0 {
             return .cool
         }
         
-        if tempInCelsius >= 5 {
+        if tempInKelvin >= 273.15 + 5 {
             return .cold
         }
         

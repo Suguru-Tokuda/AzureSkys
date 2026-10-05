@@ -21,7 +21,7 @@ struct WeatherDailyForecastListCellView: View {
                 Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
                     .frame(width: 50, alignment: .leading)
                 if let weather = forecast.weather.first {
-                    WeatherImageView(icon: weather.icon, width: 40)
+                    WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 40)
                 }
                 Text(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                     .foregroundStyle(.white.opacity(0.5))
@@ -32,10 +32,9 @@ struct WeatherDailyForecastListCellView: View {
                     .padding(.top, 18)
                 Text(forecast.temp.max.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
             }
-            .padding(10)
             .fontWeight(.semibold)
         }
-        .frame(height: 50)
+        .frame(height: 40)
     }
 }
 

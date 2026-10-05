@@ -71,6 +71,7 @@ struct LocationsView: View {
                     }, label: {
                         Image(systemName: SystemImages.gear.rawValue)
                     })
+                    .accessibilityLabel(Strings.settings.rawValue)
                 }
             }
             .navigationBarTitleDisplayMode(.large)
@@ -80,6 +81,9 @@ struct LocationsView: View {
             .navigationBarBackButtonHidden(true)
             .navigationDestination(for: LocationsCoordinator.Route.self) { route in
                 locationsCoordinator.destination(for: route)
+            }
+            .background {
+                BackGroundView()
             }
         }
         .sheet(item: $coordinator.forecastPreview) { destination in

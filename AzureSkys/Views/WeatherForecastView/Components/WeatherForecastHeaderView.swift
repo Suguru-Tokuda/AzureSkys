@@ -16,33 +16,40 @@ struct WeatherForecastHeaderView: View {
     var scrollViewOffsetPercentage: CGFloat
     
     var body: some View {
-        VStack(alignment: .center, spacing: -10) {
-            Text(isMyLocation ? Strings.myLocation.rawValue : geocode.name)
-                .font(.largeTitle)
-            if isMyLocation {
-                Text(geocode.name)
-                    .font(.title3.weight(.semibold))
-                    .padding(.top, 10)
+        VStack(alignment: .leading, spacing: -10) {
+            HStack(alignment: .top) {
+                Image(systemName: SystemImages.mapPin.rawValue)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .modifier(WeatherPanelModifier(cornerRadius: 22))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(isMyLocation ? Strings.myLocation.rawValue : geocode.name)
+                        .font(.largeTitle)
+                    if isMyLocation {
+                        Text(geocode.name)
+                            .font(.title3.weight(.semibold))
+                            .padding(.top, 10)
+                    }
+                }
+                .shadow(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)
             }
+
             Text(currentForecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                 .font(.system(size: 96))
                 .fontWeight(.thin)
                 .offset(x: 10)
                 .shadow(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)
             
-            VStack {
+            VStack(alignment: .leading) {
                 if let weather = currentForecast.weather.first {
                     Text(weather.main)
                 }
-                
-                HStack {
-                    Spacer()
-                    HighLowTemperatures(maxTemp: dailyForecast.temp.max, minTemp: dailyForecast.temp.min)
-                    Spacer()
-                }
+                HighLowTemperatures(maxTemp: dailyForecast.temp.max, minTemp: dailyForecast.temp.min)
             }
             .font(.title3.weight(.semibold))
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.white)
         .shadow(
             color: .black.opacity(0.5),

@@ -39,6 +39,13 @@ enum Strings: String {
     case step2Of2 = "Step 2 of 2"
 
     // Settings.
+    case back = "Back"
+    case settingsYourLocation = "YOUR LOCATION"
+    case settingsPreferences = "PREFERENCES"
+    case settingsSubtitle = "Make the forecast yours"
+    case settingsLocationDescription = "Local forecasts, wherever you are."
+    case settingsTemperatureDescription = "Choose your preferred unit."
+    case settingsSyncDescription = "Keep saved places across your devices."
     case temperature = "Temperature"
     case temperatureUnit = "Temperature unit"
     case iCloudSync = "iCloud Sync"
@@ -59,6 +66,8 @@ enum Strings: String {
     case locationAuthorizationDescription = "The App requires location information to continue"
 
     // Weather.
+    case hourlyForecast = "Hourly Forecast"
+    case dailyForecast = "Daily Forecast"
     case today = "Today"
     case weather = "Weather"
     case locationsTitle = "Locations"

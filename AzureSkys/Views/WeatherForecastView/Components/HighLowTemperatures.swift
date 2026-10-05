@@ -17,6 +17,7 @@ struct HighLowTemperatures: View {
             Text(Strings.highTemperature(maxTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
             Text(Strings.lowTemperature(minTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
         }
+        .opacity(0.85)
     }
 }
 

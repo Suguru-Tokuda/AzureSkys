@@ -66,7 +66,7 @@ struct LocationViewCell: View {
                         Text(vm.currentForecast?.weather.first?.main ?? Strings.unavailable.rawValue)
                         if let currentForecast = vm.currentForecast,
                            let weather = currentForecast.weather.first {
-                            WeatherImageView(icon: weather.icon, width: 20)
+                            WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 20)
                         }
                     }
 
@@ -80,10 +80,12 @@ struct LocationViewCell: View {
             }
             .padding(.vertical, 20)
             .padding(.horizontal, 40)
+            .foregroundStyle(.white)
+            .shadow(color: .black.opacity(0.55), radius: 3, x: 0, y: 2)
         }
         .listRowSeparator(.hidden)
         .listRowBackground(
-            vm.listRowBackground
+            rowBackground
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal, 20)
@@ -115,6 +117,19 @@ struct LocationViewCell: View {
 
         .onDisappear {
             vm.endDataRefreshTimer()
+        }
+    }
+
+    @ViewBuilder
+    private var rowBackground: some View {
+        if let forecast = vm.currentForecast,
+           let weather = forecast.weather.first {
+            weather.weatherCondition.getBackgroundImage(
+                partOfDay: weather.partOfDay,
+                clouds: forecast.clouds.all
+            )
+        } else {
+            Color.black.opacity(0.2)
         }
     }
 }

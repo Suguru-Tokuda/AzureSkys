@@ -44,6 +44,29 @@ final class AzureSkysUITests: XCTestCase {
         field.typeText("Chicago")
     }
 
+    func testSettingsTemperatureSelectionAndBackNavigation() {
+        openLocations()
+        app.buttons["Settings"].tap()
+        let celsius = app.buttons["Celsius"]
+        XCTAssertTrue(celsius.waitForExistence(timeout: 5))
+        celsius.tap()
+        XCTAssertTrue(celsius.isSelected)
+        XCTAssertFalse(app.buttons["Fahrenheit"].isSelected)
+
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Settings weather cards"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+
+        app.buttons["Back"].tap()
+        XCTAssertTrue(app.navigationBars["Weather"].waitForExistence(timeout: 5))
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(celsius.waitForExistence(timeout: 5))
+        XCTAssertTrue(celsius.isSelected)
+        app.buttons["Fahrenheit"].tap()
+        XCTAssertTrue(app.buttons["Fahrenheit"].isSelected)
+    }
+
     func testLocationsDismissReturnsToForecast() {
         openLocations()
         app.buttons["dismissButton"].tap()

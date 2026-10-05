@@ -20,7 +20,7 @@ struct WeatherThreeHourlyForecastListViewCell: View {
                                     .unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset)
                                     .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
             if let weather = forecast.weather.first {
-                WeatherImageView(icon: weather.icon, width: 40)
+                WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 40)
             }
             Text(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
         }

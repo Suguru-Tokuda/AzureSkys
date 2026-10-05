@@ -15,11 +15,11 @@ extension CoreDataError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .save:
-            return NSLocalizedString("Error with saving to core data.", comment: "save")
+            return NSLocalizedString(Strings.coreDataSaveError.rawValue, comment: "save")
         case .fetch:
-            return NSLocalizedString("Error with fetching from core data.", comment: "fetch")
+            return NSLocalizedString(Strings.coreDataFetchError.rawValue, comment: "fetch")
         case .delete:
-            return NSLocalizedString("Error with deleting from core data.", comment: "delete")
+            return NSLocalizedString(Strings.coreDataDeleteError.rawValue, comment: "delete")
         }
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LocationsView: View {
     @EnvironmentObject private var coordinator: MainCoordinator
+    @EnvironmentObject private var locationsCoordinator: LocationsCoordinator
     @EnvironmentObject private var locationManager: LocationManager
     let dependencies: AppDependencies
     @StateObject var vm: LocationForecastViewModel
@@ -23,7 +24,7 @@ struct LocationsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $locationsCoordinator.path) {
             VStack {
                 if let error = vm.networkError {
                     RetryView(errorMessage: error.localizedDescription) {
@@ -45,7 +46,7 @@ struct LocationsView: View {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
-                    Text("OK")
+                    Text(Strings.ok.rawValue)
                 })
             })
             .toolbar {
@@ -60,29 +61,26 @@ struct LocationsView: View {
                         Button(action: {
                             dependencies.settingsManager.navigateToSettings()
                         }, label: {
-                            Image(systemName: "gear")
+                            Image(systemName: SystemImages.gear.rawValue)
                         })
                     }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Menu {
-                        ForEach(TempScale.allCases) { scale in
-                            Button(action: {
-                                tempScale = scale
-                            }, label: {
-                                tempScaleOptionBtn(selected: tempScale, option: scale)
-                            })
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
+                    Button(action: {
+                        locationsCoordinator.showSettings()
+                    }, label: {
+                        Image(systemName: SystemImages.gear.rawValue)
+                    })
                 }
             }
             .navigationBarTitleDisplayMode(.large)
-            .navigationTitle("Weather")
+            .navigationTitle(Strings.weather.rawValue)
             .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always))
             .autocorrectionDisabled()
             .navigationBarBackButtonHidden(true)
+            .navigationDestination(for: LocationsCoordinator.Route.self) { route in
+                locationsCoordinator.destination(for: route)
+            }
         }
         .sheet(item: $coordinator.forecastPreview) { destination in
             WeatherForecastView(dependencies: dependencies, location: .saved(destination.place), presentation: .preview)
@@ -101,7 +99,7 @@ extension LocationsView {
     func locationSearchResult() -> some View {
         if vm.loadingStatus == .loading {
             VStack {
-                ProgressView("Loading...")
+                ProgressView(Strings.loading.rawValue)
             }
         } else {
             VStack {
@@ -133,13 +131,13 @@ extension LocationsView {
                 Spacer()
                     .frame(width: 10)
             } else {
-                Image(systemName: "checkmark")
+                Image(systemName: SystemImages.checkmark.rawValue)
                     .resizable()
                     .frame(width: 10, height: 10)
             }
             Text(option.displayName)
             Spacer()
-            Text("°\(option.displayName.first?.uppercased() ?? "")")
+            Text(Strings.degreePrefixedUnit(option.displayName.first?.uppercased() ?? ""))
         }
     }
 }

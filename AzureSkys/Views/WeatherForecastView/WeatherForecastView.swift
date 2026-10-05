@@ -19,7 +19,7 @@ struct WeatherForecastView: View {
     private var place: SavedPlace? { location.place }
 
     enum Presentation { case main, preview, fullScreen }
-    var coordinateSpaceName = "weatherScroll"
+    var coordinateSpaceName = WeatherViewIdentifiers.weatherScroll
 
     init(dependencies: AppDependencies, location: ForecastLocation = .current, presentation: Presentation = .main) {
         self.dependencies = dependencies
@@ -30,7 +30,18 @@ struct WeatherForecastView: View {
 
     var body: some View {
         ZStack {
-            vm.background.ignoresSafeArea(edges: .all)
+            GeometryReader { geometry in
+                if let forecast = vm.forecast,
+                   let weather = forecast.current.weather.first {
+                    weather.weatherCondition.getBackgroundImage(
+                        partOfDay: weather.partOfDay,
+                        clouds: forecast.current.clouds ?? 0
+                    )
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                }
+            }
+            .ignoresSafeArea()
             if let networkError = vm.networkError {
                 RetryView(errorMessage: networkError.localizedDescription) {
                     vm.startDataRefreshTimer()
@@ -56,7 +67,7 @@ struct WeatherForecastView: View {
             Button(action: {
                 vm.dismissError()
             }, label: {
-                Text("OK")
+                Text(Strings.ok.rawValue)
             })
         }
         .onReceive(NotificationCenter
@@ -124,13 +135,13 @@ extension WeatherForecastView {
             })
             .padding(.top, 20)
         } else if vm.loadingStatus == .loading {
-            ProgressView("Loading...")
+            ProgressView(Strings.loading.rawValue)
         }
     }
 
     @ViewBuilder func footer() -> some View {
         if presentation == .main, vm.locationAuthorized == true {
-            WeatherForecastBottomBar(background: vm.background)
+            WeatherForecastBottomBar()
         }
     }
 }

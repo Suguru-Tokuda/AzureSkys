@@ -38,7 +38,7 @@ final class LocalFileManagerTests: XCTestCase {
         let manager = LocalFileManager(directory: nil)
         XCTAssertNil(manager.getPath(name: "test"))
         XCTAssertThrowsError(try manager.getImage(name: "test")) { XCTAssertEqual($0 as? FileManagerError, .badPath) }
-        let image = UIImage(systemName: "cloud")!
+        let image = UIImage(systemName: SystemImages.cloud.rawValue)!
         XCTAssertThrowsError(try manager.saveImage(image: image, name: "test")) { XCTAssertEqual($0 as? FileManagerError, .badPath) }
         let unavailable = LocalFileManager(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
         XCTAssertThrowsError(try unavailable.saveImage(image: image, name: "test")) { XCTAssertEqual($0 as? FileManagerError, .save) }

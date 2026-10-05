@@ -23,14 +23,14 @@ struct WeatherDailyForecastListCellView: View {
                 if let weather = forecast.weather.first {
                     WeatherImageView(icon: weather.icon, width: 40)
                 }
-                Text("\(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+                Text(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                     .foregroundStyle(.white.opacity(0.5))
                 TempBarView(minTemp: forecast.temp.min,
                             maxTemp: forecast.temp.max,
                             height: 5,
                             showAnimation: showTempBarAnimation)
                     .padding(.top, 18)
-                Text("\(forecast.temp.max.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+                Text(forecast.temp.max.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
             }
             .padding(10)
             .fontWeight(.semibold)

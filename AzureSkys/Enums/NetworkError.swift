@@ -20,17 +20,17 @@ extension NetworkError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .badUrl:
-            return NSLocalizedString("Bad URL Error. Please make sure the URL is valid.", comment: "badUrl")
+            return NSLocalizedString(Strings.badURLError.rawValue, comment: "badUrl")
         case .dataParsingError:
-            return NSLocalizedString("Data Processing Error", comment: "dataParsingError")
+            return NSLocalizedString(Strings.dataProcessingError.rawValue, comment: "dataParsingError")
         case .serverError:
-            return NSLocalizedString("Server Error", comment: "serverError")
+            return NSLocalizedString(Strings.serverError.rawValue, comment: "serverError")
         case .noData:
-            return NSLocalizedString("No data found.", comment: "noData")
+            return NSLocalizedString(Strings.noDataFound.rawValue, comment: "noData")
         case .networkUnavailable:
-            return NSLocalizedString("Network connection unavailable", comment: "networkUnavailable")
+            return NSLocalizedString(Strings.networkConnectionUnavailable.rawValue, comment: "networkUnavailable")
         case .unknown:
-            return NSLocalizedString("Unknown error.", comment: "unknown")
+            return NSLocalizedString(Strings.unknownError.rawValue, comment: "unknown")
         }
     }
 }

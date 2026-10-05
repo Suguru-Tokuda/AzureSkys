@@ -17,17 +17,18 @@ struct WeatherForecastHeaderView: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: -10) {
-            Text(isMyLocation ? "My Location" : geocode.name)
+            Text(isMyLocation ? Strings.myLocation.rawValue : geocode.name)
                 .font(.largeTitle)
             if isMyLocation {
                 Text(geocode.name)
                     .font(.title3.weight(.semibold))
                     .padding(.top, 10)
             }
-            Text("\(currentForecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+            Text(currentForecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                 .font(.system(size: 96))
                 .fontWeight(.thin)
                 .offset(x: 10)
+                .shadow(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)
             
             VStack {
                 if let weather = currentForecast.weather.first {
@@ -42,6 +43,13 @@ struct WeatherForecastHeaderView: View {
             }
             .font(.title3.weight(.semibold))
         }
+        .foregroundStyle(.white)
+        .shadow(
+            color: .black.opacity(0.5),
+            radius: 3,
+            x: 0,
+            y: 2
+        )
     }
 }
 

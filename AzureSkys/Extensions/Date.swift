@@ -14,7 +14,7 @@ extension Date {
         
         // if it's the same day then return "Today"
         if dayComparison == .orderedSame {
-            return "Today"
+            return Strings.today.rawValue
         } else { // otherwise it returns a weekday string
             let weekday = Calendar.current.component(.weekday, from: self)
             return Weekdays.getWeekday(day: weekday).rawValue

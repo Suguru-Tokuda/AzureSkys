@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 class SettingsManager {
     private let canOpen: (URL) -> Bool
@@ -15,6 +16,19 @@ class SettingsManager {
          open: @escaping (URL) -> Void = { UIApplication.shared.open($0) }) {
         self.canOpen = canOpen
         self.open = open
+    }
+
+    func manageLocationAccess(locationManager: LocationManager) {
+        switch locationManager.locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestAuthorization()
+        case .denied, .authorizedWhenInUse, .authorizedAlways:
+            navigateToSettings()
+        case .restricted:
+            break
+        @unknown default:
+            break
+        }
     }
 
     func navigateToSettings() {

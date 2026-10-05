@@ -12,6 +12,6 @@ import SwiftUI
 @MainActor
 final class WeatherForecastBottomBarTests: XCTestCase {
     func testLocationsControlRendersOverWeatherBackground() async throws {
-        assertVisibleContent(try await renderSnapshot(WeatherForecastBottomBar(background: Color.skyBlue100)))
+        assertVisibleContent(try await renderSnapshot(WeatherForecastBottomBar()))
     }
 }

@@ -18,14 +18,14 @@ struct WindStatusGridViewCell: View {
                 width: width,
                 background: background) {
                     VStack {
-                        StatusGridCellTitleView(icon: "wind", title: "Wind")
+                        StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: Strings.wind.rawValue)
                         HStack {
-                            Text("\(wind.speed, specifier: "%.0f")")
+                            Text(String(format: "%.0f", wind.speed))
                                 .withStatusGridViewValueLabelModifier()
                             VStack(alignment: .leading) {
-                                Text("MPH")
+                                Text(Strings.mph.rawValue)
                                     .withStatusGridViewLabelModifier()
-                                Text("Wind")
+                                Text(Strings.wind.rawValue)
                                     .font(.callout.weight(.semibold))
                             }
                             Spacer()
@@ -37,12 +37,12 @@ struct WindStatusGridViewCell: View {
                                 .frame(height: 0.8)
                                 .background(.white.opacity(0.8))
                             HStack {
-                                Text("\(gust, specifier: "%.0f")")
+                                Text(String(format: "%.0f", gust))
                                     .withStatusGridViewValueLabelModifier()
                                 VStack(alignment: .leading) {
-                                    Text("MPH")
+                                    Text(Strings.mph.rawValue)
                                         .withStatusGridViewLabelModifier()
-                                    Text("Gusts")
+                                    Text(Strings.gusts.rawValue)
                                         .font(.callout.weight(.semibold))
                                 }
                                 Spacer()

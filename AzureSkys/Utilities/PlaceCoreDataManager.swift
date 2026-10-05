@@ -15,21 +15,22 @@ protocol PlaceCoreDataActions {
     func clearAllFromDatabase() async throws
 }
 
+@MainActor
 class PlaceCoreDataManager: PlaceCoreDataActions {
-    let persistentContainer: NSPersistentContainer
+    private let persistence: PersistenceController
 
-    init(container: NSPersistentContainer) {
-        persistentContainer = container
+    init(persistence: PersistenceController) {
+        self.persistence = persistence
     }
 
     func savePlaceIntoDatabase(place: SavedPlace) async throws {
-        try await persistentContainer.performBackgroundTask { context in
+        try await persistence.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", place.id)
             request.fetchLimit = 1
             guard try context.fetch(request).isEmpty else { return }
 
-            let entity = PlaceEntity(entity: NSEntityDescription.entity(forEntityName: "PlaceEntity", in: context)!, insertInto: context)
+            let entity = PlaceEntity(entity: NSEntityDescription.entity(forEntityName: PlaceCoreDataManagerConstants.placeEntity, in: context)!, insertInto: context)
             entity.id = place.id
             entity.name = place.name
             entity.formattedAddress = place.formattedAddress
@@ -41,14 +42,14 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func getPlacesFromDatabase() async throws -> [SavedPlace] {
-        try await persistentContainer.performBackgroundTask { context in
+        try await persistence.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             return try context.fetch(request).compactMap { SavedPlace(from: $0) }
         }
     }
 
     func getPlaceFromDatabase(id: String) async throws -> SavedPlace? {
-        try await persistentContainer.performBackgroundTask { context in
+        try await persistence.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", id)
             request.fetchLimit = 1
@@ -57,7 +58,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func deleteFromDatabase(place: SavedPlace) async throws {
-        try await persistentContainer.performBackgroundTask { context in
+        try await persistence.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", place.id)
             let records = try context.fetch(request)
@@ -67,7 +68,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func clearAllFromDatabase() async throws {
-        try await persistentContainer.performBackgroundTask { context in
+        try await persistence.performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             let records = try context.fetch(request)
             records.forEach { context.delete($0) }
@@ -87,4 +88,8 @@ extension SavedPlace {
                   latitude: entity.latitude, longitude: entity.longitude,
                   addressComponents: components)
     }
+}
+
+private enum PlaceCoreDataManagerConstants {
+    static let placeEntity = "PlaceEntity"
 }

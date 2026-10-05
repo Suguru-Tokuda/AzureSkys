@@ -9,10 +9,31 @@ import XCTest
 import CoreData
 @testable import AzureSkys
 
+@MainActor
 final class PlaceCoreDataManagerTests: XCTestCase {
     private func store() -> (PlaceCoreDataManager, NSPersistentContainer) {
         let controller = PersistenceController(inMemory: true)
-        return (PlaceCoreDataManager(container: controller.container), controller.container)
+        return (PlaceCoreDataManager(persistence: controller), controller.container)
+    }
+
+    func testExistingManagerReadsAndWritesAfterContainerReplacement() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let persistence = PersistenceController(storeURL: directory.appendingPathComponent("places.sqlite"))
+        let manager = PlaceCoreDataManager(persistence: persistence)
+        try await manager.savePlaceIntoDatabase(place: testPlace)
+        let oldContext = persistence.viewContext
+
+        try await persistence.reloadStore(syncEnabled: false)
+
+        XCTAssertFalse(oldContext === persistence.viewContext)
+        XCTAssertTrue(persistence.viewContext === persistence.container.viewContext)
+        let places = try await manager.getPlacesFromDatabase()
+        XCTAssertEqual(places, [testPlace])
+        try await manager.deleteFromDatabase(place: testPlace)
+        let remaining = try await manager.getPlacesFromDatabase()
+        XCTAssertTrue(remaining.isEmpty)
     }
 
     func testSaveRoundTripAndDuplicateProtection() async throws {

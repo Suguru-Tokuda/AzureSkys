@@ -24,14 +24,14 @@ struct LocationViewCell: View {
     var body: some View {
         ZStack {
             if vm.loadingStatus == .loading {
-                ProgressView("Loading...")
+                ProgressView(Strings.loading.rawValue)
             }
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
                         // MARK: Location Text
                         Text(isMyLocation ? 
-                                "My Location" : 
+                                Strings.myLocation.rawValue :
                                 place?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
@@ -63,7 +63,7 @@ struct LocationViewCell: View {
                     .frame(height: 25)
                 HStack {
                     HStack {
-                        Text(vm.currentForecast?.weather.first?.main ?? "-")
+                        Text(vm.currentForecast?.weather.first?.main ?? Strings.unavailable.rawValue)
                         if let currentForecast = vm.currentForecast,
                            let weather = currentForecast.weather.first {
                             WeatherImageView(icon: weather.icon, width: 20)

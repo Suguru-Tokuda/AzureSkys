@@ -31,7 +31,7 @@ final class WeatherImageViewTests: XCTestCase {
     }
 
     func testCacheErrorsStillAllowValidDownload() async throws {
-        let png = UIImage(systemName: "sun.max")!.withTintColor(.yellow, renderingMode: .alwaysOriginal).pngData()!
+        let png = UIImage(systemName: SystemImages.sunMax.rawValue)!.withTintColor(.yellow, renderingMode: .alwaysOriginal).pngData()!
         let image = try await scenario(status: 200, data: png, cache: FailingImageCache(directory: nil))
         assertVisibleContent(image)
     }

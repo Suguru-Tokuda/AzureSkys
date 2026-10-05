@@ -12,11 +12,24 @@ struct ContentView: View {
     @EnvironmentObject var coordinator: MainCoordinator
     
     var body: some View {
+        switch coordinator.rootFlow {
+        case .onboarding:
+            OnboardingFlow(
+                dependencies: dependencies,
+                onFinished: coordinator.completeOnboarding
+            )
+        case .weather:
+            mainView
+        }
+
+    }
+
+    private var mainView: some View {
         WeatherForecastMainView(dependencies: dependencies)
             .fullScreenCover(item: $coordinator.fullScreenDestination) { destination in
                 switch destination {
                 case .locations:
-                    LocationsView(dependencies: dependencies, showDismiss: true)
+                    LocationsFlow(dependencies: dependencies, showDismiss: true)
                 case .forecast(let location):
                     WeatherForecastView(dependencies: dependencies, location: location, presentation: .fullScreen)
                 }

@@ -9,6 +9,7 @@ import XCTest
 import CoreData
 @testable import AzureSkys
 
+@MainActor
 final class PersistenceControllerTests: XCTestCase {
     func testTemporaryContainersAreIsolatedAndMergeChanges() throws {
         let first = PersistenceController(inMemory: true)

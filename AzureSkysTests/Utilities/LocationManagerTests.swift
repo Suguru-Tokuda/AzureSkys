@@ -13,20 +13,22 @@ private final class LocationDriver: CLLocationManager {
     var status: CLAuthorizationStatus = .notDetermined
     var requested = false
     var started = false
+    var stopped = false
     override var authorizationStatus: CLAuthorizationStatus { status }
 
     override func requestWhenInUseAuthorization() { requested = true }
 
     override func startUpdatingLocation() { started = true }
+    override func stopUpdatingLocation() { stopped = true }
 }
 
 @MainActor
 final class LocationManagerTests: XCTestCase {
     func testStartupAndPermissionMappingWithoutSystemPrompts() {
         let driver = LocationDriver()
-        let manager = LocationManager(locationManager: driver)
+        let manager = LocationManager(startAutomatically: true, locationManager: driver)
         XCTAssertTrue(driver.requested)
-        XCTAssertTrue(driver.started)
+        XCTAssertFalse(driver.started)
         XCTAssertTrue(driver.delegate === manager)
         for (status, expected) in [(CLAuthorizationStatus.notDetermined, Optional<Bool>.none), (.restricted, false), (.denied, false), (.authorizedAlways, true), (.authorizedWhenInUse, true)] {
             driver.status = status
@@ -34,6 +36,24 @@ final class LocationManagerTests: XCTestCase {
             manager.locationManagerDidChangeAuthorization(driver)
             XCTAssertEqual(manager.locationAuthorized, expected)
         }
+    }
+
+    func testGrantingPermissionStartsUpdatesAfterOnboardingRequest() {
+        let driver = LocationDriver()
+        let manager = LocationManager(locationManager: driver)
+        manager.requestAuthorization()
+        XCTAssertTrue(driver.requested)
+        XCTAssertFalse(driver.started)
+
+        driver.status = .authorizedWhenInUse
+        manager.locationManagerDidChangeAuthorization(driver)
+        XCTAssertEqual(manager.locationAuthorized, true)
+        XCTAssertTrue(driver.started)
+
+        driver.status = .denied
+        manager.locationManagerDidChangeAuthorization(driver)
+        XCTAssertEqual(manager.locationAuthorized, false)
+        XCTAssertTrue(driver.stopped)
     }
 
     func testLatestLocationAndDisabledAutomaticStart() {

@@ -105,7 +105,7 @@ struct WeatherForecast: Decodable, Identifiable {
         self.rain = try container.decodeIfPresent(Rain.self, forKey: .rain)
         self.snow = try container.decodeIfPresent(Snow.self, forKey: .snow)
         let pod = try container.decodeIfPresent(PartOfDayModel.self, forKey: .partOfDay)
-        self.partOfDay = pod?.pod == "d" ? PartOfDay.day : PartOfDay.night
+        self.partOfDay = pod?.pod == WeatherAPI.dayIconMarker ? PartOfDay.day : PartOfDay.night
         self.dateForecasted = try container.decode(String.self, forKey: .dateForecasted)
     }
     
@@ -158,7 +158,7 @@ struct Weather: Decodable, Identifiable {
         self.main = try container.decode(String.self, forKey: .main)
         self.description = try container.decode(String.self, forKey: .description)
         self.icon = try container.decode(String.self, forKey: .icon)
-        self.partOfDay = self.icon.contains("d") ? .day : .night
+        self.partOfDay = self.icon.contains(WeatherAPI.dayIconMarker) ? .day : .night
         self.weatherCondition = WeatherCondition.getWeatherCondition(str: self.main)
     }
     

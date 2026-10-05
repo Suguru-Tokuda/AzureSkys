@@ -9,7 +9,7 @@ import SwiftUI
 
 class UIBackdropView: UIView {
     override class var layerClass: AnyClass {
-        NSClassFromString("CABackdropLayer") ?? CALayer.self
+        NSClassFromString(BlurConstants.backdropLayerClassName) ?? CALayer.self
     }
 }
 
@@ -34,4 +34,8 @@ struct Blur: View {
 
 #Preview {
     Blur(radius: 25, opaque: true)
+}
+
+private enum BlurConstants {
+    static let backdropLayerClassName = "CABackdropLayer"
 }

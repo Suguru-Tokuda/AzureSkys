@@ -32,9 +32,9 @@ struct StatusGridCellView: View {
     StatusGridCellView(
         width: 150.0,
         background: Color.skyBlue100,
-        icon: "thermometer.medium",
-        title: "FEELS LIKE",
-        value: "44°"
+        icon: SystemImages.thermometerMedium.rawValue,
+        title: Strings.feelsLikeUppercase.rawValue,
+        value: PreviewManager.Strings.previewFeelsLikeTemperature
     )
     .preferredColorScheme(.dark)
 }

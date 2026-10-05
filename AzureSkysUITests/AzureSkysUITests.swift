@@ -24,6 +24,13 @@ final class AzureSkysUITests: XCTestCase {
 
     private func openLocations() {
         app.launch()
+        let chooseCities = app.buttons["Choose Cities Instead"]
+        if chooseCities.waitForExistence(timeout: 3) {
+            chooseCities.tap()
+            let notNow = app.buttons["Not Now"]
+            XCTAssertTrue(notNow.waitForExistence(timeout: 5))
+            notNow.tap()
+        }
         let locations = app.buttons["locationsButton"]
         XCTAssertTrue(locations.waitForExistence(timeout: 10))
         locations.tap()

@@ -18,14 +18,14 @@ struct WindStatusGridViewCell: View {
                 width: width,
                 background: background) {
                     VStack {
-                        StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: WeatherStrings.wind)
+                        StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: Strings.wind.rawValue)
                         HStack {
-                            Text(String(format: WeatherFormatting.wholeNumberFormat, wind.speed))
+                            Text(String(format: "%.0f", wind.speed))
                                 .withStatusGridViewValueLabelModifier()
                             VStack(alignment: .leading) {
-                                Text(WeatherStrings.mph)
+                                Text(Strings.mph.rawValue)
                                     .withStatusGridViewLabelModifier()
-                                Text(WeatherStrings.wind)
+                                Text(Strings.wind.rawValue)
                                     .font(.callout.weight(.semibold))
                             }
                             Spacer()
@@ -37,12 +37,12 @@ struct WindStatusGridViewCell: View {
                                 .frame(height: 0.8)
                                 .background(.white.opacity(0.8))
                             HStack {
-                                Text(String(format: WeatherFormatting.wholeNumberFormat, gust))
+                                Text(String(format: "%.0f", gust))
                                     .withStatusGridViewValueLabelModifier()
                                 VStack(alignment: .leading) {
-                                    Text(WeatherStrings.mph)
+                                    Text(Strings.mph.rawValue)
                                         .withStatusGridViewLabelModifier()
-                                    Text(WeatherStrings.gusts)
+                                    Text(Strings.gusts.rawValue)
                                         .font(.callout.weight(.semibold))
                                 }
                                 Spacer()

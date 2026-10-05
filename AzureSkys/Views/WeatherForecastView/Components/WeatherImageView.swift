@@ -30,7 +30,7 @@ struct WeatherImageView: View {
                     .resizable()
                     .scaledToFit()
                     .foregroundStyle(.secondary)
-                    .accessibilityLabel(WeatherStrings.weatherIconUnavailable)
+                    .accessibilityLabel(Strings.weatherIconUnavailable.rawValue)
             }
         }
         .frame(width: width, height: width)

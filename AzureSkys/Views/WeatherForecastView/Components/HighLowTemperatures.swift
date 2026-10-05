@@ -14,8 +14,8 @@ struct HighLowTemperatures: View {
     
     var body: some View {
         HStack {
-            Text(WeatherFormatting.highTemperature(maxTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
-            Text(WeatherFormatting.lowTemperature(minTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
+            Text(Strings.highTemperature(maxTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
+            Text(Strings.lowTemperature(minTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
         }
     }
 }

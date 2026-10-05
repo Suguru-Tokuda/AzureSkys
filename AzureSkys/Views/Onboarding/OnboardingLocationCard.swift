@@ -15,7 +15,7 @@ struct OnboardingLocationCard: View {
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(CommonStrings.myLocation)
+                Text(Strings.myLocation.rawValue)
                     .font(.caption)
                 Text(city)
                     .font(.headline)

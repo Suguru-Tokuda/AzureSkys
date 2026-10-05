@@ -1,5 +1,9 @@
-// LaunchArguments.swift
-// Constants owned by LaunchArguments.
+//
+//  LaunchArguments.swift
+//  AzureSkys
+//
+//  Created by Suguru Tokuda on 10/5/26.
+//
 
 enum LaunchArguments {
     static let uiTestingArgument = "--ui-testing"

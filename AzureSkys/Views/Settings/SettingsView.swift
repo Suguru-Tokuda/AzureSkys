@@ -32,31 +32,31 @@ struct SettingsView: View {
         List {
             Section {
                 HStack {
-                    Text(SettingsStrings.locationAccess)
+                    Text(Strings.locationAccess.rawValue)
                     Spacer()
                     Text(locationStatusLabel)
                         .foregroundStyle(.secondary)
                 }
                 Button(locationManager.authorizationStatus == .notDetermined
-                       ? SettingsStrings.enableLocation
-                       : SettingsStrings.manageLocation) {
+                       ? Strings.enableLocation.rawValue
+                       : Strings.manageLocation.rawValue) {
                     settingsManager.manageLocationAccess(locationManager: locationManager)
                 }
                 .disabled(locationManager.authorizationStatus == .restricted)
             } footer: {
                 if locationManager.authorizationStatus == .restricted {
-                    Text(SettingsStrings.locationRestrictedDescription)
+                    Text(Strings.locationRestrictedDescription.rawValue)
                 }
             }
 
             Section {
                 HStack {
-                    Text(SettingsStrings.temperature)
+                    Text(Strings.temperature.rawValue)
                     Spacer()
                     Text(tempScale.shortName)
                         .foregroundStyle(.secondary)
                     Menu {
-                        Picker(SettingsStrings.temperature, selection: $tempScale) {
+                        Picker(Strings.temperature.rawValue, selection: $tempScale) {
                             ForEach(TempScale.allCases) { scale in
                                 Text(scale.shortName)
                                     .tag(scale)
@@ -66,12 +66,12 @@ struct SettingsView: View {
                     } label: {
                         Image(systemName: SystemImages.ellipsisCircle.rawValue)
                     }
-                    .accessibilityLabel(SettingsStrings.temperatureUnit)
+                    .accessibilityLabel(Strings.temperatureUnit.rawValue)
                     .accessibilityValue(tempScale.displayName)
                 }
 
                 Toggle(
-                    SettingsStrings.iCloudSync,
+                    Strings.iCloudSync.rawValue,
                     isOn: Binding(
                         get: {
                             iCloudSyncEnabled && vm.isICloudAvailable
@@ -87,11 +87,11 @@ struct SettingsView: View {
                 if let error = vm.syncError {
                     Text(error)
                 } else if !vm.isICloudAvailable {
-                    Text(SettingsStrings.iCloudUnavailableDescription)
+                    Text(Strings.iCloudUnavailableDescription.rawValue)
                 }
             }
         }
-        .navigationTitle(SettingsStrings.settings)
+        .navigationTitle(Strings.settings.rawValue)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.refreshICloudAvailability()
@@ -114,11 +114,11 @@ struct SettingsView: View {
 
     private var locationStatusLabel: String {
         switch locationManager.authorizationStatus {
-        case .notDetermined: return SettingsStrings.locationNotRequested
-        case .denied: return SettingsStrings.locationDenied
-        case .restricted: return SettingsStrings.locationRestricted
-        case .authorizedAlways, .authorizedWhenInUse: return SettingsStrings.locationEnabled
-        @unknown default: return SettingsStrings.locationUnknown
+        case .notDetermined: return Strings.locationNotRequested.rawValue
+        case .denied: return Strings.locationDenied.rawValue
+        case .restricted: return Strings.locationRestricted.rawValue
+        case .authorizedAlways, .authorizedWhenInUse: return Strings.locationEnabled.rawValue
+        @unknown default: return Strings.locationUnknown.rawValue
         }
     }
 

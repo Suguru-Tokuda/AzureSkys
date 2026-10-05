@@ -1,5 +1,9 @@
-// PreviewManager+Strings.swift
-// Text fixtures shared by previews.
+//
+//  PreviewManager+Strings.swift
+//  AzureSkys
+//
+//  Created by Suguru Tokuda on 10/5/26.
+//
 
 extension PreviewManager {
     enum Strings {

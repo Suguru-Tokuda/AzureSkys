@@ -18,20 +18,13 @@ extension FileManagerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .data:
-            return NSLocalizedString(FileManagerErrorConstants.dataParsingError, comment: "data")
+            return NSLocalizedString(Strings.dataParsingError.rawValue, comment: "data")
         case .badPath:
-            return NSLocalizedString(FileManagerErrorConstants.filePathError, comment: "badPath")
+            return NSLocalizedString(Strings.filePathError.rawValue, comment: "badPath")
         case .save:
-            return NSLocalizedString(FileManagerErrorConstants.fileSaveError, comment: "save")
+            return NSLocalizedString(Strings.fileSaveError.rawValue, comment: "save")
         case .retrieve:
-            return NSLocalizedString(FileManagerErrorConstants.fileRetrieveError, comment: "retrieve")
+            return NSLocalizedString(Strings.fileRetrieveError.rawValue, comment: "retrieve")
         }
     }
-}
-
-private enum FileManagerErrorConstants {
-    static let dataParsingError = "Error in parsing to data."
-    static let filePathError = "Could not find a path to the file."
-    static let fileSaveError = "Error in saving data."
-    static let fileRetrieveError = "Error in retrieving data."
 }

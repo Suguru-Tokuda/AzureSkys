@@ -59,7 +59,7 @@ final class AppDependencies: ObservableObject {
             placeStore: PlaceCoreDataManager(persistence: persistenceController),
             persistenceController: persistenceController, locationManager: locationManager,
             coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager(),
-            iCloudManager: ICloudManager(persistence: persistenceController))
+            iCloudManager: PreviewICloudManager())
     }
 
     func makeOnboardingViewModel() -> OnboardingViewModel {
@@ -140,6 +140,11 @@ private struct PreviewWeatherService: WeatherServicing {
 private struct PreviewPlacesService: PlacesServicing {
     func getPredictions(query: String) async throws -> [Prediction] { PreviewManager.predictions }
     func getPlaceDetails(placeID: String) async throws -> SavedPlace { SavedPlace(details: PreviewManager.placeDetails) }
+}
+
+private struct PreviewICloudManager: ICloudManaging {
+    func isAvailable() async throws -> Bool { false }
+    func setEnabled(_ enabled: Bool) async throws {}
 }
 
 #if DEBUG

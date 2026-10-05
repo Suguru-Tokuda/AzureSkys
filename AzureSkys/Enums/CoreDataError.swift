@@ -15,17 +15,11 @@ extension CoreDataError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .save:
-            return NSLocalizedString(CoreDataErrorConstants.coreDataSaveError, comment: "save")
+            return NSLocalizedString(Strings.coreDataSaveError.rawValue, comment: "save")
         case .fetch:
-            return NSLocalizedString(CoreDataErrorConstants.coreDataFetchError, comment: "fetch")
+            return NSLocalizedString(Strings.coreDataFetchError.rawValue, comment: "fetch")
         case .delete:
-            return NSLocalizedString(CoreDataErrorConstants.coreDataDeleteError, comment: "delete")
+            return NSLocalizedString(Strings.coreDataDeleteError.rawValue, comment: "delete")
         }
     }
-}
-
-private enum CoreDataErrorConstants {
-    static let coreDataSaveError = "Error with saving to core data."
-    static let coreDataFetchError = "Error with fetching from core data."
-    static let coreDataDeleteError = "Error with deleting from core data."
 }

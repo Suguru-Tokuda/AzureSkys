@@ -17,11 +17,11 @@ struct LocationAuthorizationRequestView: View {
                     .resizable()
                     .frame(width: 75, height: 75)
                     .padding(.top, 100)
-                Text(LocationAuthorizationStrings.locationAuthorizationRequired)
+                Text(Strings.locationAuthorizationRequired.rawValue)
                     .font(.title3.weight(.bold))
                     .padding(.top, 50)
                     
-                Text(LocationAuthorizationStrings.locationAuthorizationDescription)
+                Text(Strings.locationAuthorizationDescription.rawValue)
                     .font(.callout)
                 Spacer()
             }
@@ -29,7 +29,7 @@ struct LocationAuthorizationRequestView: View {
             Button(action: {
                 settingsManager.navigateToSettings()
             }, label: {
-                Text(CommonStrings.openSettings)
+                Text(Strings.openSettings.rawValue)
             })
             .buttonStyle(OpenSettingsBtnStyle(
                 backgroundColor: .night1,

@@ -46,7 +46,7 @@ struct LocationsView: View {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
-                    Text(CommonStrings.ok)
+                    Text(Strings.ok.rawValue)
                 })
             })
             .toolbar {
@@ -74,7 +74,7 @@ struct LocationsView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.large)
-            .navigationTitle(WeatherStrings.weather)
+            .navigationTitle(Strings.weather.rawValue)
             .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always))
             .autocorrectionDisabled()
             .navigationBarBackButtonHidden(true)
@@ -99,7 +99,7 @@ extension LocationsView {
     func locationSearchResult() -> some View {
         if vm.loadingStatus == .loading {
             VStack {
-                ProgressView(CommonStrings.loading)
+                ProgressView(Strings.loading.rawValue)
             }
         } else {
             VStack {
@@ -137,7 +137,7 @@ extension LocationsView {
             }
             Text(option.displayName)
             Spacer()
-            Text(WeatherFormatting.degreePrefixedUnit(option.displayName.first?.uppercased() ?? ""))
+            Text(Strings.degreePrefixedUnit(option.displayName.first?.uppercased() ?? ""))
         }
     }
 }

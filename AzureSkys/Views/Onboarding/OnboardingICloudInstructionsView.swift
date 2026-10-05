@@ -12,7 +12,7 @@ struct OnboardingICloudInstructionsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(OnboardingStrings.onboardingICloudSetupTitle)
+            Text(Strings.onboardingICloudSetupTitle.rawValue)
                 .font(.headline)
 
             if let errorMessage {
@@ -20,11 +20,11 @@ struct OnboardingICloudInstructionsView: View {
                     .font(.subheadline)
             }
 
-            instruction(1, text: OnboardingStrings.onboardingICloudSetupStepOne)
-            instruction(2, text: OnboardingStrings.onboardingICloudSetupStepTwo)
-            instruction(3, text: OnboardingStrings.onboardingICloudSetupStepThree)
+            instruction(1, text: Strings.onboardingICloudSetupStepOne.rawValue)
+            instruction(2, text: Strings.onboardingICloudSetupStepTwo.rawValue)
+            instruction(3, text: Strings.onboardingICloudSetupStepThree.rawValue)
 
-            Text(OnboardingStrings.onboardingICloudSetupReturn)
+            Text(Strings.onboardingICloudSetupReturn.rawValue)
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.85))
 

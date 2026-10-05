@@ -23,7 +23,7 @@ struct StatusGridCellTitleView: View {
 #Preview {
     StatusGridCellTitleView(
         icon: SystemImages.thermometerMedium.rawValue,
-        title: WeatherStrings.feelsLikeTitle
+        title: Strings.feelsLikeTitle.rawValue
     )
     .preferredColorScheme(.dark)
 }

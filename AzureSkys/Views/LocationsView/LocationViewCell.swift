@@ -24,14 +24,14 @@ struct LocationViewCell: View {
     var body: some View {
         ZStack {
             if vm.loadingStatus == .loading {
-                ProgressView(CommonStrings.loading)
+                ProgressView(Strings.loading.rawValue)
             }
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
                         // MARK: Location Text
                         Text(isMyLocation ? 
-                                CommonStrings.myLocation :
+                                Strings.myLocation.rawValue :
                                 place?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
@@ -43,7 +43,7 @@ struct LocationViewCell: View {
                                     .unixTimeToDateStr(dateFormat: Constants.dateFormat,
                                                        timezoneOffset: vm.currentForecast?.timezone ?? 0)
                                     .getDateStrinng(dateFormat: Constants.dateFormat,
-                                                    newDateFormat: WeatherFormatting.timeFormat) ?? "")
+                                                    newDateFormat: "hh:mm") ?? "")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
@@ -63,7 +63,7 @@ struct LocationViewCell: View {
                     .frame(height: 25)
                 HStack {
                     HStack {
-                        Text(vm.currentForecast?.weather.first?.main ?? CommonStrings.unavailable)
+                        Text(vm.currentForecast?.weather.first?.main ?? Strings.unavailable.rawValue)
                         if let currentForecast = vm.currentForecast,
                            let weather = currentForecast.weather.first {
                             WeatherImageView(icon: weather.icon, width: 20)

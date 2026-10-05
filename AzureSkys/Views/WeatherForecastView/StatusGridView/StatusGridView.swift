@@ -29,7 +29,7 @@ struct StatusGridView: View {
                 width: width,
                 background: background,
                 icon: SystemImages.thermometerMedium.rawValue,
-                title: WeatherStrings.feelsLike,
+                title: Strings.feelsLike.rawValue,
                 value: forecast.feelsLike.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
             
             if let visibility = forecast.visibility {
@@ -37,8 +37,8 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.eyeFill.rawValue,
-                    title: WeatherStrings.visibility,
-                    value: WeatherFormatting.miles(String(describing: visibility.toMiles())))
+                    title: Strings.visibility.rawValue,
+                    value: Strings.miles(String(describing: visibility.toMiles())))
             }
             
             if let humidity = forecast.humidity {
@@ -46,8 +46,8 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.humidityFill.rawValue,
-                    title: WeatherStrings.humidity,
-                    value: WeatherFormatting.humidityValue(String(describing: humidity)))
+                    title: Strings.humidity.rawValue,
+                    value: Strings.humidityValue(String(describing: humidity)))
             }
             
             if let pressure = forecast.pressure {
@@ -55,8 +55,8 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.gaugeWithDotsNeedle50Percent.rawValue,
-                    title: WeatherStrings.pressure,
-                    value: WeatherFormatting.pressureValue(String(describing: pressure)))
+                    title: Strings.pressure.rawValue,
+                    value: Strings.pressureValue(String(describing: pressure)))
             }
             
             if let clouds = forecast.clouds {
@@ -64,8 +64,8 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.cloudFill.rawValue,
-                    title: WeatherStrings.cloudiness,
-                    value: WeatherFormatting.percentage(String(describing: clouds)))
+                    title: Strings.cloudiness.rawValue,
+                    value: Strings.percentage(String(describing: clouds)))
             }
             
             if let uvi = forecast.uvi {
@@ -73,7 +73,7 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.sunMax.rawValue,
-                    title: WeatherStrings.uvIndex,
+                    title: Strings.uvIndex.rawValue,
                     value: String(describing: uvi))
             }
             
@@ -82,7 +82,7 @@ struct StatusGridView: View {
                     width: width,
                     background: background,
                     icon: SystemImages.dropFill.rawValue,
-                    title: WeatherStrings.dewPoint,
+                    title: Strings.dewPoint.rawValue,
                     value: dewPoint.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
 
             }

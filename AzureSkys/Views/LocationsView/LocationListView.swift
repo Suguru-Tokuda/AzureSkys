@@ -92,7 +92,7 @@ extension LocationListView {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
-                    Text(CommonStrings.ok)
+                    Text(Strings.ok.rawValue)
                 })
             }
         }

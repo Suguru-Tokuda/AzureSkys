@@ -26,6 +26,6 @@ extension String {
     }
     
     func appendDegree() -> String {
-        return WeatherFormatting.appendingDegree(self)
+        return Strings.appendingDegree(self)
     }
 }

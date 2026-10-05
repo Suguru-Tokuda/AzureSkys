@@ -67,7 +67,7 @@ struct WeatherForecastView: View {
             Button(action: {
                 vm.dismissError()
             }, label: {
-                Text(CommonStrings.ok)
+                Text(Strings.ok.rawValue)
             })
         }
         .onReceive(NotificationCenter
@@ -135,7 +135,7 @@ extension WeatherForecastView {
             })
             .padding(.top, 20)
         } else if vm.loadingStatus == .loading {
-            ProgressView(CommonStrings.loading)
+            ProgressView(Strings.loading.rawValue)
         }
     }
 

@@ -1,5 +1,9 @@
-// ImageAssets.swift.rawValue
-// Named image assets bundled with the app.
+//
+//  ImageAssets.swift
+//  AzureSkys
+//
+//  Created by Suguru Tokuda on 10/5/26.
+//
 
 enum ImageAssets: String {
     case sun = "Sun"

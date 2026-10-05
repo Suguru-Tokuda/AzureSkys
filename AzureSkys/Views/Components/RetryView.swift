@@ -15,14 +15,14 @@ struct RetryView: View {
         ZStack {
             VStack {
                 Spacer()
-                Text(errorMessage ?? CommonStrings.error)
+                Text(errorMessage ?? Strings.error.rawValue)
                     .font(.title3.weight(.bold))
                     .padding(.bottom, 12)
                 Button(action: {
                     onRetryBtnTapped?()
                 }, label: {
                     Image(systemName: SystemImages.arrowClockwise.rawValue)
-                 Text(CommonStrings.retry)
+                 Text(Strings.retry.rawValue)
                 })
                 Spacer()
             }
@@ -31,5 +31,5 @@ struct RetryView: View {
 }
 
 #Preview {
-    RetryView(errorMessage: CommonStrings.networkError)
+    RetryView(errorMessage: Strings.networkError.rawValue)
 }

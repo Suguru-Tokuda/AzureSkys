@@ -20,17 +20,17 @@ extension NetworkError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .badUrl:
-            return NSLocalizedString(NetworkErrorConstants.badURLError, comment: "badUrl")
+            return NSLocalizedString(Strings.badURLError.rawValue, comment: "badUrl")
         case .dataParsingError:
-            return NSLocalizedString(NetworkErrorConstants.dataProcessingError, comment: "dataParsingError")
+            return NSLocalizedString(Strings.dataProcessingError.rawValue, comment: "dataParsingError")
         case .serverError:
-            return NSLocalizedString(NetworkErrorConstants.serverError, comment: "serverError")
+            return NSLocalizedString(Strings.serverError.rawValue, comment: "serverError")
         case .noData:
-            return NSLocalizedString(NetworkErrorConstants.noDataFound, comment: "noData")
+            return NSLocalizedString(Strings.noDataFound.rawValue, comment: "noData")
         case .networkUnavailable:
-            return NSLocalizedString(NetworkErrorConstants.networkConnectionUnavailable, comment: "networkUnavailable")
+            return NSLocalizedString(Strings.networkConnectionUnavailable.rawValue, comment: "networkUnavailable")
         case .unknown:
-            return NSLocalizedString(NetworkErrorConstants.unknownError, comment: "unknown")
+            return NSLocalizedString(Strings.unknownError.rawValue, comment: "unknown")
         }
     }
 }
@@ -54,13 +54,4 @@ extension NetworkError {
             self = .unknown
         }
     }
-}
-
-private enum NetworkErrorConstants {
-    static let badURLError = "Bad URL Error. Please make sure the URL is valid."
-    static let dataProcessingError = "Data Processing Error"
-    static let serverError = "Server Error"
-    static let noDataFound = "No data found."
-    static let networkConnectionUnavailable = "Network connection unavailable"
-    static let unknownError = "Unknown error."
 }

@@ -49,14 +49,14 @@ enum WeatherCondition: String, CaseIterable {
                 case .clear, .clouds:
                     backgroundLayer(
                         named: isNight
-                            ? Strings.weatherBackgroundClearNight.rawValue
-                            : Strings.weatherBackgroundClearDay.rawValue,
+                            ? ImageAssets.weatherBackgroundClearNight.rawValue
+                            : ImageAssets.weatherBackgroundClearDay.rawValue,
                         size: geometry.size
                     )
                     backgroundLayer(
                         named: isNight
-                            ? Strings.weatherBackgroundCloudsNight.rawValue
-                            : Strings.weatherBackgroundCloudsDay.rawValue,
+                            ? ImageAssets.weatherBackgroundCloudsNight.rawValue
+                            : ImageAssets.weatherBackgroundCloudsDay.rawValue,
                         size: geometry.size
                     )
                     .opacity(cloudOpacity)
@@ -85,21 +85,21 @@ enum WeatherCondition: String, CaseIterable {
 
     private var backgroundImageName: String {
         switch self {
-        case .thunderstorm: return Strings.weatherBackgroundThunderstormDay.rawValue
-        case .drizzle: return Strings.weatherBackgroundDrizzleDay.rawValue
-        case .rain: return Strings.weatherBackgroundRainDay.rawValue
-        case .snow: return Strings.weatherBackgroundSnowDay.rawValue
-        case .mist: return Strings.weatherBackgroundMistDay.rawValue
-        case .smoke: return Strings.weatherBackgroundSmokeDay.rawValue
-        case .haze: return Strings.weatherBackgroundHazeDay.rawValue
-        case .dust: return Strings.weatherBackgroundDustDay.rawValue
-        case .fog: return Strings.weatherBackgroundFogDay.rawValue
-        case .sand: return Strings.weatherBackgroundSandDay.rawValue
-        case .ash: return Strings.weatherBackgroundAshDay.rawValue
-        case .squall: return Strings.weatherBackgroundSquallDay.rawValue
-        case .tornado: return Strings.weatherBackgroundTornadoDay.rawValue
-        case .clear: return Strings.weatherBackgroundClearDay.rawValue
-        case .clouds: return Strings.weatherBackgroundCloudsDay.rawValue
+        case .thunderstorm: return ImageAssets.weatherBackgroundThunderstormDay.rawValue
+        case .drizzle: return ImageAssets.weatherBackgroundDrizzleDay.rawValue
+        case .rain: return ImageAssets.weatherBackgroundRainDay.rawValue
+        case .snow: return ImageAssets.weatherBackgroundSnowDay.rawValue
+        case .mist: return ImageAssets.weatherBackgroundMistDay.rawValue
+        case .smoke: return ImageAssets.weatherBackgroundSmokeDay.rawValue
+        case .haze: return ImageAssets.weatherBackgroundHazeDay.rawValue
+        case .dust: return ImageAssets.weatherBackgroundDustDay.rawValue
+        case .fog: return ImageAssets.weatherBackgroundFogDay.rawValue
+        case .sand: return ImageAssets.weatherBackgroundSandDay.rawValue
+        case .ash: return ImageAssets.weatherBackgroundAshDay.rawValue
+        case .squall: return ImageAssets.weatherBackgroundSquallDay.rawValue
+        case .tornado: return ImageAssets.weatherBackgroundTornadoDay.rawValue
+        case .clear: return ImageAssets.weatherBackgroundClearDay.rawValue
+        case .clouds: return ImageAssets.weatherBackgroundCloudsDay.rawValue
         }
     }
 

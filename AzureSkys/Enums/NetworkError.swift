@@ -20,17 +20,17 @@ extension NetworkError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .badUrl:
-            return NSLocalizedString(Strings.badURLError.rawValue, comment: Strings.badUrl.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.badURLError, comment: "badUrl")
         case .dataParsingError:
-            return NSLocalizedString(Strings.dataProcessingError.rawValue, comment: Strings.dataParsingErrorComment.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.dataProcessingError, comment: "dataParsingError")
         case .serverError:
-            return NSLocalizedString(Strings.serverError.rawValue, comment: Strings.serverErrorComment.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.serverError, comment: "serverError")
         case .noData:
-            return NSLocalizedString(Strings.noDataFound.rawValue, comment: Strings.noData.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.noDataFound, comment: "noData")
         case .networkUnavailable:
-            return NSLocalizedString(Strings.networkConnectionUnavailable.rawValue, comment: Strings.networkUnavailable.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.networkConnectionUnavailable, comment: "networkUnavailable")
         case .unknown:
-            return NSLocalizedString(Strings.unknownError.rawValue, comment: Strings.unknown.rawValue)
+            return NSLocalizedString(NetworkErrorConstants.unknownError, comment: "unknown")
         }
     }
 }
@@ -54,4 +54,13 @@ extension NetworkError {
             self = .unknown
         }
     }
+}
+
+private enum NetworkErrorConstants {
+    static let badURLError = "Bad URL Error. Please make sure the URL is valid."
+    static let dataProcessingError = "Data Processing Error"
+    static let serverError = "Server Error"
+    static let noDataFound = "No data found."
+    static let networkConnectionUnavailable = "Network connection unavailable"
+    static let unknownError = "Unknown error."
 }

@@ -9,6 +9,7 @@ import Combine
 import CoreLocation
 
 class LocationManager: NSObject, ObservableObject {
+    @Published private(set) var authorizationStatus: CLAuthorizationStatus
     @Published var currentLocation: CLLocation?
     @Published var locationAuthorized: Bool?
     var locationAuthorizedPublisher = PassthroughSubject<Bool?, Never>()
@@ -17,6 +18,7 @@ class LocationManager: NSObject, ObservableObject {
 
     init(startAutomatically: Bool = false, locationManager: CLLocationManager = CLLocationManager()) {
         self.locationManager = locationManager
+        self.authorizationStatus = locationManager.authorizationStatus
         super.init()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = kCLDistanceFilterNone
@@ -38,7 +40,8 @@ extension LocationManager: CLLocationManagerDelegate {
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch manager.authorizationStatus {
+        authorizationStatus = manager.authorizationStatus
+        switch authorizationStatus {
         case .notDetermined:
             locationAuthorized = nil
         case .restricted:

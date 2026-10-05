@@ -18,8 +18,8 @@ enum ForecastLocation: Identifiable {
 
     var id: String {
         switch self {
-        case .current: return Strings.current.rawValue
-        case .saved(let place): return Strings.savedLocationID(place.id)
+        case .current: return MainCoordinatorConstants.current
+        case .saved(let place): return MainCoordinatorConstants.savedLocationID(place.id)
         }
     }
 
@@ -35,8 +35,8 @@ enum FullScreenDestination: Identifiable {
 
     var id: String {
         switch self {
-        case .locations: return Strings.locations.rawValue
-        case .forecast(let location): return Strings.forecastRouteID(location.id)
+        case .locations: return MainCoordinatorConstants.locations
+        case .forecast(let location): return MainCoordinatorConstants.forecastRouteID(location.id)
         }
     }
 }
@@ -63,7 +63,7 @@ final class MainCoordinator: ObservableObject {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         rootFlow = defaults.bool(
-            forKey: Strings.hasSeenOnboarding.rawValue
+            forKey: MainCoordinatorConstants.hasSeenOnboarding
         ) ? .weather : .onboarding
     }
 
@@ -98,7 +98,19 @@ final class MainCoordinator: ObservableObject {
     }
 
     func completeOnboarding() {
-        defaults.set(true, forKey: Strings.hasSeenOnboarding.rawValue)
+        defaults.set(true, forKey: MainCoordinatorConstants.hasSeenOnboarding)
         rootFlow = .weather
+    }
+}
+
+private enum MainCoordinatorConstants {
+    static let current = "current"
+    static let locations = "locations"
+    static let hasSeenOnboarding = "hasSeenOnboarding"
+    static func savedLocationID(_ placeID: String) -> String {
+        "saved:\(placeID)"
+    }
+    static func forecastRouteID(_ locationID: String) -> String {
+        "forecast:\(locationID)"
     }
 }

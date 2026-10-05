@@ -22,8 +22,8 @@ struct WeatherForecastBottomBar: View {
                 }, label: {
                     Image(systemName: SystemImages.listBullet.rawValue)
                 })
-                .accessibilityLabel(Strings.locationsTitle.rawValue)
-                .accessibilityIdentifier(Strings.locationsButton.rawValue)
+                .accessibilityLabel(WeatherStrings.locationsTitle)
+                .accessibilityIdentifier(AccessibilityIdentifiers.locationsButton)
             }
             .padding(EdgeInsets(top: 20, leading: 32, bottom: 24, trailing: 32))
         }

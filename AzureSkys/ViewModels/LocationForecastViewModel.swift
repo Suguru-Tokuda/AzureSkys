@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 class LocationForecastViewModel: ObservableObject {
-    @Published var searchText = Strings.empty.rawValue
+    @Published var searchText = ""
     @Published private(set) var searchState: RequestState<[Prediction]> = .idle
     @Published private(set) var detailsState: RequestState<SavedPlace> = .idle
     var predictions: [Prediction] { searchState.value ?? [] }

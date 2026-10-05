@@ -19,7 +19,7 @@ struct WeatherForecastView: View {
     private var place: SavedPlace? { location.place }
 
     enum Presentation { case main, preview, fullScreen }
-    var coordinateSpaceName = Strings.weatherScroll.rawValue
+    var coordinateSpaceName = WeatherViewIdentifiers.weatherScroll
 
     init(dependencies: AppDependencies, location: ForecastLocation = .current, presentation: Presentation = .main) {
         self.dependencies = dependencies
@@ -67,7 +67,7 @@ struct WeatherForecastView: View {
             Button(action: {
                 vm.dismissError()
             }, label: {
-                Text(Strings.ok.rawValue)
+                Text(CommonStrings.ok)
             })
         }
         .onReceive(NotificationCenter
@@ -135,7 +135,7 @@ extension WeatherForecastView {
             })
             .padding(.top, 20)
         } else if vm.loadingStatus == .loading {
-            ProgressView(Strings.loading.rawValue)
+            ProgressView(CommonStrings.loading)
         }
     }
 

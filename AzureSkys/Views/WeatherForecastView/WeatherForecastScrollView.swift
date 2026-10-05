@@ -14,7 +14,7 @@ struct WeatherForecastScrollView: View {
     var showAnimation: Bool = true
     var onRefresh: (() -> ())?
 
-    let coordinateSpaceName = Strings.weatherScroll.rawValue
+    let coordinateSpaceName = WeatherViewIdentifiers.weatherScroll
     var body: some View {
         GeometryReader { geometry in
             ScrollView {

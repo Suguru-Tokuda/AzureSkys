@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct SettingsView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -15,9 +16,13 @@ struct SettingsView: View {
     @AppStorage(UserDefaultKeys.iCloudSyncEnabled.rawValue)
     private var iCloudSyncEnabled = false
 
+    @EnvironmentObject private var locationManager: LocationManager
+    private let settingsManager: SettingsManager
+
     @StateObject private var vm: SettingsViewModel
 
     init(dependencies: AppDependencies) {
+        settingsManager = dependencies.settingsManager
         _vm = StateObject(
             wrappedValue: dependencies.makeSettingsViewModel()
         )
@@ -27,12 +32,31 @@ struct SettingsView: View {
         List {
             Section {
                 HStack {
-                    Text(Strings.temperature.rawValue)
+                    Text(SettingsStrings.locationAccess)
+                    Spacer()
+                    Text(locationStatusLabel)
+                        .foregroundStyle(.secondary)
+                }
+                Button(locationManager.authorizationStatus == .notDetermined
+                       ? SettingsStrings.enableLocation
+                       : SettingsStrings.manageLocation) {
+                    settingsManager.manageLocationAccess(locationManager: locationManager)
+                }
+                .disabled(locationManager.authorizationStatus == .restricted)
+            } footer: {
+                if locationManager.authorizationStatus == .restricted {
+                    Text(SettingsStrings.locationRestrictedDescription)
+                }
+            }
+
+            Section {
+                HStack {
+                    Text(SettingsStrings.temperature)
                     Spacer()
                     Text(tempScale.shortName)
                         .foregroundStyle(.secondary)
                     Menu {
-                        Picker(Strings.temperature.rawValue, selection: $tempScale) {
+                        Picker(SettingsStrings.temperature, selection: $tempScale) {
                             ForEach(TempScale.allCases) { scale in
                                 Text(scale.shortName)
                                     .tag(scale)
@@ -42,12 +66,12 @@ struct SettingsView: View {
                     } label: {
                         Image(systemName: SystemImages.ellipsisCircle.rawValue)
                     }
-                    .accessibilityLabel(Strings.temperatureUnit.rawValue)
+                    .accessibilityLabel(SettingsStrings.temperatureUnit)
                     .accessibilityValue(tempScale.displayName)
                 }
 
                 Toggle(
-                    Strings.iCloudSync.rawValue,
+                    SettingsStrings.iCloudSync,
                     isOn: Binding(
                         get: {
                             iCloudSyncEnabled && vm.isICloudAvailable
@@ -63,11 +87,11 @@ struct SettingsView: View {
                 if let error = vm.syncError {
                     Text(error)
                 } else if !vm.isICloudAvailable {
-                    Text(Strings.iCloudUnavailableDescription.rawValue)
+                    Text(SettingsStrings.iCloudUnavailableDescription)
                 }
             }
         }
-        .navigationTitle(Strings.settings.rawValue)
+        .navigationTitle(SettingsStrings.settings)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.refreshICloudAvailability()
@@ -85,6 +109,16 @@ struct SettingsView: View {
             Task {
                 await vm.refreshICloudAvailability()
             }
+        }
+    }
+
+    private var locationStatusLabel: String {
+        switch locationManager.authorizationStatus {
+        case .notDetermined: return SettingsStrings.locationNotRequested
+        case .denied: return SettingsStrings.locationDenied
+        case .restricted: return SettingsStrings.locationRestricted
+        case .authorizedAlways, .authorizedWhenInUse: return SettingsStrings.locationEnabled
+        @unknown default: return SettingsStrings.locationUnknown
         }
     }
 

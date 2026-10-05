@@ -13,14 +13,10 @@ struct WeatherForecastMainView: View {
     @EnvironmentObject var coordinator: MainCoordinator
 
     var body: some View {
-        if let locationAuthorized = locationManager.locationAuthorized {
-            if locationAuthorized {
-                WeatherForecastView(dependencies: dependencies, location: coordinator.selectedLocation)
-            } else {
-                LocationsFlow(dependencies: dependencies, showDismiss: false)
-            }
+        if locationManager.locationAuthorized == true {
+            WeatherForecastView(dependencies: dependencies, location: coordinator.selectedLocation)
         } else {
-            LaunchView()
+            LocationsFlow(dependencies: dependencies, showDismiss: false)
         }
     }
 }

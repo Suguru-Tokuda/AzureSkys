@@ -18,7 +18,7 @@ extension Int {
             return dateFormatter.string(from: date)
         }
         
-        return Strings.empty.rawValue
+        return ""
     }
     
     func unixTimeToDateStr(dateFormat: String, timezoneOffset: Int) -> String {

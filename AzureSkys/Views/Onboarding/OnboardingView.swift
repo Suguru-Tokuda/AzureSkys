@@ -24,10 +24,10 @@ struct OnboardingView: View {
                 case .location:
                     OnboardingStepView(
                         iconImageName: SystemImages.locationFill.rawValue,
-                        titleLabel: Strings.weatherWhereYouAre.rawValue,
-                        description: Strings.locationAccessDescription.rawValue,
-                        enableButtonDesc: Strings.allowLocation.rawValue,
-                        disableButtonDesc: Strings.chooseCitiesInstead.rawValue
+                        titleLabel: OnboardingStrings.weatherWhereYouAre,
+                        description: OnboardingStrings.locationAccessDescription,
+                        enableButtonDesc: OnboardingStrings.allowLocation,
+                        disableButtonDesc: OnboardingStrings.chooseCitiesInstead
                     ) { enabled in
                         if enabled {
                             vm.enableLocation()
@@ -42,10 +42,10 @@ struct OnboardingView: View {
                 case .cloudSync:
                     OnboardingStepView(
                         iconImageName: SystemImages.iCloudSyncFill.rawValue,
-                        titleLabel: Strings.yourPlacesEverywhere.rawValue,
-                        description: Strings.iCloudSyncDescription.rawValue,
-                        enableButtonDesc: Strings.enableICloudSync.rawValue,
-                        disableButtonDesc: Strings.notNow.rawValue,
+                        titleLabel: OnboardingStrings.yourPlacesEverywhere,
+                        description: OnboardingStrings.iCloudSyncDescription,
+                        enableButtonDesc: OnboardingStrings.enableICloudSync,
+                        disableButtonDesc: OnboardingStrings.notNow,
                         isEnableButtonEnabled: vm.isICloudAvailable && !vm.isCheckingICloud,
                         usesCompactLayout: true
                     ) { enabled in
@@ -88,7 +88,7 @@ struct OnboardingView: View {
             .padding(.top, 12)
             .padding(.bottom, 24)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(coordinator.currentStep == .location ? Strings.step1Of2.rawValue : Strings.step2Of2.rawValue)
+            .accessibilityLabel(coordinator.currentStep == .location ? OnboardingStrings.step1Of2 : OnboardingStrings.step2Of2)
         }
         .onChange(of: vm.didResolveLocationRequest) { _, resolved in
             if resolved, coordinator.currentStep == .location {
@@ -106,7 +106,7 @@ struct OnboardingView: View {
         }
         .background {
             GeometryReader { geometry in
-                Image(Strings.onboardingSky.rawValue)
+                Image(ImageAssets.onboardingSky.rawValue)
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()

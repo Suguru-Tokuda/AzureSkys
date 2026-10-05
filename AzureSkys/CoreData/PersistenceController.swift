@@ -31,13 +31,13 @@ final class PersistenceController: ObservableObject {
         self.inMemory = inMemory
         self.syncEnabled = syncEnabled
         container = NSPersistentCloudKitContainer(
-            name: Strings.weatherCoreData.rawValue
+            name: PersistenceControllerConstants.weatherCoreData
         )
 
         viewContext = container.viewContext
 
         guard let description = container.persistentStoreDescriptions.first else {
-            fatalError(Strings.missingPersistentStoreDescription.rawValue)
+            fatalError(PersistenceControllerConstants.missingPersistentStoreDescription)
         }
 
         if let storeURL { description.url = storeURL }
@@ -57,12 +57,12 @@ final class PersistenceController: ObservableObject {
         }
         
         if inMemory {
-            description.url = URL(fileURLWithPath: Strings.nullDevicePath.rawValue)
+            description.url = URL(fileURLWithPath: PersistenceControllerConstants.nullDevicePath)
         }
         
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
-                fatalError(Strings.unresolvedError(String(describing: error), String(describing: error.userInfo)))
+                fatalError(PersistenceControllerConstants.unresolvedError(String(describing: error), String(describing: error.userInfo)))
             }
         }
         
@@ -160,7 +160,7 @@ final class PersistenceController: ObservableObject {
         syncEnabled: Bool
     ) throws -> NSPersistentCloudKitContainer {
         let replacement = NSPersistentCloudKitContainer(
-            name: Strings.weatherCoreData.rawValue
+            name: PersistenceControllerConstants.weatherCoreData
         )
 
         guard let description = replacement.persistentStoreDescriptions.first else {
@@ -191,5 +191,14 @@ final class PersistenceController: ObservableObject {
         }
 
         replacement.viewContext.automaticallyMergesChangesFromParent = true
+    }
+}
+
+private enum PersistenceControllerConstants {
+    static let weatherCoreData = "WeatherCoreData"
+    static let missingPersistentStoreDescription = "WeatherCoreData has no persistent store description."
+    static let nullDevicePath = "/dev/null"
+    static func unresolvedError(_ error: String, _ userInfo: String) -> String {
+        "Unresolved error \(error), \(userInfo)"
     }
 }

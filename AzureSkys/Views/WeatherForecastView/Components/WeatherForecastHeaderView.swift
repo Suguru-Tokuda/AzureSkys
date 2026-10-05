@@ -17,7 +17,7 @@ struct WeatherForecastHeaderView: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: -10) {
-            Text(isMyLocation ? Strings.myLocation.rawValue : geocode.name)
+            Text(isMyLocation ? CommonStrings.myLocation : geocode.name)
                 .font(.largeTitle)
             if isMyLocation {
                 Text(geocode.name)

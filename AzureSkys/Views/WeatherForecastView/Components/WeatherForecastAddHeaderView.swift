@@ -16,7 +16,7 @@ struct WeatherForecastAddHeaderView: View {
             Button(action: {
                 cancelBtnTapped?()
             }, label: {
-                Text(Strings.cancel.rawValue)
+                Text(CommonStrings.cancel)
                     .shadow(
                         color: .black.opacity(0.5),
                         radius: 3,
@@ -28,7 +28,7 @@ struct WeatherForecastAddHeaderView: View {
             Button(action: {
                 addBtnTapped?()
             }, label: {
-                Text(Strings.add.rawValue)
+                Text(CommonStrings.add)
                     .shadow(
                         color: .black.opacity(0.5),
                         radius: 3,

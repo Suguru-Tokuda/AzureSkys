@@ -45,10 +45,10 @@ struct StatusGridViewCellContainer<Content: View>: View {
         VStack {
             HStack {
                 Image(systemName: SystemImages.thermometerMedium.rawValue)
-                Text(Strings.feelsLikeUppercase.rawValue)
+                Text(WeatherStrings.feelsLikeUppercase)
             }
                 .withStatusGridViewLabelModifier()
-            Text(Strings.previewTemperature.rawValue)
+            Text(PreviewManager.Strings.previewTemperature)
                 .withStatusGridViewValueLabelModifier()
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer()

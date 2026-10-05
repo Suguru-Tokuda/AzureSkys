@@ -18,13 +18,20 @@ extension PlistError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .parse:
-            return NSLocalizedString(Strings.plistParsingError.rawValue, comment: Strings.parse.rawValue)
+            return NSLocalizedString(PlistErrorConstants.plistParsingError, comment: "parse")
         case .url:
-            return NSLocalizedString(Strings.plistURLError.rawValue, comment: Strings.url.rawValue)
+            return NSLocalizedString(PlistErrorConstants.plistURLError, comment: "url")
         case .path:
-            return NSLocalizedString(Strings.plistPathError.rawValue, comment: Strings.path.rawValue)
+            return NSLocalizedString(PlistErrorConstants.plistPathError, comment: "path")
         case .dataNotFound:
-            return NSLocalizedString(Strings.plistDataNotFound.rawValue, comment: Strings.dataNotFound.rawValue)
+            return NSLocalizedString(PlistErrorConstants.plistDataNotFound, comment: "dataNotFound")
         }
     }
+}
+
+private enum PlistErrorConstants {
+    static let plistParsingError = "Error in parsing a PList."
+    static let plistURLError = "Error in finding a url."
+    static let plistPathError = "Error in finding a path."
+    static let plistDataNotFound = "No PList data found."
 }

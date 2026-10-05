@@ -153,7 +153,7 @@ private final class UITestPlacesService: PlacesServicing {
     private var failedSearch = false
 
     func getPredictions(query: String) async throws -> [Prediction] {
-        if ProcessInfo.processInfo.arguments.contains(Strings.searchFailsOnceArgument.rawValue), !failedSearch {
+        if ProcessInfo.processInfo.arguments.contains(LaunchArguments.searchFailsOnceArgument), !failedSearch {
             failedSearch = true
             throw NetworkError.networkUnavailable
         }

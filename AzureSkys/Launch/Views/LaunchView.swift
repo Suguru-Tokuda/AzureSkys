@@ -13,10 +13,10 @@ struct LaunchView: View {
             Color.launchScreen
                 .ignoresSafeArea()
             VStack {
-                Image(Strings.sun.rawValue)
+                Image(ImageAssets.sun.rawValue)
                     .resizable()
                     .frame(width: 100, height: 100, alignment: .center)
-                Text(Strings.azureSkys.rawValue)
+                Text(CommonStrings.azureSkys)
                     .foregroundStyle(Color.launchScreenText)
                     .font(.largeTitle)
                     .fontWeight(.bold)

@@ -18,14 +18,14 @@ struct WindStatusGridViewCell: View {
                 width: width,
                 background: background) {
                     VStack {
-                        StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: Strings.wind.rawValue)
+                        StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: WeatherStrings.wind)
                         HStack {
-                            Text(String(format: Strings.wholeNumberFormat.rawValue, wind.speed))
+                            Text(String(format: WeatherFormatting.wholeNumberFormat, wind.speed))
                                 .withStatusGridViewValueLabelModifier()
                             VStack(alignment: .leading) {
-                                Text(Strings.mph.rawValue)
+                                Text(WeatherStrings.mph)
                                     .withStatusGridViewLabelModifier()
-                                Text(Strings.wind.rawValue)
+                                Text(WeatherStrings.wind)
                                     .font(.callout.weight(.semibold))
                             }
                             Spacer()
@@ -37,12 +37,12 @@ struct WindStatusGridViewCell: View {
                                 .frame(height: 0.8)
                                 .background(.white.opacity(0.8))
                             HStack {
-                                Text(String(format: Strings.wholeNumberFormat.rawValue, gust))
+                                Text(String(format: WeatherFormatting.wholeNumberFormat, gust))
                                     .withStatusGridViewValueLabelModifier()
                                 VStack(alignment: .leading) {
-                                    Text(Strings.mph.rawValue)
+                                    Text(WeatherStrings.mph)
                                         .withStatusGridViewLabelModifier()
-                                    Text(Strings.gusts.rawValue)
+                                    Text(WeatherStrings.gusts)
                                         .font(.callout.weight(.semibold))
                                 }
                                 Spacer()

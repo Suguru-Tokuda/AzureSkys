@@ -62,7 +62,7 @@ final class OnboardingViewModel: ObservableObject {
         do {
             isICloudAvailable = try await iCloudManager.isAvailable()
         } catch {
-            iCloudCheckError = Strings.iCloudCheckError.rawValue
+            iCloudCheckError = OnboardingStrings.iCloudCheckError
         }
     }
 

@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct OnboardingLocationCard: View {
-    var city: String = Strings.cupertino.rawValue
-    var temperature: String = Strings.previewHotTemperature.rawValue
+    var city: String = PreviewManager.Strings.cupertino
+    var temperature: String = PreviewManager.Strings.previewHotTemperature
     var weatherSymbol: String = SystemImages.cloudFill.rawValue
 
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(Strings.myLocation.rawValue)
+                Text(CommonStrings.myLocation)
                     .font(.caption)
                 Text(city)
                     .font(.headline)
@@ -31,11 +31,11 @@ struct OnboardingLocationCard: View {
 }
 
 struct OnboardingSyncCard: View {
-    var firstCity: String = Strings.cupertino.rawValue
-    var firstTemperature: String = Strings.previewHotTemperature.rawValue
+    var firstCity: String = PreviewManager.Strings.cupertino
+    var firstTemperature: String = PreviewManager.Strings.previewHotTemperature
     var firstWeatherSymbol: String = SystemImages.cloudSunFill.rawValue
-    var secondCity: String = Strings.houston.rawValue
-    var secondTemperature: String = Strings.previewVeryHotTemperature.rawValue
+    var secondCity: String = PreviewManager.Strings.houston
+    var secondTemperature: String = PreviewManager.Strings.previewVeryHotTemperature
     var secondWeatherSymbol: String = SystemImages.cloudFill.rawValue
 
     var body: some View {
@@ -92,7 +92,7 @@ private struct OnboardingWeatherSummary: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             GeometryReader { geometry in
-                Image(Strings.onboardingSky.rawValue)
+                Image(ImageAssets.onboardingSky.rawValue)
                     .resizable()
                     .scaledToFill()
                     .frame(width: geometry.size.width, height: geometry.size.height)

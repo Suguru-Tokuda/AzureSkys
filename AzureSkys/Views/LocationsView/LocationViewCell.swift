@@ -24,26 +24,26 @@ struct LocationViewCell: View {
     var body: some View {
         ZStack {
             if vm.loadingStatus == .loading {
-                ProgressView(Strings.loading.rawValue)
+                ProgressView(CommonStrings.loading)
             }
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
                         // MARK: Location Text
                         Text(isMyLocation ? 
-                                Strings.myLocation.rawValue :
-                                place?.name ?? Strings.empty.rawValue)
+                                CommonStrings.myLocation :
+                                place?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
                         // MARK: Time
                         Text(isMyLocation ? 
-                                vm.currentForecast?.name ?? Strings.empty.rawValue :
+                                vm.currentForecast?.name ?? "" :
                                 vm.currentForecast?
                                     .dateTime
                                     .unixTimeToDateStr(dateFormat: Constants.dateFormat,
                                                        timezoneOffset: vm.currentForecast?.timezone ?? 0)
                                     .getDateStrinng(dateFormat: Constants.dateFormat,
-                                                    newDateFormat: Strings.timeFormat.rawValue) ?? Strings.empty.rawValue)
+                                                    newDateFormat: WeatherFormatting.timeFormat) ?? "")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
@@ -63,7 +63,7 @@ struct LocationViewCell: View {
                     .frame(height: 25)
                 HStack {
                     HStack {
-                        Text(vm.currentForecast?.weather.first?.main ?? Strings.unavailable.rawValue)
+                        Text(vm.currentForecast?.weather.first?.main ?? CommonStrings.unavailable)
                         if let currentForecast = vm.currentForecast,
                            let weather = currentForecast.weather.first {
                             WeatherImageView(icon: weather.icon, width: 20)

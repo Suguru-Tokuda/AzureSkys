@@ -48,10 +48,10 @@ struct WeatherForecastView: View {
                 }
             } else {
                 forecastView()
-                    .padding(.bottom, 30)
             }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
             navigationControls()
-            footer()
         }
         .onAppear {
             vm.setLocationManager(locationManager: locationManager)
@@ -84,12 +84,15 @@ struct WeatherForecastView: View {
             isActive = false
             vm.endDataRefreshTimer()
         }
+        .background {
+            BackGroundView()
+        }
     }
 }
 
 extension WeatherForecastView {
     @ViewBuilder func navigationControls() -> some View {
-        VStack {
+        Group {
             if presentation == .preview {
                 WeatherForecastAddHeaderView(cancelBtnTapped: {
                     coordinator.dismissForecast()
@@ -109,19 +112,32 @@ extension WeatherForecastView {
                 })
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
-                .padding(.bottom, 40)
             } else if presentation == .fullScreen {
                 HStack {
                     DismissButton { coordinator.dismissForecast() }
                     Spacer()
                 }
                 .padding(20)
-            } else {
-                Spacer()
+            } else if vm.locationAuthorized == true {
+                HStack {
+                    Spacer()
+                    Button {
+                        coordinator.goToLocations()
+                    } label: {
+                        Image(systemName: SystemImages.listBullet.rawValue)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .shadow(color: .black, radius: 3, x: 0, y: 2)
+                            .frame(width: 44, height: 44)
+                            .modifier(WeatherPanelModifier(cornerRadius: 22))
+                    }
+                    .accessibilityLabel(Strings.locationsTitle.rawValue)
+                    .accessibilityIdentifier(AccessibilityIdentifiers.locationsButton)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 8)
             }
-            Spacer()
         }
-            .zIndex(2.0)
     }
 
     @ViewBuilder func forecastView() -> some View {
@@ -133,15 +149,8 @@ extension WeatherForecastView {
                                       onRefresh: {
                 vm.startDataRefreshTimer()
             })
-            .padding(.top, 20)
         } else if vm.loadingStatus == .loading {
             ProgressView(Strings.loading.rawValue)
-        }
-    }
-
-    @ViewBuilder func footer() -> some View {
-        if presentation == .main, vm.locationAuthorized == true {
-            WeatherForecastBottomBar()
         }
     }
 }

@@ -37,6 +37,12 @@ enum WeatherCondition: String, CaseIterable {
         return retVal ?? .clear
     }
     
+    /// Bundled artwork keeps forecasts available without icon downloads.
+    func iconAssetName(partOfDay: PartOfDay) -> String {
+        let suffix = partOfDay == .night ? "Night" : "Day"
+        return "WeatherIcon" + rawValue + suffix
+    }
+
     /// Cloud coverage blends the clear and cloudy artwork for the time of day.
     /// Other night conditions use tinted daytime artwork.
     func getBackgroundImage(partOfDay: PartOfDay, clouds: Int = 0) -> some View {

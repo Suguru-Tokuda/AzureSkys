@@ -15,7 +15,6 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     var currentForecast: WeatherForecastCurrentResponse? { requestState.value }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
     @Published var locationAuthorized: Bool?
-    @Published var listRowBackground: LinearGradient = .init(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
     var place: SavedPlace?
     
     var currentLocation: CLLocation?
@@ -84,9 +83,6 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             let response = try await weatherService.getCurrentWeather(coordinate: coordinate)
             try Task.checkCancellation()
             requestState = .loaded(response)
-            if let weather = response.weather.first {
-                setRowBackgroundColor(weather: weather, clouds: response.clouds.all)
-            }
         } catch {
             guard !Task.isCancelled else {
                 requestState = previous.map(RequestState.loaded) ?? .idle
@@ -104,11 +100,6 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         }
     }
     
-    private func setRowBackgroundColor(weather: Weather, clouds: Int) {
-        self.listRowBackground = weather.weatherCondition.getBackgroundColor(partOfDay: weather.partOfDay, clouds: clouds)
-    }
-    
-
 }
 
 // MARK: Refresh scheduling

@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum WeatherViewIdentifiers {
+    static let weatherScroll = "weatherScroll"
+}
+
 struct WeatherForecastScrollView: View {
     var forecast: WeatherForecastOneCallResponse?
     var geocode: WeatherGeocode?
@@ -16,7 +20,7 @@ struct WeatherForecastScrollView: View {
 
     let coordinateSpaceName = WeatherViewIdentifiers.weatherScroll
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             ScrollView {
                 if let geocode = geocode,
                    let forecast = forecast
@@ -32,20 +36,11 @@ struct WeatherForecastScrollView: View {
 
                         WeatherThreeHourlyForecastListView(forecast: forecast)
 
+                        StatusListView(forecast: forecast.current)
+
                         WeatherDailyForecastListView(list: forecast.daily,
                                                      timezoneOffset: forecast.timezoneOffset,
                                                      showAnimation: self.showAnimation)
-
-                        if let weather = forecast.current.weather.first {
-                            StatusGridView(
-                                forecast: forecast.current,
-                                background: weather
-                                                .weatherCondition
-                                    .getBackgroundColor(partOfDay: weather.partOfDay,
-                                                        clouds: forecast.current.clouds ?? 0),
-                                parentViewWidth: geometry.size.width
-                            )
-                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 20)

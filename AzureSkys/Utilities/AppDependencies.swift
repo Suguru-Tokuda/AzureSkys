@@ -18,11 +18,13 @@ final class AppDependencies: ObservableObject {
     let coordinator: MainCoordinator
     let fileManager: LocalFileManager
     let settingsManager: SettingsManager
+    let iCloudManager: ICloudManaging
 
     init(weatherService: WeatherServicing, placesService: PlacesServicing,
          placeStore: PlaceCoreDataActions, persistenceController: PersistenceController,
          locationManager: LocationManager, coordinator: MainCoordinator,
-         fileManager: LocalFileManager, settingsManager: SettingsManager) {
+         fileManager: LocalFileManager, settingsManager: SettingsManager, iCloudManager: ICloudManaging
+    ) {
         self.weatherService = weatherService
         self.placesService = placesService
         self.placeStore = placeStore
@@ -31,18 +33,20 @@ final class AppDependencies: ObservableObject {
         self.coordinator = coordinator
         self.fileManager = fileManager
         self.settingsManager = settingsManager
+        self.iCloudManager = iCloudManager
     }
 
     static func live() -> AppDependencies {
         let networkManager = NetworkManager()
         let apiKeyManager = ApiKeyManager()
-        let persistenceController = PersistenceController.shared
+        let persistenceController = PersistenceController(syncEnabled: syncEnabled)
         return AppDependencies(
             weatherService: WeatherService(networkManager: networkManager, apiKeyManager: apiKeyManager),
             placesService: PlacesService(networkManager: networkManager, apiKeyManager: apiKeyManager),
-            placeStore: PlaceCoreDataManager(container: persistenceController.container),
+            placeStore: PlaceCoreDataManager(persistence: persistenceController),
             persistenceController: persistenceController, locationManager: LocationManager(),
-            coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager())
+            coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager(),
+            iCloudManager: ICloudManager(persistence: persistenceController))
     }
 
     static func preview(placesService: PlacesServicing? = nil) -> AppDependencies {
@@ -52,9 +56,14 @@ final class AppDependencies: ObservableObject {
         locationManager.currentLocation = CLLocation(latitude: 33.7488, longitude: -84.3877)
         return AppDependencies(
             weatherService: PreviewWeatherService(), placesService: placesService ?? PreviewPlacesService(),
-            placeStore: PlaceCoreDataManager(container: persistenceController.container),
+            placeStore: PlaceCoreDataManager(persistence: persistenceController),
             persistenceController: persistenceController, locationManager: locationManager,
-            coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager())
+            coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager(),
+            iCloudManager: ICloudManager(persistence: persistenceController))
+    }
+
+    func makeOnboardingViewModel() -> OnboardingViewModel {
+        OnboardingViewModel(locationManager: locationManager, iCloudManager: iCloudManager)
     }
 
     func makeWeatherForecastViewModel() -> WeatherForecastViewModel {
@@ -72,15 +81,38 @@ final class AppDependencies: ObservableObject {
     func makeLocationsViewModel() -> LocationsViewModel {
         LocationsViewModel(placeCoreDataManager: placeStore)
     }
+
+    func makeSettingsViewModel() -> SettingsViewModel {
+        SettingsViewModel(iCloudManager: iCloudManager)
+    }
+
+    private static var syncEnabled: Bool {
+        UserDefaults.standard.bool(
+            forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue
+        )
+    }
+}
+
+private struct AppEnvironmentModifier: ViewModifier {
+    let dependencies: AppDependencies
+    @ObservedObject var persistence: PersistenceController
+
+    func body(content: Content) -> some View {
+        content
+            .environmentObject(dependencies.locationManager)
+            .environmentObject(dependencies.coordinator)
+            .environmentObject(dependencies.fileManager)
+            .environment(\.managedObjectContext, persistence.viewContext)
+    }
 }
 
 extension View {
     @MainActor
     func appEnvironment(_ dependencies: AppDependencies) -> some View {
-        environmentObject(dependencies.locationManager)
-            .environmentObject(dependencies.coordinator)
-            .environmentObject(dependencies.fileManager)
-            .environment(\.managedObjectContext, dependencies.persistenceController.container.viewContext)
+        modifier(AppEnvironmentModifier(
+            dependencies: dependencies,
+            persistence: dependencies.persistenceController
+        ))
     }
 }
 
@@ -121,7 +153,7 @@ private final class UITestPlacesService: PlacesServicing {
     private var failedSearch = false
 
     func getPredictions(query: String) async throws -> [Prediction] {
-        if ProcessInfo.processInfo.arguments.contains("--search-fails-once"), !failedSearch {
+        if ProcessInfo.processInfo.arguments.contains(Strings.searchFailsOnceArgument.rawValue), !failedSearch {
             failedSearch = true
             throw NetworkError.networkUnavailable
         }

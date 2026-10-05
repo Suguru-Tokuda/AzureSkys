@@ -37,6 +37,72 @@ enum WeatherCondition: String, CaseIterable {
         return retVal ?? .clear
     }
     
+    /// Cloud coverage blends the clear and cloudy artwork for the time of day.
+    /// Other night conditions use tinted daytime artwork.
+    func getBackgroundImage(partOfDay: PartOfDay, clouds: Int = 0) -> some View {
+        let cloudOpacity = Double(min(max(clouds, 0), 100)) / 100
+        let isNight = partOfDay == .night
+
+        return GeometryReader { geometry in
+            ZStack {
+                switch self {
+                case .clear, .clouds:
+                    backgroundLayer(
+                        named: isNight
+                            ? Strings.weatherBackgroundClearNight.rawValue
+                            : Strings.weatherBackgroundClearDay.rawValue,
+                        size: geometry.size
+                    )
+                    backgroundLayer(
+                        named: isNight
+                            ? Strings.weatherBackgroundCloudsNight.rawValue
+                            : Strings.weatherBackgroundCloudsDay.rawValue,
+                        size: geometry.size
+                    )
+                    .opacity(cloudOpacity)
+                default:
+                    backgroundLayer(named: backgroundImageName, size: geometry.size)
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .clipped()
+            .colorMultiply(
+                isNight && self != .clear && self != .clouds
+                    ? Color(red: 0.22, green: 0.30, blue: 0.48)
+                    : .white
+            )
+        }
+        .accessibilityHidden(true)
+    }
+
+    private func backgroundLayer(named name: String, size: CGSize) -> some View {
+        Image(name)
+            .resizable()
+            .scaledToFill()
+            .frame(width: size.width, height: size.height)
+            .clipped()
+    }
+
+    private var backgroundImageName: String {
+        switch self {
+        case .thunderstorm: return Strings.weatherBackgroundThunderstormDay.rawValue
+        case .drizzle: return Strings.weatherBackgroundDrizzleDay.rawValue
+        case .rain: return Strings.weatherBackgroundRainDay.rawValue
+        case .snow: return Strings.weatherBackgroundSnowDay.rawValue
+        case .mist: return Strings.weatherBackgroundMistDay.rawValue
+        case .smoke: return Strings.weatherBackgroundSmokeDay.rawValue
+        case .haze: return Strings.weatherBackgroundHazeDay.rawValue
+        case .dust: return Strings.weatherBackgroundDustDay.rawValue
+        case .fog: return Strings.weatherBackgroundFogDay.rawValue
+        case .sand: return Strings.weatherBackgroundSandDay.rawValue
+        case .ash: return Strings.weatherBackgroundAshDay.rawValue
+        case .squall: return Strings.weatherBackgroundSquallDay.rawValue
+        case .tornado: return Strings.weatherBackgroundTornadoDay.rawValue
+        case .clear: return Strings.weatherBackgroundClearDay.rawValue
+        case .clouds: return Strings.weatherBackgroundCloudsDay.rawValue
+        }
+    }
+
     /**
         Get Color or Gradient
      */

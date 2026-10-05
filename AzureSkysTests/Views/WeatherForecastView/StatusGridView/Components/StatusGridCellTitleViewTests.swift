@@ -12,6 +12,6 @@ import SwiftUI
 @MainActor
 final class StatusGridCellTitleViewTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(StatusGridCellTitleView(icon: "wind", title: "Wind")))
+        assertVisibleContent(try await renderSnapshot(StatusGridCellTitleView(icon: SystemImages.wind.rawValue, title: "Wind")))
     }
 }

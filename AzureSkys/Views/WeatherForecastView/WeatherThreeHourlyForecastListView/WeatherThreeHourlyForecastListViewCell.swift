@@ -15,14 +15,14 @@ struct WeatherThreeHourlyForecastListViewCell: View {
     
     var body: some View {
         VStack {
-            Text(isFirst ? "Now" : forecast
+            Text(isFirst ? Strings.now.rawValue : forecast
                                     .dateTime
                                     .unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset)
-                                    .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
+                                    .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: Strings.hourFormat.rawValue))
             if let weather = forecast.weather.first {
                 WeatherImageView(icon: weather.icon, width: 40)
             }
-            Text("\(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+            Text(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
         }
         .fontWeight(.bold)
     }

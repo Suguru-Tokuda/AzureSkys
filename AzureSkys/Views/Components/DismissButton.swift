@@ -14,12 +14,12 @@ struct DismissButton: View {
         Button {
             onButtonPress?()
         } label: {
-            Image(systemName: "xmark")
+            Image(systemName: SystemImages.xmark.rawValue)
                 .resizable()
                 .frame(width: 15, height: 15)
         }
-        .accessibilityLabel("Dismiss")
-        .accessibilityIdentifier("dismissButton")
+        .accessibilityLabel(Strings.dismiss.rawValue)
+        .accessibilityIdentifier(Strings.dismissButton.rawValue)
     }
 }
 

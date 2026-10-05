@@ -14,9 +14,9 @@ protocol PlistActions {
 
 extension PlistActions {
     var resourceBundle: Bundle { .main }
-    func getData<T: Decodable>(resource: String = "ApiKeys", type: T.Type = ApiKeyModel.self) throws -> T {
+    func getData<T: Decodable>(resource: String = Strings.apiKeys.rawValue, type: T.Type = ApiKeyModel.self) throws -> T {
         do {
-            if let url = resourceBundle.url(forResource: resource, withExtension: "plist") {
+            if let url = resourceBundle.url(forResource: resource, withExtension: Strings.plist.rawValue) {
                 var data: Data
                 
                 do {
@@ -49,7 +49,7 @@ class ApiKeyManager: ApiKeyActions, PlistActions {
     let resourceBundle: Bundle
     private let resource: String
 
-    init(bundle: Bundle = .main, resource: String = "ApiKeys") {
+    init(bundle: Bundle = .main, resource: String = Strings.apiKeys.rawValue) {
         self.resourceBundle = bundle
         self.resource = resource
     }

@@ -13,8 +13,8 @@ struct AzureSkysApp: App {
 
     init() {
         #if DEBUG
-        let isUITesting = ProcessInfo.processInfo.arguments.contains("--ui-testing")
-        let isUnitTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        let isUITesting = ProcessInfo.processInfo.arguments.contains(Strings.uiTestingArgument.rawValue)
+        let isUnitTesting = ProcessInfo.processInfo.environment[Strings.testConfigurationEnvironmentKey.rawValue] != nil
         _dependencies = StateObject(wrappedValue: isUITesting ? .uiTesting() : (isUnitTesting ? .preview() : .live()))
         #else
         _dependencies = StateObject(wrappedValue: .live())

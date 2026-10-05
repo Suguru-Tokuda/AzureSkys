@@ -5,16 +5,17 @@
 //  Created by Suguru Tokuda on 11/27/23.
 //
 
-
+import Combine
 import CoreLocation
 
 class LocationManager: NSObject, ObservableObject {
     @Published var currentLocation: CLLocation?
     @Published var locationAuthorized: Bool?
-    
+    var locationAuthorizedPublisher = PassthroughSubject<Bool?, Never>()
+
     let locationManager: CLLocationManager
-    
-    init(startAutomatically: Bool = true, locationManager: CLLocationManager = CLLocationManager()) {
+
+    init(startAutomatically: Bool = false, locationManager: CLLocationManager = CLLocationManager()) {
         self.locationManager = locationManager
         super.init()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -22,8 +23,11 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.delegate = self
         if startAutomatically {
             locationManager.requestWhenInUseAuthorization()
-            locationManager.startUpdatingLocation()
         }
+    }
+
+    func requestAuthorization() {
+        locationManager.requestWhenInUseAuthorization()
     }
 }
 
@@ -32,11 +36,11 @@ extension LocationManager: CLLocationManagerDelegate {
         guard let latestLocation = locations.last else { return }
         currentLocation = latestLocation
     }
-    
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .notDetermined:
-            break
+            locationAuthorized = nil
         case .restricted:
             locationAuthorized = false
             break
@@ -53,5 +57,13 @@ extension LocationManager: CLLocationManagerDelegate {
             locationAuthorized = false
             break
         }
+
+        if locationAuthorized == true {
+            manager.startUpdatingLocation()
+        } else {
+            manager.stopUpdatingLocation()
+        }
+
+        locationAuthorizedPublisher.send(locationAuthorized)
     }
 }

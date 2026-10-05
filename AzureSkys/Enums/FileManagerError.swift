@@ -18,13 +18,13 @@ extension FileManagerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .data:
-            return NSLocalizedString("Error in parsing to data.", comment: "data")
+            return NSLocalizedString(Strings.dataParsingError.rawValue, comment: Strings.data.rawValue)
         case .badPath:
-            return NSLocalizedString("Could not find a path to the file.", comment: "badPath")
+            return NSLocalizedString(Strings.filePathError.rawValue, comment: Strings.badPath.rawValue)
         case .save:
-            return NSLocalizedString("Error in saving data.", comment: "save")
+            return NSLocalizedString(Strings.fileSaveError.rawValue, comment: Strings.save.rawValue)
         case .retrieve:
-            return NSLocalizedString("Error in retrieving data.", comment: "retrieve")
+            return NSLocalizedString(Strings.fileRetrieveError.rawValue, comment: Strings.retrieve.rawValue)
         }
     }
 }

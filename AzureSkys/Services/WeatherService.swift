@@ -36,9 +36,9 @@ final class WeatherService: WeatherServicing {
         }
         try Task.checkCancellation()
         let apiKey = try getAPIKey()
-        let forecastURL = try weatherURL(path: "/data/3.0/onecall", coordinate: coordinate,
+        let forecastURL = try weatherURL(path: Strings.oneCallPath.rawValue, coordinate: coordinate,
                                          apiKey: apiKey, excludeMinutely: true)
-        let geocodeURL = try weatherURL(path: "/geo/1.0/reverse", coordinate: coordinate, apiKey: apiKey)
+        let geocodeURL = try weatherURL(path: Strings.reverseGeocodePath.rawValue, coordinate: coordinate, apiKey: apiKey)
         async let forecast = networkManager.getData(url: forecastURL, type: WeatherForecastOneCallResponse.self)
         async let geocodes = networkManager.getData(url: geocodeURL, type: [WeatherGeocode].self)
         let result = try await (forecast, geocodes)
@@ -48,7 +48,7 @@ final class WeatherService: WeatherServicing {
 
     func getCurrentWeather(coordinate: CLLocationCoordinate2D) async throws -> WeatherForecastCurrentResponse {
         try Task.checkCancellation()
-        let url = try weatherURL(path: "/data/2.5/weather", coordinate: coordinate, apiKey: getAPIKey())
+        let url = try weatherURL(path: Strings.currentWeatherPath.rawValue, coordinate: coordinate, apiKey: getAPIKey())
         let response = try await networkManager.getData(url: url, type: WeatherForecastCurrentResponse.self)
         try Task.checkCancellation()
         return response
@@ -64,12 +64,12 @@ final class WeatherService: WeatherServicing {
         guard var components = URLComponents(string: baseURL) else { throw NetworkError.badUrl }
         components.path = path
         components.queryItems = [
-            URLQueryItem(name: "lat", value: String(coordinate.latitude)),
-            URLQueryItem(name: "lon", value: String(coordinate.longitude)),
-            URLQueryItem(name: "appid", value: apiKey)
+            URLQueryItem(name: Strings.lat.rawValue, value: String(coordinate.latitude)),
+            URLQueryItem(name: Strings.lon.rawValue, value: String(coordinate.longitude)),
+            URLQueryItem(name: Strings.appid.rawValue, value: apiKey)
         ]
         if excludeMinutely {
-            components.queryItems?.append(URLQueryItem(name: "exclude", value: "minutely"))
+            components.queryItems?.append(URLQueryItem(name: Strings.exclude.rawValue, value: Strings.minutely.rawValue))
         }
         guard let url = components.url else { throw NetworkError.badUrl }
         return url

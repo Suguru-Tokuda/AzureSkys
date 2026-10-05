@@ -13,15 +13,15 @@ struct LocationAuthorizationRequestView: View {
     var body: some View {
         ZStack {
             VStack {
-                Image(systemName: "location.circle.fill")
+                Image(systemName: SystemImages.locationCircleFill.rawValue)
                     .resizable()
                     .frame(width: 75, height: 75)
                     .padding(.top, 100)
-                Text("Location Authorization Required")
+                Text(Strings.locationAuthorizationRequired.rawValue)
                     .font(.title3.weight(.bold))
                     .padding(.top, 50)
                     
-                Text("The App requires location information to continue")
+                Text(Strings.locationAuthorizationDescription.rawValue)
                     .font(.callout)
                 Spacer()
             }
@@ -29,7 +29,7 @@ struct LocationAuthorizationRequestView: View {
             Button(action: {
                 settingsManager.navigateToSettings()
             }, label: {
-                Text("Open Settings")
+                Text(Strings.openSettings.rawValue)
             })
             .buttonStyle(OpenSettingsBtnStyle(
                 backgroundColor: .night1,

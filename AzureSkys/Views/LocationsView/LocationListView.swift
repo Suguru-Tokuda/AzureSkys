@@ -19,7 +19,7 @@ struct LocationListView: View {
     
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
-        let entity = dependencies.persistenceController.container.managedObjectModel.entitiesByName["PlaceEntity"]!
+        let entity = dependencies.persistenceController.container.managedObjectModel.entitiesByName[Strings.placeEntity.rawValue]!
         _results = FetchRequest(entity: entity, sortDescriptors: [])
         _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
     }
@@ -64,7 +64,7 @@ extension LocationListView {
                 Button(action: {
                     vm.dismissError()
                 }, label: {
-                    Text("OK")
+                    Text(Strings.ok.rawValue)
                 })
             }
         }

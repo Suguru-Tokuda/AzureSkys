@@ -28,62 +28,62 @@ struct StatusGridView: View {
             StatusGridCellView(
                 width: width,
                 background: background,
-                icon: "thermometer.medium",
-                title: "Feels like",
-                value: "\(forecast.feelsLike.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+                icon: SystemImages.thermometerMedium.rawValue,
+                title: Strings.feelsLike.rawValue,
+                value: forecast.feelsLike.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
             
             if let visibility = forecast.visibility {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "eye.fill",
-                    title: "Visibility",
-                    value: "\(visibility.toMiles()) mi")
+                    icon: SystemImages.eyeFill.rawValue,
+                    title: Strings.visibility.rawValue,
+                    value: Strings.miles(String(describing: visibility.toMiles())))
             }
             
             if let humidity = forecast.humidity {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "humidity.fill",
-                    title: "Humidity",
-                    value: "\(humidity) %")
+                    icon: SystemImages.humidityFill.rawValue,
+                    title: Strings.humidity.rawValue,
+                    value: Strings.humidityValue(String(describing: humidity)))
             }
             
             if let pressure = forecast.pressure {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "gauge.with.dots.needle.50percent",
-                    title: "Pressure",
-                    value: "\(pressure) hPa")
+                    icon: SystemImages.gaugeWithDotsNeedle50Percent.rawValue,
+                    title: Strings.pressure.rawValue,
+                    value: Strings.pressureValue(String(describing: pressure)))
             }
             
             if let clouds = forecast.clouds {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "cloud.fill",
-                    title: "Cloudiness",
-                    value: "\(clouds)%")
+                    icon: SystemImages.cloudFill.rawValue,
+                    title: Strings.cloudiness.rawValue,
+                    value: Strings.percentage(String(describing: clouds)))
             }
             
             if let uvi = forecast.uvi {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "sun.max",
-                    title: "UV Index",
-                    value: "\(uvi)")
+                    icon: SystemImages.sunMax.rawValue,
+                    title: Strings.uvIndex.rawValue,
+                    value: String(describing: uvi))
             }
             
             if let dewPoint = forecast.dewPoint {
                 StatusGridCellView(
                     width: width,
                     background: background,
-                    icon: "drop.fill",
-                    title: "Dew Point",
-                    value: "\(dewPoint.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())")
+                    icon: SystemImages.dropFill.rawValue,
+                    title: Strings.dewPoint.rawValue,
+                    value: dewPoint.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
 
             }
         }

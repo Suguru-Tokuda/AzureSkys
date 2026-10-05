@@ -22,8 +22,8 @@ struct StatusGridCellTitleView: View {
 
 #Preview {
     StatusGridCellTitleView(
-        icon: "thermometer.medium",
-        title: "Feels Like"
+        icon: SystemImages.thermometerMedium.rawValue,
+        title: Strings.feelsLikeTitle.rawValue
     )
     .preferredColorScheme(.dark)
 }

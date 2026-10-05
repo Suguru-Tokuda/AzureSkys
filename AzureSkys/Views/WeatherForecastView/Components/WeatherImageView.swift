@@ -26,11 +26,11 @@ struct WeatherImageView: View {
                     .resizable()
                     .scaledToFit()
             } else {
-                Image(systemName: "cloud")
+                Image(systemName: SystemImages.cloud.rawValue)
                     .resizable()
                     .scaledToFit()
                     .foregroundStyle(.secondary)
-                    .accessibilityLabel("Weather icon unavailable")
+                    .accessibilityLabel(Strings.weatherIconUnavailable.rawValue)
             }
         }
         .frame(width: width, height: width)
@@ -53,8 +53,8 @@ struct WeatherImageView: View {
         }
 
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
-            image = UIImage(systemName: "cloud")
+        if ProcessInfo.processInfo.arguments.contains(Strings.uiTestingArgument.rawValue) {
+            image = UIImage(systemName: SystemImages.cloud.rawValue)
             return
         }
         #endif
@@ -65,7 +65,7 @@ struct WeatherImageView: View {
             return
         }
 
-        guard let url = URL(string: Constants.weatherIconURL.replacingOccurrences(of: "ICON_CODE", with: icon)) else {
+        guard let url = URL(string: Constants.weatherIconURL.replacingOccurrences(of: Strings.iconCodePlaceholder.rawValue, with: icon)) else {
             return
         }
 
@@ -89,6 +89,6 @@ struct WeatherImageView: View {
 }
 
 #Preview {
-    WeatherImageView(icon: "01d", width: 40)
+    WeatherImageView(icon: Strings.clearDayIcon.rawValue, width: 40)
         .environmentObject(LocalFileManager())
 }

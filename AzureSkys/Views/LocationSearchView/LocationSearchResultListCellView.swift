@@ -12,7 +12,7 @@ struct LocationSearchResultListCellView: View {
     
     var body: some View {
         HStack {
-            Text(prediction.description ?? "")
+            Text(prediction.description ?? Strings.empty.rawValue)
             Spacer()
         }
     }

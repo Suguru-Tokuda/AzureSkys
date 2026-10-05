@@ -9,7 +9,7 @@ import SwiftUI
 
 class UIBackdropView: UIView {
     override class var layerClass: AnyClass {
-        NSClassFromString("CABackdropLayer") ?? CALayer.self
+        NSClassFromString(Strings.backdropLayerClassName.rawValue) ?? CALayer.self
     }
 }
 

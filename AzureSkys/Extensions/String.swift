@@ -26,6 +26,6 @@ extension String {
     }
     
     func appendDegree() -> String {
-        return "\(self)\u{00B0}"
+        return Strings.appendingDegree(self)
     }
 }

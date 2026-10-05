@@ -29,6 +29,6 @@ extension Double {
         let formatter = NumberFormatter()
         formatter.maximumFractionDigits = maxFractions
         
-        return formatter.string(from: self as NSNumber) ?? ""
+        return formatter.string(from: self as NSNumber) ?? Strings.empty.rawValue
     }
 }

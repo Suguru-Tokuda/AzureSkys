@@ -8,23 +8,22 @@
 import SwiftUI
 
 struct WeatherForecastBottomBar: View {
-    var background: LinearGradient
     @EnvironmentObject var coordinator: MainCoordinator
 
     var body: some View {
         ZStack {
-            background
-                .opacity(0.95)
+            Rectangle()
+                .fill(.ultraThinMaterial)
                 .frame(maxHeight: 75)
             HStack {
                 Spacer()
                 Button(action: {
                     coordinator.goToLocations()
                 }, label: {
-                    Image(systemName: "list.bullet")
+                    Image(systemName: SystemImages.listBullet.rawValue)
                 })
-                .accessibilityLabel("Locations")
-                .accessibilityIdentifier("locationsButton")
+                .accessibilityLabel(Strings.locationsTitle.rawValue)
+                .accessibilityIdentifier(Strings.locationsButton.rawValue)
             }
             .padding(EdgeInsets(top: 20, leading: 32, bottom: 24, trailing: 32))
         }
@@ -34,9 +33,7 @@ struct WeatherForecastBottomBar: View {
 }
 
 #Preview {
-    WeatherForecastBottomBar(
-        background: Color.skyBlue100
-    )
+    WeatherForecastBottomBar()
     .environmentObject(MainCoordinator())
     .preferredColorScheme(.dark)
 }

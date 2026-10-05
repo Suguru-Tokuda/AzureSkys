@@ -20,9 +20,6 @@ class WeatherForecastViewModel: ObservableObject {
     var networkError: NetworkError? { requestState.error }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
     @Published var locationAuthorized: Bool?
-    @Published var background: LinearGradient = LinearGradient(colors: [Color.clear], 
-                                                               startPoint: .topLeading,
-                                                               endPoint: .bottomTrailing)
     var place: SavedPlace?
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
@@ -85,7 +82,6 @@ class WeatherForecastViewModel: ObservableObject {
             let data = try await weatherService.getForecast(coordinate: coordinate)
             try Task.checkCancellation()
             requestState = .loaded(data)
-            setBackgroundColor()
         } catch {
             guard !Task.isCancelled else {
                 requestState = previous.map(RequestState.loaded) ?? .idle
@@ -107,13 +103,6 @@ class WeatherForecastViewModel: ObservableObject {
         coreDataError = nil
     }
 
-    private func setBackgroundColor() {
-        if let forecast,
-           let weather = forecast.current.weather.first {
-            self.background = weather.weatherCondition.getBackgroundColor(partOfDay: weather.partOfDay, clouds: forecast.current.clouds ?? 0)
-        }
-    }
-    
     /**
         Dependency injection for locationManager
      */

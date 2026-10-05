@@ -8,9 +8,9 @@
 import Foundation
 
 struct Constants {
-    static let weatherApiEndpoint = "https://api.openweathermap.org"
-    static let googleApiBaseURL = "https://maps.googleapis.com/maps/api/place/"
-    static let weatherIconURL = "https://openweathermap.org/img/wn/ICON_CODE@2x.png"
+    static let weatherApiEndpoint = Strings.weatherAPIEndpoint.rawValue
+    static let googleApiBaseURL = Strings.googleAPIBaseURL.rawValue
+    static let weatherIconURL = Strings.weatherIconURL.rawValue
     
-    static let dateFormat = "yyyy-MM-dd HH:mm:ss"
+    static let dateFormat = Strings.dateFormat.rawValue
 }

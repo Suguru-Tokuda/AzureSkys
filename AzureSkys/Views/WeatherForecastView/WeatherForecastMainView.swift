@@ -17,7 +17,7 @@ struct WeatherForecastMainView: View {
             if locationAuthorized {
                 WeatherForecastView(dependencies: dependencies, location: coordinator.selectedLocation)
             } else {
-                LocationsView(dependencies: dependencies, showDismiss: false)
+                LocationsFlow(dependencies: dependencies, showDismiss: false)
             }
         } else {
             LaunchView()

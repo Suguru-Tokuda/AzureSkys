@@ -15,8 +15,15 @@ enum TempScale: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .fahrenheit: return "Fahrenheit"
-        case .celsius: return "Celsius"
+        case .fahrenheit: return Strings.fahrenheit.rawValue
+        case .celsius: return Strings.celsius.rawValue
+        }
+    }
+
+    var shortName: String {
+        switch self {
+        case .fahrenheit: return Strings.fahrenheitSymbol.rawValue
+        case .celsius: return Strings.celsiusSymbol.rawValue
         }
     }
 }

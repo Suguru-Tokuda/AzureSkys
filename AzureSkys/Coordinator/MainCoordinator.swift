@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum Route: Hashable {
+    case settings
+}
+
 // Each destination carries the location it displays.
 enum ForecastLocation: Identifiable {
     case current
@@ -14,8 +18,8 @@ enum ForecastLocation: Identifiable {
 
     var id: String {
         switch self {
-        case .current: return "current"
-        case .saved(let place): return "saved:\(place.id)"
+        case .current: return Strings.current.rawValue
+        case .saved(let place): return Strings.savedLocationID(place.id)
         }
     }
 
@@ -31,8 +35,8 @@ enum FullScreenDestination: Identifiable {
 
     var id: String {
         switch self {
-        case .locations: return "locations"
-        case .forecast(let location): return "forecast:\(location.id)"
+        case .locations: return Strings.locations.rawValue
+        case .forecast(let location): return Strings.forecastRouteID(location.id)
         }
     }
 }
@@ -44,9 +48,24 @@ struct ForecastPreviewDestination: Identifiable {
 
 @MainActor
 final class MainCoordinator: ObservableObject {
+    enum RootFlow {
+        case onboarding
+        case weather
+    }
+
     @Published private(set) var selectedLocation: ForecastLocation = .current
     @Published var fullScreenDestination: FullScreenDestination?
     @Published var forecastPreview: ForecastPreviewDestination?
+    @Published private(set) var rootFlow: RootFlow
+
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        rootFlow = defaults.bool(
+            forKey: Strings.hasSeenOnboarding.rawValue
+        ) ? .weather : .onboarding
+    }
 
     func goToLocations() {
         fullScreenDestination = .locations
@@ -76,5 +95,10 @@ final class MainCoordinator: ObservableObject {
         } else if case .forecast = fullScreenDestination {
             fullScreenDestination = nil
         }
+    }
+
+    func completeOnboarding() {
+        defaults.set(true, forKey: Strings.hasSeenOnboarding.rawValue)
+        rootFlow = .weather
     }
 }

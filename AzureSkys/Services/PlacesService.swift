@@ -26,10 +26,10 @@ final class PlacesService: PlacesServicing {
 
     func getPredictions(query: String) async throws -> [Prediction] {
         try Task.checkCancellation()
-        let url = try placesURL(endpoint: "autocomplete/json", queryItems: [
-            URLQueryItem(name: "input", value: query),
-            URLQueryItem(name: "types", value: "(cities)"),
-            URLQueryItem(name: "fields", value: "place_id,description")
+        let url = try placesURL(endpoint: Strings.autocompleteJson.rawValue, queryItems: [
+            URLQueryItem(name: Strings.input.rawValue, value: query),
+            URLQueryItem(name: Strings.types.rawValue, value: Strings.citiesFilter.rawValue),
+            URLQueryItem(name: Strings.fields.rawValue, value: Strings.autocompleteFields.rawValue)
         ])
         let response = try await networkManager.getData(url: url, type: GoogleAutoCompleteModel.self)
         try Task.checkCancellation()
@@ -38,9 +38,9 @@ final class PlacesService: PlacesServicing {
 
     func getPlaceDetails(placeID: String) async throws -> SavedPlace {
         try Task.checkCancellation()
-        let url = try placesURL(endpoint: "details/json", queryItems: [
-            URLQueryItem(name: "placeid", value: placeID),
-            URLQueryItem(name: "fields", value: "geometry,formatted_address,name,place_id,address_components")
+        let url = try placesURL(endpoint: Strings.detailsJson.rawValue, queryItems: [
+            URLQueryItem(name: Strings.placeid.rawValue, value: placeID),
+            URLQueryItem(name: Strings.fields.rawValue, value: Strings.placeDetailFields.rawValue)
         ])
         let response = try await networkManager.getData(url: url, type: GooglePlaceDetailsResponse.self)
         try Task.checkCancellation()
@@ -50,7 +50,7 @@ final class PlacesService: PlacesServicing {
     private func placesURL(endpoint: String, queryItems: [URLQueryItem]) throws -> URL {
         guard let key = try? apiKeyManager.getGoogleApiKey(),
               var components = URLComponents(string: baseURL + endpoint) else { throw NetworkError.badUrl }
-        components.queryItems = queryItems + [URLQueryItem(name: "key", value: key)]
+        components.queryItems = queryItems + [URLQueryItem(name: Strings.key.rawValue, value: key)]
         guard let url = components.url else { throw NetworkError.badUrl }
         return url
     }

@@ -16,7 +16,7 @@ final class AppDependenciesTests: XCTestCase {
     func testFactoriesUseInjectedServicesAndStore() async throws {
         let service = WeatherDouble(), store = PlaceStoreDouble()
         let controller = PersistenceController(inMemory: true)
-        let dependencies = AppDependencies(weatherService: service, placesService: ControlledPlacesService(), placeStore: store, persistenceController: controller, locationManager: LocationManager(startAutomatically: false), coordinator: MainCoordinator(), fileManager: LocalFileManager(directory: nil), settingsManager: SettingsManager(canOpen: { _ in false }, open: { _ in }))
+        let dependencies = AppDependencies(weatherService: service, placesService: ControlledPlacesService(), placeStore: store, persistenceController: controller, locationManager: LocationManager(startAutomatically: false), coordinator: MainCoordinator(), fileManager: LocalFileManager(directory: nil), settingsManager: SettingsManager(canOpen: { _ in false }, open: { _ in }), iCloudManager: ICloudManager(persistence: controller))
         let forecast = dependencies.makeWeatherForecastViewModel()
         forecast.setPlace(place: testPlace)
         await forecast.loadWeatherData(showLoading: true)

@@ -53,8 +53,10 @@ final class LocationListViewTests: XCTestCase {
         controller.view.layoutIfNeeded()
     }
 
-    func testRendersWithInjectedDependencies() async throws {
+    func testRendersSavedLocationWithInjectedDependencies() async throws {
         let dependencies = AppDependencies.preview()
+        // Verify a persisted location, independent of simulator authorization callbacks.
+        try await dependencies.placeStore.savePlaceIntoDatabase(place: testPlace)
         assertVisibleContent(try await renderSnapshot(LocationListView(dependencies: dependencies), dependencies: dependencies))
     }
 }

@@ -24,7 +24,7 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func savePlaceIntoDatabase(place: SavedPlace) async throws {
-        try await persistence.performBackgroundTask { context in
+        try await persistence.performLocationChange { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", place.id)
             request.fetchLimit = 1
@@ -37,7 +37,6 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
             entity.addressComponents = try JSONEncoder().encode(place.addressComponents)
             entity.latitude = place.latitude
             entity.longitude = place.longitude
-            try context.save()
         }
     }
 
@@ -58,21 +57,19 @@ class PlaceCoreDataManager: PlaceCoreDataActions {
     }
 
     func deleteFromDatabase(place: SavedPlace) async throws {
-        try await persistence.performBackgroundTask { context in
+        try await persistence.performLocationChange { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", place.id)
             let records = try context.fetch(request)
             records.forEach { context.delete($0) }
-            try context.save()
         }
     }
 
     func clearAllFromDatabase() async throws {
-        try await persistence.performBackgroundTask { context in
+        try await persistence.performLocationChange { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
             let records = try context.fetch(request)
             records.forEach { context.delete($0) }
-            try context.save()
         }
     }
 }

@@ -23,6 +23,7 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.delegate = self
+        locationManagerDidChangeAuthorization(locationManager)
         if startAutomatically {
             locationManager.requestWhenInUseAuthorization()
         }

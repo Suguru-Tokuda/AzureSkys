@@ -13,6 +13,23 @@ import CoreLocation
 
 @MainActor
 final class AppDependenciesTests: XCTestCase {
+    func testReinstallRestoresSyncButPreservesExplicitOptOut() async throws {
+        let suite = "ReinstallTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let manager = ICloudManager(persistence: PersistenceController(inMemory: true), defaults: defaults)
+        try await manager.restoreSyncAfterReinstall(hasCloudLocations: { false })
+        XCTAssertNil(defaults.object(forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue))
+        try await manager.restoreSyncAfterReinstall(hasCloudLocations: { true })
+        XCTAssertTrue(defaults.bool(forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue))
+        defaults.set(false, forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue)
+        try await manager.restoreSyncAfterReinstall(hasCloudLocations: {
+            XCTFail("An explicit local preference must bypass cloud discovery")
+            return true
+        })
+        XCTAssertFalse(defaults.bool(forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue))
+    }
+
     func testFactoriesUseInjectedServicesAndStore() async throws {
         let service = WeatherDouble(), store = PlaceStoreDouble()
         let controller = PersistenceController(inMemory: true)

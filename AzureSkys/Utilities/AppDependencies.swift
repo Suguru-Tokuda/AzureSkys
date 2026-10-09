@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 import CoreLocation
 
 @MainActor
@@ -18,6 +19,7 @@ final class AppDependencies: ObservableObject {
     let coordinator: MainCoordinator
     let fileManager: LocalFileManager
     let settingsManager: SettingsManager
+    private var syncRestoreSubscription: AnyCancellable?
     let iCloudManager: ICloudManaging
 
     init(weatherService: WeatherServicing, placesService: PlacesServicing,
@@ -40,13 +42,27 @@ final class AppDependencies: ObservableObject {
         let networkManager = NetworkManager()
         let apiKeyManager = ApiKeyManager()
         let persistenceController = PersistenceController(syncEnabled: syncEnabled)
-        return AppDependencies(
+        let iCloudManager = ICloudManager(persistence: persistenceController)
+        Task {
+            do { try await iCloudManager.restoreSyncAfterReinstall() }
+            catch { persistenceController.reportSyncError(error) }
+        }
+        let dependencies = AppDependencies(
             weatherService: WeatherService(networkManager: networkManager, apiKeyManager: apiKeyManager),
             placesService: PlacesService(networkManager: networkManager, apiKeyManager: apiKeyManager),
             placeStore: PlaceCoreDataManager(persistence: persistenceController),
             persistenceController: persistenceController, locationManager: LocationManager(),
             coordinator: MainCoordinator(), fileManager: LocalFileManager(), settingsManager: SettingsManager(),
-            iCloudManager: ICloudManager(persistence: persistenceController))
+            iCloudManager: iCloudManager)
+        dependencies.syncRestoreSubscription = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+            .merge(with: NotificationCenter.default.publisher(for: .CKAccountChanged))
+            .sink { _ in
+                Task { @MainActor in
+                    do { try await iCloudManager.restoreSyncAfterReinstall() }
+                    catch { persistenceController.reportSyncError(error) }
+                }
+            }
+        return dependencies
     }
 
     static func preview(placesService: PlacesServicing? = nil) -> AppDependencies {

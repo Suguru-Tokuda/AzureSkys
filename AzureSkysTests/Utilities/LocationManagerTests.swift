@@ -38,6 +38,17 @@ final class LocationManagerTests: XCTestCase {
         }
     }
 
+    func testRelaunchWithExistingPermissionStartsUpdatesWithoutPrompt() {
+        for status in [CLAuthorizationStatus.authorizedWhenInUse, .authorizedAlways] {
+            let driver = LocationDriver()
+            driver.status = status
+            let manager = LocationManager(locationManager: driver)
+            XCTAssertEqual(manager.locationAuthorized, true)
+            XCTAssertTrue(driver.started)
+            XCTAssertFalse(driver.requested)
+        }
+    }
+
     func testGrantingPermissionStartsUpdatesAfterOnboardingRequest() {
         let driver = LocationDriver()
         let manager = LocationManager(locationManager: driver)

@@ -90,7 +90,15 @@ final class CloudKitLocationSync: CKSyncEngineDelegate, LocationSyncControlling 
             engine = syncEngine
             syncEngine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: LocationCloudRecord.zoneID))])
             try await enqueueLocalChanges()
+            // Restore immediately on activation rather than waiting for the
+            // automatic scheduler to fetch a new installation's empty store.
             persistence.reportSyncError(nil)
+            do {
+                try await syncEngine.fetchChanges()
+            } catch {
+                // Keep the engine active so its automatic retries can recover offline.
+                persistence.reportSyncError(error)
+            }
         } catch {
             if currentGeneration == generation { scheduleActivationRetry(error) }
             throw error

@@ -83,6 +83,7 @@ struct LocationViewCell: View {
             .foregroundStyle(.white)
             .shadow(color: .black.opacity(0.55), radius: 3, x: 0, y: 2)
         }
+        .contentShape(Rectangle())
         .listRowSeparator(.hidden)
         .listRowBackground(
             rowBackground

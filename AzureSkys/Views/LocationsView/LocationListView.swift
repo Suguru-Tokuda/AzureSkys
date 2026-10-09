@@ -31,9 +31,7 @@ struct LocationListView: View {
     var body: some View {
         ZStack {
             if isSearching {
-                Color
-                    .black
-                    .opacity(0.4)
+                BackGroundView()
                     .zIndex(2)
             }
             getLocationList()

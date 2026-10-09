@@ -15,6 +15,7 @@ struct LocationSearchResultListCellView: View {
             Text(prediction.description ?? "")
             Spacer()
         }
+        .contentShape(Rectangle())
     }
 }
 

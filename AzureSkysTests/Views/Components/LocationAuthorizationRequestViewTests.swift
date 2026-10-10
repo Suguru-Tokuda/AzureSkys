@@ -12,6 +12,12 @@ import SwiftUI
 @MainActor
 final class LocationAuthorizationRequestViewTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(LocationAuthorizationRequestView(settingsManager: SettingsManager(canOpen: { _ in false }, open: { _ in }))))
+        assertVisibleContent(
+            try await renderSnapshot(
+                LocationAuthorizationRequestView(
+                    settingsManager: SettingsManager(canOpen: { _ in false }, open: { _ in })
+                )
+            )
+        )
     }
 }

@@ -9,24 +9,29 @@ import Foundation
 
 protocol PlistActions {
     var resourceBundle: Bundle { get }
+
     func getData<T: Decodable>(resource: String, type: T.Type) throws -> T
 }
 
 extension PlistActions {
     var resourceBundle: Bundle { .main }
-    func getData<T: Decodable>(resource: String = ApiKeyManagerConstants.apiKeys, type: T.Type = ApiKeyModel.self) throws -> T {
+
+    func getData<T: Decodable>(resource: String = ApiKeyManagerConstants.apiKeys, type: T.Type = ApiKeyModel.self)
+        throws -> T
+    {
         do {
             if let url = resourceBundle.url(forResource: resource, withExtension: ApiKeyManagerConstants.plist) {
                 var data: Data
-                
+
                 do {
                     data = try Data(contentsOf: url)
                 } catch {
                     throw PlistError.url
                 }
-                
+
                 do {
                     let retVal = try PropertyListDecoder().decode(type.self, from: data)
+
                     return retVal
                 } catch {
                     throw PlistError.parse
@@ -47,6 +52,7 @@ protocol ApiKeyActions {
 
 class ApiKeyManager: ApiKeyActions, PlistActions {
     let resourceBundle: Bundle
+
     private let resource: String
 
     init(bundle: Bundle = .main, resource: String = ApiKeyManagerConstants.apiKeys) {
@@ -57,15 +63,17 @@ class ApiKeyManager: ApiKeyActions, PlistActions {
     func getGoogleApiKey() throws -> String {
         do {
             let apiKeyModel = try self.getData(resource: resource, type: ApiKeyModel.self)
+
             return apiKeyModel.googleApiKey
         } catch {
             throw PlistError.dataNotFound
         }
     }
-    
+
     func getOpenWeatherApiKey() throws -> String {
         do {
             let apiKeyModel = try self.getData(resource: resource, type: ApiKeyModel.self)
+
             return apiKeyModel.openWeatherApiKey
         } catch {
             throw PlistError.dataNotFound

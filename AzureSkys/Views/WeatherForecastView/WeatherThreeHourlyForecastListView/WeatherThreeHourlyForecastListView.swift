@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeatherThreeHourlyForecastListView: View {
     var forecast: WeatherForecastOneCallResponse
-    
+
     @ScaledMetric(relativeTo: .body) private var hourlyCellHeight: CGFloat = 100
 
     var body: some View {

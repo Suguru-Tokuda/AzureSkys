@@ -12,6 +12,9 @@ import SwiftUI
 @MainActor
 final class TempBarViewTests: XCTestCase {
     func testDisplayedStateChangesRenderedContent() async throws {
-        try await assertDifferent(TempBarView(minTemp: 270, maxTemp: 275, showAnimation: false).frame(height: 30), TempBarView(minTemp: 300, maxTemp: 320, showAnimation: false).frame(height: 30))
+        try await assertDifferent(
+            TempBarView(minTemp: 270, maxTemp: 275, showAnimation: false).frame(height: 30),
+            TempBarView(minTemp: 300, maxTemp: 320, showAnimation: false).frame(height: 30)
+        )
     }
 }

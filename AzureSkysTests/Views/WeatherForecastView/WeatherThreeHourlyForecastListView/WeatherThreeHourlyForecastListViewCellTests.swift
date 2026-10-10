@@ -12,6 +12,17 @@ import SwiftUI
 @MainActor
 final class WeatherThreeHourlyForecastListViewCellTests: XCTestCase {
     func testDisplayedStateChangesRenderedContent() async throws {
-        try await assertDifferent(WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.oneCallResponse.current, timezoneOffset: 0, isFirst: true), WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.oneCallResponse.current, timezoneOffset: 0, isFirst: false))
+        try await assertDifferent(
+            WeatherThreeHourlyForecastListViewCell(
+                forecast: PreviewManager.oneCallResponse.current,
+                timezoneOffset: 0,
+                isFirst: true
+            ),
+            WeatherThreeHourlyForecastListViewCell(
+                forecast: PreviewManager.oneCallResponse.current,
+                timezoneOffset: 0,
+                isFirst: false
+            )
+        )
     }
 }

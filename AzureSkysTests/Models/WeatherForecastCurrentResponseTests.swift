@@ -12,6 +12,7 @@ import XCTest
 final class WeatherForecastCurrentResponseTests: XCTestCase {
     func testCurrentForecastMapsProviderFields() throws {
         let value = try TestFixtures.current()
+
         XCTAssertEqual(value.dateTime, 1700000000)
         XCTAssertEqual(value.coordinate.latitude, 12.5)
         XCTAssertEqual(value.coordinate.longitude, -34.5)

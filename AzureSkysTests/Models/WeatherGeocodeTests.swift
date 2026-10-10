@@ -11,12 +11,19 @@ import XCTest
 
 final class WeatherGeocodeTests: XCTestCase {
     func testOptionalStateAndCoordinatesDecode() throws {
-        let value = try JSONDecoder().decode(WeatherGeocode.self, from: Data(#"{"name":"City","lat":12,"lon":34,"country":"US"}"#.utf8))
+        let value = try JSONDecoder().decode(
+            WeatherGeocode.self,
+            from: Data(#"{"name":"City","lat":12,"lon":34,"country":"US"}"#.utf8)
+        )
         XCTAssertEqual(value.latitude, 12)
         XCTAssertEqual(value.longitude, 34)
         XCTAssertEqual(value.country, "US")
         XCTAssertNil(value.state)
-        let withState = try JSONDecoder().decode(WeatherGeocode.self, from: Data(#"{"name":"City","lat":12,"lon":34,"country":"US","state":"IL"}"#.utf8))
+
+        let withState = try JSONDecoder().decode(
+            WeatherGeocode.self,
+            from: Data(#"{"name":"City","lat":12,"lon":34,"country":"US","state":"IL"}"#.utf8)
+        )
         XCTAssertEqual(withState.state, "IL")
     }
 }

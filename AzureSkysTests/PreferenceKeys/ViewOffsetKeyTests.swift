@@ -12,6 +12,7 @@ import SwiftUI
 final class ViewOffsetKeyTests: XCTestCase {
     func testOffsetsAccumulateFromZero() {
         var value = ViewOffsetKey.defaultValue
+
         ViewOffsetKey.reduce(value: &value) { 12 }
         ViewOffsetKey.reduce(value: &value) { -5 }
         XCTAssertEqual(value, 7)

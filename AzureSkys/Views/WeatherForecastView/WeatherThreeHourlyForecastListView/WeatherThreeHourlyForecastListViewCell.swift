@@ -12,16 +12,22 @@ struct WeatherThreeHourlyForecastListViewCell: View {
     var forecast: Forecast
     var timezoneOffset: Int
     var isFirst: Bool
-    
+
     var body: some View {
         VStack {
-            Text(isFirst ? Strings.now.rawValue : forecast
-                                    .dateTime
-                                    .unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset)
-                                    .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha"))
+            Text(
+                isFirst
+                    ? Strings.now.rawValue
+                    : forecast
+                        .dateTime
+                        .unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset)
+                        .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha")
+            )
+
             if let weather = forecast.weather.first {
                 WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 40)
             }
+
             Text(forecast.temp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
         }
         .fontWeight(.bold)
@@ -29,10 +35,11 @@ struct WeatherThreeHourlyForecastListViewCell: View {
 }
 
 #Preview {
-    WeatherThreeHourlyForecastListViewCell(forecast: PreviewManager.oneCallResponse.current,
-                                           timezoneOffset: 0,
-                                           isFirst: false
+    WeatherThreeHourlyForecastListViewCell(
+        forecast: PreviewManager.oneCallResponse.current,
+        timezoneOffset: 0,
+        isFirst: false
     )
-        .environmentObject(LocalFileManager())
-        .preferredColorScheme(.dark)
+    .environmentObject(LocalFileManager())
+    .preferredColorScheme(.dark)
 }

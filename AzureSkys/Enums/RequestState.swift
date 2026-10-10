@@ -22,7 +22,10 @@ enum RequestState<Value> {
     }
 
     var error: NetworkError? {
-        if case .failed(let error, _) = self { return error }
+        if case .failed(let error, _) = self {
+            return error
+        }
+
         return nil
     }
 
@@ -36,6 +39,7 @@ enum RequestState<Value> {
 
     mutating func dismissError() {
         guard error != nil else { return }
+
         self = value.map(Self.loaded) ?? .idle
     }
 }

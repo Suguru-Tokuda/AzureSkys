@@ -12,6 +12,7 @@ import XCTest
 final class MainCoordinatorTests: XCTestCase {
     func testSelectingSavedPlaceClosesLocationsAndUpdatesMainForecast() {
         let coordinator = MainCoordinator()
+
         coordinator.goToLocations()
         coordinator.selectLocation(testPlace)
         XCTAssertNil(coordinator.fullScreenDestination)
@@ -23,6 +24,7 @@ final class MainCoordinatorTests: XCTestCase {
 
     func testNestedPreviewDismissalPreservesLocations() {
         let coordinator = MainCoordinator()
+
         coordinator.goToLocations()
         coordinator.previewForecast(place: testPlace)
         XCTAssertEqual(coordinator.forecastPreview?.place, testPlace)
@@ -33,6 +35,7 @@ final class MainCoordinatorTests: XCTestCase {
 
     func testRootForecastCarriesPlaceWithoutChangingMainSelection() {
         let coordinator = MainCoordinator()
+
         coordinator.selectLocation(testPlace)
         XCTAssertEqual(coordinator.fullScreenDestination?.id, "forecast:saved:test-city")
         XCTAssertNil(coordinator.selectedLocation.place)

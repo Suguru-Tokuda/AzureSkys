@@ -9,9 +9,9 @@ import Foundation
 
 enum PlistError: String, Error {
     case parse,
-         url,
-         path,
-         dataNotFound
+        url,
+        path,
+        dataNotFound
 }
 
 extension PlistError: LocalizedError {

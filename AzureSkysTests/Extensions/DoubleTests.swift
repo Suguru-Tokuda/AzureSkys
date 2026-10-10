@@ -20,6 +20,7 @@ final class DoubleTests: XCTestCase {
 
     func testFormattingHonorsFractionLimit() {
         let formatter = NumberFormatter()
+
         formatter.maximumFractionDigits = 1
         XCTAssertEqual(12.345.formatDouble(maxFractions: 1), formatter.string(from: 12.345))
         XCTAssertEqual(12.0.formatDouble(maxFractions: 0), "12")

@@ -13,9 +13,11 @@ final class OnboardingCoordiantor: ObservableObject {
     private let onFinished: () -> Void
     private var hasFinished = false
 
-    init(dependencies: AppDependencies,
-         initialStep: OnboardingStep = .location,
-         onFinished: @escaping () -> Void) {
+    init(
+        dependencies: AppDependencies,
+        initialStep: OnboardingStep = .location,
+        onFinished: @escaping () -> Void
+    ) {
         self.dependencies = dependencies
         self.currentStep = initialStep
         self.onFinished = onFinished
@@ -23,9 +25,11 @@ final class OnboardingCoordiantor: ObservableObject {
 
     func nextStep() {
         guard !hasFinished else { return }
+
         switch currentStep {
         case .location:
             currentStep = .cloudSync
+
         case .cloudSync:
             hasFinished = true
             onFinished()

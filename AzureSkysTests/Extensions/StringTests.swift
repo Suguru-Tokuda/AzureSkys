@@ -19,6 +19,7 @@ final class StringTests: XCTestCase {
     func testInvalidDateFallsBackToCurrentTime() {
         let before = Date()
         let date = "invalid".getDate(dateFormat: "yyyy-MM-dd")
+
         XCTAssertGreaterThanOrEqual(date, before)
         XCTAssertLessThanOrEqual(date, Date())
     }

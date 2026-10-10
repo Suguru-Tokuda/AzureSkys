@@ -12,24 +12,33 @@ struct WeatherDailyForecastListCellView: View {
     var forecast: DailyForecast
     var timezoneOffset: Int
     var showTempBarAnimation: Bool = true
-    
+
     var body: some View {
         ZStack {
             Color.clear
                 .blur(radius: 3.0, opaque: false)
             HStack(alignment: .center, spacing: 20) {
-                Text(forecast.dateTime.unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset) .getDate(dateFormat: Constants.dateFormat).getWeekDayStr())
-                    .frame(width: 50, alignment: .leading)
+                Text(
+                    forecast.dateTime.unixTimeToDateStr(
+                        dateFormat: Constants.dateFormat,
+                        timezoneOffset: timezoneOffset
+                    ).getDate(dateFormat: Constants.dateFormat).getWeekDayStr()
+                )
+                .frame(width: 50, alignment: .leading)
+
                 if let weather = forecast.weather.first {
                     WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 40)
                 }
+
                 Text(forecast.temp.min.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
                     .foregroundStyle(.white.opacity(0.5))
-                TempBarView(minTemp: forecast.temp.min,
-                            maxTemp: forecast.temp.max,
-                            height: 5,
-                            showAnimation: showTempBarAnimation)
-                    .padding(.top, 18)
+                TempBarView(
+                    minTemp: forecast.temp.min,
+                    maxTemp: forecast.temp.max,
+                    height: 5,
+                    showAnimation: showTempBarAnimation
+                )
+                .padding(.top, 18)
                 Text(forecast.temp.max.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree())
             }
             .fontWeight(.semibold)
@@ -39,8 +48,10 @@ struct WeatherDailyForecastListCellView: View {
 }
 
 #Preview {
-    WeatherDailyForecastListCellView(forecast: PreviewManager.oneCallResponse.daily.first!,
-                                     timezoneOffset: 0)
-        .environmentObject(LocalFileManager())
-        .preferredColorScheme(.dark)
+    WeatherDailyForecastListCellView(
+        forecast: PreviewManager.oneCallResponse.daily.first!,
+        timezoneOffset: 0
+    )
+    .environmentObject(LocalFileManager())
+    .preferredColorScheme(.dark)
 }

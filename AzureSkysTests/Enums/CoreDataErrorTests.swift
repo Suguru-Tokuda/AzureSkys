@@ -13,6 +13,7 @@ final class CoreDataErrorTests: XCTestCase {
     func testEveryErrorHasDistinctUserFacingDescription() {
         let errors: [CoreDataError] = [.save, .fetch, .delete]
         let descriptions = errors.map { $0.localizedDescription }
+
         XCTAssertTrue(descriptions.allSatisfy { !$0.isEmpty })
         XCTAssertEqual(Set(descriptions).count, errors.count)
     }

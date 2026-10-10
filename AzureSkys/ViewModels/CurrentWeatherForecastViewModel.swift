@@ -14,19 +14,22 @@ class CurrentWeatherForecastViewModel: ObservableObject {
     @Published private(set) var requestState: RequestState<WeatherForecastCurrentResponse> = .idle
     var currentForecast: WeatherForecastCurrentResponse? { requestState.value }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
+
     @Published var locationAuthorized: Bool?
     var place: SavedPlace?
-    
+
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
 
     private let weatherService: WeatherServicing
+
     var locationManager: LocationManager?
 
     private var wasInactive = false
 
     func didBecomeActive() {
         guard wasInactive else { return }
+
         wasInactive = false
         startDataRefreshTimer(showLoading: false)
     }
@@ -63,9 +66,13 @@ class CurrentWeatherForecastViewModel: ObservableObject {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] receiveVal in
                     guard let self else { return }
+
                     locationAuthorized = receiveVal.0
+
                     let receivedFirstLocation = currentLocation == nil && receiveVal.1 != nil
+
                     currentLocation = receiveVal.1
+
                     if receivedFirstLocation && refreshScheduler.isRunning {
                         startDataRefreshTimer()
                     }
@@ -76,31 +83,45 @@ class CurrentWeatherForecastViewModel: ObservableObject {
 
     func getCurrentWeatherDataWithCurrentLocation(showLoading: Bool = true) async {
         guard let currentLocation else { return }
+
         await getCurrentWeatherData(coordinate: currentLocation.coordinate, showLoading: showLoading)
     }
 
     func getCurrentWeatherDataWithCityData(showLoading: Bool = true) async {
         guard let place else { return }
-        let coordinate = CLLocationCoordinate2D(latitude: place.latitude,
-                                                longitude: place.longitude)
+
+        let coordinate = CLLocationCoordinate2D(
+            latitude: place.latitude,
+            longitude: place.longitude
+        )
         await getCurrentWeatherData(coordinate: coordinate, showLoading: showLoading)
     }
 
     private func getCurrentWeatherData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
-        guard !Task.isCancelled else { return }
-        if case .loading = requestState { return }
+        guard !Task.isCancelled else {
+            return
+        }
+
+        if case .loading = requestState {
+            return
+        }
+
         let previous = requestState.value
+
         requestState = .loading(previous: showLoading ? nil : previous)
 
         do {
             let response = try await weatherService.getCurrentWeather(coordinate: coordinate)
+
             try Task.checkCancellation()
             requestState = .loaded(response)
         } catch {
             guard !Task.isCancelled else {
                 requestState = previous.map(RequestState.loaded) ?? .idle
+
                 return
             }
+
             requestState = .failed(NetworkError(error), previous: previous)
         }
     }
@@ -112,7 +133,7 @@ class CurrentWeatherForecastViewModel: ObservableObject {
             await getCurrentWeatherDataWithCurrentLocation(showLoading: showLoading)
         }
     }
-    
+
 }
 
 // MARK: Refresh scheduling

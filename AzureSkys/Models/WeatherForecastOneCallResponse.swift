@@ -15,15 +15,15 @@ struct WeatherForecastOneCallResponse: Decodable {
     let current: Forecast
     let hourly: [Forecast]
     let daily: [DailyForecast]
-    
+
     enum CodingKeys: String, CodingKey {
         case latitude = "lat",
-             longitude = "lon",
-             timezone,
-             timezoneOffset = "timezone_offset",
-             current,
-             hourly,
-             daily
+            longitude = "lon",
+            timezone,
+            timezoneOffset = "timezone_offset",
+            current,
+            hourly,
+            daily
     }
 }
 
@@ -45,7 +45,7 @@ struct Forecast: Decodable, Identifiable {
     let windGust: Double?
     let weather: [Weather]
     let probabilityOfPrecipitation: Float?
-    
+
     enum CodingKeys: String, CodingKey {
         case dateTime = "dt"
         case sunrise

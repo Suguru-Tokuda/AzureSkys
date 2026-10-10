@@ -28,7 +28,8 @@ enum Strings: String {
     case onboardingICloudSetupReturn = "Return here—we’ll check iCloud access automatically."
     case weatherWhereYouAre = "Weather where\nyou are"
     case iCloudCheckError = "Couldn't check iCloud availabbility. Try again."
-    case locationAccessDescription = "Allow location access to see your local forecast. You can also add cities manually."
+    case locationAccessDescription =
+        "Allow location access to see your local forecast. You can also add cities manually."
     case allowLocation = "Allow Location"
     case chooseCitiesInstead = "Choose Cities Instead"
     case yourPlacesEverywhere = "Your places, everywhere"
@@ -49,7 +50,8 @@ enum Strings: String {
     case temperature = "Temperature"
     case temperatureUnit = "Temperature unit"
     case iCloudSync = "iCloud Sync"
-    case iCloudUnavailableDescription = "iCloud is unavailable. Check your Apple Account and this app's iCloud access in Settings."
+    case iCloudUnavailableDescription =
+        "iCloud is unavailable. Check your Apple Account and this app's iCloud access in Settings."
     case settings = "Settings"
     case locationAccess = "Location Access"
     case enableLocation = "Enable Location"
@@ -121,24 +123,31 @@ enum Strings: String {
     static func appendingDegree(_ value: String) -> String {
         "\(value)\u{00B0}"
     }
+
     static func degreePrefixedUnit(_ unit: String) -> String {
         "°\(unit)"
     }
+
     static func highTemperature(_ temperature: String) -> String {
         "H:\(temperature)"
     }
+
     static func lowTemperature(_ temperature: String) -> String {
         "L:\(temperature)"
     }
+
     static func miles(_ distance: String) -> String {
         "\(distance) mi"
     }
+
     static func humidityValue(_ humidity: String) -> String {
         "\(humidity) %"
     }
+
     static func pressureValue(_ pressure: String) -> String {
         "\(pressure) hPa"
     }
+
     static func percentage(_ value: String) -> String {
         "\(value)%"
     }

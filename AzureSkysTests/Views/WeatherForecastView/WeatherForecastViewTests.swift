@@ -13,6 +13,9 @@ import SwiftUI
 final class WeatherForecastViewTests: XCTestCase {
     func testRendersWithInjectedDependencies() async throws {
         let dependencies = AppDependencies.preview()
-        assertVisibleContent(try await renderSnapshot(WeatherForecastView(dependencies: dependencies), dependencies: dependencies))
+
+        assertVisibleContent(
+            try await renderSnapshot(WeatherForecastView(dependencies: dependencies), dependencies: dependencies)
+        )
     }
 }

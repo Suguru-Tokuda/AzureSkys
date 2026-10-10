@@ -11,8 +11,16 @@ import XCTest
 
 final class GooglePlaceDetailsResponseTests: XCTestCase {
     func testProviderGeometryAndAddressMappings() throws {
-        let details = GooglePlaceDetails(id: "city", formattedAddress: "City, USA", geometry: .init(location: .init(latitude: 12, longitude: 34)), name: "City", addressComponents: [.init(longName: "City", shortName: "C", types: ["locality"])])
+        let details = GooglePlaceDetails(
+            id: "city",
+            formattedAddress: "City, USA",
+            geometry: .init(location: .init(latitude: 12, longitude: 34)),
+            name: "City",
+            addressComponents: [.init(longName: "City", shortName: "C", types: ["locality"])]
+        )
+
         let saved = SavedPlace(details: details)
+
         XCTAssertEqual(saved.id, details.id)
         XCTAssertEqual(saved.name, details.name)
         XCTAssertEqual(saved.latitude, 12)
@@ -21,6 +29,8 @@ final class GooglePlaceDetailsResponseTests: XCTestCase {
     }
 
     func testInvalidResponseIsRejected() {
-        XCTAssertThrowsError(try JSONDecoder().decode(GooglePlaceDetailsResponse.self, from: Data(#"{"result":{}}"#.utf8)))
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(GooglePlaceDetailsResponse.self, from: Data(#"{"result":{}}"#.utf8))
+        )
     }
 }

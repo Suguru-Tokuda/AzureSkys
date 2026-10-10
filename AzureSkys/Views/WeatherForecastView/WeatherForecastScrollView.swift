@@ -23,7 +23,7 @@ struct WeatherForecastScrollView: View {
         GeometryReader { _ in
             ScrollView {
                 if let geocode = geocode,
-                   let forecast = forecast
+                    let forecast = forecast
                 {
                     VStack {
                         WeatherForecastHeaderView(
@@ -38,9 +38,11 @@ struct WeatherForecastScrollView: View {
 
                         StatusListView(forecast: forecast.current)
 
-                        WeatherDailyForecastListView(list: forecast.daily,
-                                                     timezoneOffset: forecast.timezoneOffset,
-                                                     showAnimation: self.showAnimation)
+                        WeatherDailyForecastListView(
+                            list: forecast.daily,
+                            timezoneOffset: forecast.timezoneOffset,
+                            showAnimation: self.showAnimation
+                        )
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 20)
@@ -55,8 +57,10 @@ struct WeatherForecastScrollView: View {
 }
 
 #Preview {
-    WeatherForecastScrollView(forecast: PreviewManager.oneCallResponse,
-                            geocode: PreviewManager.geocode)
-        .preferredColorScheme(.dark)
-        .environmentObject(MainCoordinator())
+    WeatherForecastScrollView(
+        forecast: PreviewManager.oneCallResponse,
+        geocode: PreviewManager.geocode
+    )
+    .preferredColorScheme(.dark)
+    .environmentObject(MainCoordinator())
 }

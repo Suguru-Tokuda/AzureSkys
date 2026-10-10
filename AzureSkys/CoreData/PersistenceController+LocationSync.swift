@@ -22,26 +22,41 @@ extension PersistenceController {
                 guard let id = row.value(forKey: "id") as? String,
                     let action = row.value(forKey: "action") as? String
                 else { return nil }
+
                 let storedRevision = row.value(forKey: "revision") as? String
                 let revision = storedRevision ?? UUID().uuidString
-                if storedRevision == nil { row.setValue(revision, forKey: "revision") }
+
+                if storedRevision == nil {
+                    row.setValue(revision, forKey: "revision")
+                }
+
                 return PendingLocationChange(id: id, action: action, revision: revision)
             }
-            if context.hasChanges { try context.save() }
+
+            if context.hasChanges {
+                try context.save()
+            }
+
             return changes
         }
+
         pendingUploadCount = changes.count
+
         return changes
     }
 
     func recordForSync(_ id: String) async throws -> CKRecord? {
         try await performBackgroundTask { context in
             let request: NSFetchRequest<PlaceEntity> = PlaceEntity.fetchRequest()
+
             request.predicate = NSPredicate(format: "id == %@", id)
+
             guard let entity = try context.fetch(request).first, let place = SavedPlace(from: entity) else {
                 return nil
             }
+
             let state = try Self.recordState(id, in: context)
+
             return try LocationCloudRecord.make(place, systemFields: state?.value(forKey: "data") as? Data)
         }
     }
@@ -49,18 +64,32 @@ extension PersistenceController {
     func applyRemoteLocations(_ records: [CKRecord], deletedIDs: [CKRecord.ID]) async throws {
         // Decode before changing any local objects: malformed batches must not partially commit.
         let places = try records.map { try LocationCloudRecord.place(from: $0) }
+
         try await performBackgroundTask { context in
             let actions = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "LocalSyncAction"))
             let pendingIDs = Set(actions.compactMap { $0.value(forKey: "id") as? String })
+
             for (place, record) in zip(places, records) {
                 try Self.cacheRecord(record, in: context)
-                if !pendingIDs.contains(place.id) { try Self.upsert(place, in: context) }
+
+                if !pendingIDs.contains(place.id) {
+                    try Self.upsert(place, in: context)
+                }
             }
+
             for recordID in deletedIDs where recordID.zoneID == LocationCloudRecord.zoneID {
-                if let state = try Self.recordState(recordID.recordName, in: context) { context.delete(state) }
-                if !pendingIDs.contains(recordID.recordName) { try Self.delete(recordID.recordName, in: context) }
+                if let state = try Self.recordState(recordID.recordName, in: context) {
+                    context.delete(state)
+                }
+
+                if !pendingIDs.contains(recordID.recordName) {
+                    try Self.delete(recordID.recordName, in: context)
+                }
             }
-            if context.hasChanges { try context.save() }
+
+            if context.hasChanges {
+                try context.save()
+            }
         }
     }
 
@@ -68,20 +97,36 @@ extension PersistenceController {
         async throws
     {
         try await performBackgroundTask { context in
-            for record in saved { try Self.cacheRecord(record, in: context) }
-            for id in deleted {
-                if let state = try Self.recordState(id.recordName, in: context) { context.delete(state) }
+            for record in saved {
+                try Self.cacheRecord(record, in: context)
             }
+
+            for id in deleted {
+                if let state = try Self.recordState(id.recordName, in: context) {
+                    context.delete(state)
+                }
+            }
+
             let request = NSFetchRequest<NSManagedObject>(entityName: "LocalSyncAction")
+
             for row in try context.fetch(request) {
                 guard let id = row.value(forKey: "id") as? String, let change = sent[id],
                     change.revision == row.value(forKey: "revision") as? String
-                else { continue }
+                else {
+                    continue
+                }
+
                 let savedOK = change.action == "upsert" && saved.contains { $0.recordID.recordName == id }
                 let deletedOK = change.action == "delete" && deleted.contains { $0.recordName == id }
-                if savedOK || deletedOK { context.delete(row) }
+
+                if savedOK || deletedOK {
+                    context.delete(row)
+                }
             }
-            if context.hasChanges { try context.save() }
+
+            if context.hasChanges {
+                try context.save()
+            }
         }
     }
 
@@ -94,8 +139,13 @@ extension PersistenceController {
 
     func clearServerRecord(_ id: String) async throws {
         try await performBackgroundTask { context in
-            if let state = try Self.recordState(id, in: context) { context.delete(state) }
-            if context.hasChanges { try context.save() }
+            if let state = try Self.recordState(id, in: context) {
+                context.delete(state)
+            }
+
+            if context.hasChanges {
+                try context.save()
+            }
         }
     }
 
@@ -106,14 +156,19 @@ extension PersistenceController {
                     context.delete(state)
                 }
             }
+
             let actions = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "LocalSyncAction"))
             let pendingIDs = Set(actions.compactMap { $0.value(forKey: "id") as? String })
+
             for place in try context.fetch(PlaceEntity.fetchRequest()) {
                 if let id = place.id, !pendingIDs.contains(id) {
                     try Self.markPending(id, action: "upsert", in: context)
                 }
             }
-            if context.hasChanges { try context.save() }
+
+            if context.hasChanges {
+                try context.save()
+            }
         }
     }
 
@@ -122,12 +177,16 @@ extension PersistenceController {
             let actions = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "LocalSyncAction"))
             let pendingIDs = Set(actions.compactMap { $0.value(forKey: "id") as? String })
             var existingIDs = Set(try context.fetch(PlaceEntity.fetchRequest()).compactMap(\.id))
+
             for place in places where !pendingIDs.contains(place.id) && !existingIDs.contains(place.id) {
                 try Self.upsert(place, in: context)
                 try Self.markPending(place.id, action: "upsert", in: context)
                 existingIDs.insert(place.id)
             }
-            if context.hasChanges { try context.save() }
+
+            if context.hasChanges {
+                try context.save()
+            }
         }
     }
 
@@ -138,12 +197,15 @@ extension PersistenceController {
         {
             throw LocationSyncError.differentAccount
         }
+
         try setMetadata("syncAccount", data: Data(accountID.utf8))
     }
 
     private static func recordState(_ id: String, in context: NSManagedObjectContext) throws -> NSManagedObject? {
         let request = NSFetchRequest<NSManagedObject>(entityName: "LocalCloudRecord")
+
         request.predicate = NSPredicate(format: "id == %@", id)
+
         return try context.fetch(request).first
     }
 
@@ -152,6 +214,7 @@ extension PersistenceController {
         else {
             throw LocationSyncError.invalidRecord
         }
+
         let state =
             try recordState(record.recordID.recordName, in: context)
             ?? NSEntityDescription.insertNewObject(forEntityName: "LocalCloudRecord", into: context)

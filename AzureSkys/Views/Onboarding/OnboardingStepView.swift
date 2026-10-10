@@ -19,6 +19,7 @@ struct OnboardingStepView<Content: View>: View {
     let shouldShowDisableButton: Bool
     let usesCompactLayout: Bool
     let onButtonClick: ((Bool) -> Void)?
+
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize = 36
 
     init(

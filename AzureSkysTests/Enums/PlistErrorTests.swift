@@ -13,6 +13,7 @@ final class PlistErrorTests: XCTestCase {
     func testEveryErrorHasDistinctUserFacingDescription() {
         let errors: [PlistError] = [.parse, .url, .path, .dataNotFound]
         let descriptions = errors.map { $0.localizedDescription }
+
         XCTAssertTrue(descriptions.allSatisfy { !$0.isEmpty })
         XCTAssertEqual(Set(descriptions).count, errors.count)
     }

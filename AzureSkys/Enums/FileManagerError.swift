@@ -9,9 +9,9 @@ import Foundation
 
 enum FileManagerError: Error {
     case data,
-         badPath,
-         save,
-         retrieve
+        badPath,
+        save,
+        retrieve
 }
 
 extension FileManagerError: LocalizedError {
@@ -19,10 +19,13 @@ extension FileManagerError: LocalizedError {
         switch self {
         case .data:
             return NSLocalizedString(Strings.dataParsingError.rawValue, comment: "data")
+
         case .badPath:
             return NSLocalizedString(Strings.filePathError.rawValue, comment: "badPath")
+
         case .save:
             return NSLocalizedString(Strings.fileSaveError.rawValue, comment: "save")
+
         case .retrieve:
             return NSLocalizedString(Strings.fileRetrieveError.rawValue, comment: "retrieve")
         }

@@ -12,6 +12,10 @@ import SwiftUI
 @MainActor
 final class LocationSearchResultListViewTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(LocationSearchResultListView(predictions: Array(PreviewManager.predictions.prefix(1)))))
+        assertVisibleContent(
+            try await renderSnapshot(
+                LocationSearchResultListView(predictions: Array(PreviewManager.predictions.prefix(1)))
+            )
+        )
     }
 }

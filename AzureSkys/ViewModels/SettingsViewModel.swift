@@ -20,16 +20,21 @@ final class SettingsViewModel: ObservableObject {
     @Published var tempScale: TempScale = .fahrenheit {
         didSet { UserDefaults.standard.set(tempScale.rawValue, forKey: UserDefaultKeys.tempScale.rawValue) }
     }
+
     @Published private(set) var iCloudSyncEnabled = false
 
     private func refreshPreferences() {
         let defaults = UserDefaults.standard
+
         if let value = defaults.string(forKey: UserDefaultKeys.tempScale.rawValue),
-           let scale = TempScale(rawValue: value), scale != tempScale {
+            let scale = TempScale(rawValue: value), scale != tempScale
+        {
             tempScale = scale
         }
+
         iCloudSyncEnabled = defaults.bool(forKey: UserDefaultKeys.iCloudSyncEnabled.rawValue)
     }
+
     private let persistence: PersistenceController?
     private let locationManager: LocationManager?
     private let settingsManager: SettingsManager?
@@ -50,13 +55,18 @@ final class SettingsViewModel: ObservableObject {
 
     func manageLocationAccess() {
         guard let locationManager else { return }
+
         settingsManager?.manageLocationAccess(locationManager: locationManager)
     }
 
     private let iCloudManager: any ICloudManaging
 
-    init(iCloudManager: any ICloudManaging, persistence: PersistenceController? = nil,
-         locationManager: LocationManager? = nil, settingsManager: SettingsManager? = nil) {
+    init(
+        iCloudManager: any ICloudManaging,
+        persistence: PersistenceController? = nil,
+        locationManager: LocationManager? = nil,
+        settingsManager: SettingsManager? = nil
+    ) {
         self.iCloudManager = iCloudManager
         self.persistence = persistence
         self.locationManager = locationManager
@@ -73,16 +83,23 @@ final class SettingsViewModel: ObservableObject {
         NotificationCenter.default.publisher(for: .CKAccountChanged)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                Task { await self?.refreshICloudAvailability() }
+                Task {
+                    await self?.refreshICloudAvailability()
+                }
             }
             .store(in: &subscriptions)
     }
 
     func setSyncEnabled(_ enabled: Bool) async {
         guard !isUpdatingSync, !enabled || isICloudAvailable else { return }
+
         isUpdatingSync = true
         syncError = nil
-        defer { isUpdatingSync = false }
+
+        defer {
+            isUpdatingSync = false
+        }
+
         do {
             try await iCloudManager.setEnabled(enabled)
             refreshPreferences()

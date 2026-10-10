@@ -42,11 +42,13 @@ struct StatusListCell: View {
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.7))
             }
+
             if let parameterString {
                 Text(parameterString)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.white)
             }
+
             if let footnoteString {
                 Text(footnoteString)
                     .font(.caption)

@@ -20,14 +20,21 @@ actor ControlledPlacesService: PlacesServicing {
     }
 
     func waitForRequest(_ query: String) async {
-        if requests[query] != nil { return }
+        if requests[query] != nil {
+            return
+        }
+
         await withCheckedContinuation { waiters[query] = $0 }
     }
 
     func finish(_ query: String, error: NetworkError? = nil) {
         let continuation = requests.removeValue(forKey: query)
-        if let error { continuation?.resume(throwing: error) }
-        else { continuation?.resume(returning: [.init(id: UUID(), description: query, placeId: query)]) }
+
+        if let error {
+            continuation?.resume(throwing: error)
+        } else {
+            continuation?.resume(returning: [.init(id: UUID(), description: query, placeId: query)])
+        }
     }
 
     func getPlaceDetails(placeID: String) async throws -> SavedPlace {

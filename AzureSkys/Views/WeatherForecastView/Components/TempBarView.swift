@@ -45,15 +45,20 @@ struct TempBarView: View {
         if minTemp.isFinite && maxTemp.isFinite && minTemp <= maxTemp {
             while current <= maxTemp {
                 let tempColor = TempColor.getTempColor(tempInKelvin: current)
+
                 if !tempColors.contains(tempColor) {
                     tempColors.append(tempColor)
                 }
+
                 current += 1
             }
         }
 
-        return LinearGradient(colors: tempColors.map { $0.getColor() },
-                              startPoint: .leading, endPoint: .trailing)
+        return LinearGradient(
+            colors: tempColors.map { $0.getColor() },
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 }
 

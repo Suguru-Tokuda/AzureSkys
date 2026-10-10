@@ -11,13 +11,16 @@ struct WeatherForecastView: View {
     @EnvironmentObject var coordinator: MainCoordinator
     @EnvironmentObject var locationManager: LocationManager
     let dependencies: AppDependencies
+
     @StateObject var vm: WeatherForecastViewModel
     @State var scrollViewOffset: CGFloat = .zero
     let location: ForecastLocation
     let presentation: Presentation
+
     private var place: SavedPlace? { location.place }
 
     enum Presentation { case main, preview, fullScreen }
+
     var coordinateSpaceName = WeatherViewIdentifiers.weatherScroll
 
     init(dependencies: AppDependencies, location: ForecastLocation = .current, presentation: Presentation = .main) {
@@ -31,7 +34,8 @@ struct WeatherForecastView: View {
         ZStack {
             GeometryReader { geometry in
                 if let forecast = vm.forecast,
-                   let weather = forecast.current.weather.first {
+                    let weather = forecast.current.weather.first
+                {
                     weather.weatherCondition.getBackgroundImage(
                         partOfDay: weather.partOfDay,
                         clouds: forecast.current.clouds ?? 0
@@ -41,6 +45,7 @@ struct WeatherForecastView: View {
                 }
             }
             .ignoresSafeArea()
+
             if let networkError = vm.networkError {
                 RetryView(errorMessage: networkError.localizedDescription) {
                     vm.startDataRefreshTimer()
@@ -62,21 +67,38 @@ struct WeatherForecastView: View {
             vm.setPlace(place: place)
             vm.startDataRefreshTimer()
         }
-        .alert(isPresented: Binding(get: { vm.coreDataError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.coreDataError) {
-            Button(action: {
-                vm.dismissError()
-            }, label: {
-                Text(Strings.ok.rawValue)
-            })
+        .alert(
+            isPresented: Binding(
+                get: { vm.coreDataError != nil },
+                set: {
+                    if !$0 {
+                        vm.dismissError()
+                    }
+                }
+            ),
+            error: vm.coreDataError
+        ) {
+            Button(
+                action: {
+                    vm.dismissError()
+                },
+                label: {
+                    Text(Strings.ok.rawValue)
+                }
+            )
         }
-        .onReceive(NotificationCenter
-                    .default
-                    .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+        .onReceive(
+            NotificationCenter
+                .default
+                .publisher(for: UIApplication.didBecomeActiveNotification)
+        ) { _ in
             vm.didBecomeActive()
         }
-        .onReceive(NotificationCenter
-                    .default
-                    .publisher(for: UIApplication.willResignActiveNotification)) { _ in
+        .onReceive(
+            NotificationCenter
+                .default
+                .publisher(for: UIApplication.willResignActiveNotification)
+        ) { _ in
             vm.willResignActive()
         }
         .background {
@@ -89,22 +111,26 @@ extension WeatherForecastView {
     @ViewBuilder func navigationControls() -> some View {
         Group {
             if presentation == .preview {
-                WeatherForecastAddHeaderView(cancelBtnTapped: {
-                    coordinator.dismissForecast()
-                },
-                addBtnTapped: {
-                    vm.addPlace(place: place) { result in
-                        switch result {
-                        case .success(let added):
-                            if added == true {
-                                coordinator.dismissForecast()
+                WeatherForecastAddHeaderView(
+                    cancelBtnTapped: {
+                        coordinator.dismissForecast()
+                    },
+                    addBtnTapped: {
+                        vm.addPlace(place: place) { result in
+                            switch result {
+                            case .success(let added):
+                                if added == true {
+                                    coordinator.dismissForecast()
+                                }
+
+                                break
+
+                            case .failure(_):
+                                break
                             }
-                            break
-                        case .failure(_):
-                            break
                         }
                     }
-                })
+                )
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
             } else if presentation == .fullScreen {
@@ -137,13 +163,15 @@ extension WeatherForecastView {
 
     @ViewBuilder func forecastView() -> some View {
         if vm.loadingStatus == .loaded {
-            WeatherForecastScrollView(forecast: vm.forecast,
-                                      geocode: vm.geocode,
-                                      isMyLocation: place == nil,
-                                      showAnimation: vm.showForecastAnimation,
-                                      onRefresh: {
-                vm.startDataRefreshTimer()
-            })
+            WeatherForecastScrollView(
+                forecast: vm.forecast,
+                geocode: vm.geocode,
+                isMyLocation: place == nil,
+                showAnimation: vm.showForecastAnimation,
+                onRefresh: {
+                    vm.startDataRefreshTimer()
+                }
+            )
         } else if vm.loadingStatus == .loading {
             ProgressView(Strings.loading.rawValue)
         }
@@ -152,6 +180,7 @@ extension WeatherForecastView {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     NavigationStack {
         WeatherForecastView(dependencies: dependencies)
     }

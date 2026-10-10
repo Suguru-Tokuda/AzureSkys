@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LocationSearchResultListCellView: View {
     var prediction: Prediction
-    
+
     var body: some View {
         HStack {
             Text(prediction.description ?? "")

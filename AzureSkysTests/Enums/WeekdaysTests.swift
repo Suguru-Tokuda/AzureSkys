@@ -12,7 +12,11 @@ import XCTest
 final class WeekdaysTests: XCTestCase {
     func testAllCalendarValuesAndInvalidFallback() {
         let expected: [Weekdays] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
-        for (index, value) in expected.enumerated() { XCTAssertEqual(Weekdays.getWeekday(day: index + 1), value) }
+
+        for (index, value) in expected.enumerated() {
+            XCTAssertEqual(Weekdays.getWeekday(day: index + 1), value)
+        }
+
         XCTAssertEqual(Weekdays.getWeekday(day: 0), .sunday)
         XCTAssertEqual(Weekdays.getWeekday(day: 8), .sunday)
     }

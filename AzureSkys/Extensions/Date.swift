@@ -11,12 +11,14 @@ extension Date {
     func getWeekDayStr() -> String {
         // compare today and self first
         let dayComparison = Calendar.current.compare(Date(), to: self, toGranularity: .day)
-        
+
         // if it's the same day then return "Today"
+
         if dayComparison == .orderedSame {
             return Strings.today.rawValue
-        } else { // otherwise it returns a weekday string
+        } else {  // otherwise it returns a weekday string
             let weekday = Calendar.current.component(.weekday, from: self)
+
             return Weekdays.getWeekday(day: weekday).rawValue
         }
     }

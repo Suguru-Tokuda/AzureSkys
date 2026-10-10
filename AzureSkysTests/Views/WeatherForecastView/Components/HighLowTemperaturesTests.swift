@@ -12,6 +12,9 @@ import SwiftUI
 @MainActor
 final class HighLowTemperaturesTests: XCTestCase {
     func testDisplayedStateChangesRenderedContent() async throws {
-        try await assertDifferent(HighLowTemperatures(maxTemp: 300, minTemp: 280), HighLowTemperatures(maxTemp: 270, minTemp: 250))
+        try await assertDifferent(
+            HighLowTemperatures(maxTemp: 300, minTemp: 280),
+            HighLowTemperatures(maxTemp: 270, minTemp: 250)
+        )
     }
 }

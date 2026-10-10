@@ -79,8 +79,8 @@ struct OnboardingView: View {
                     Circle()
                         .fill(
                             coordinator.currentStep == step
-                            ? Color.white
-                            : Color.white.opacity(0.35)
+                                ? Color.white
+                                : Color.white.opacity(0.35)
                         )
                         .frame(width: 8, height: 8)
                 }
@@ -88,7 +88,9 @@ struct OnboardingView: View {
             .padding(.top, 12)
             .padding(.bottom, 24)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(coordinator.currentStep == .location ? Strings.step1Of2.rawValue : Strings.step2Of2.rawValue)
+            .accessibilityLabel(
+                coordinator.currentStep == .location ? Strings.step1Of2.rawValue : Strings.step2Of2.rawValue
+            )
         }
         .onChange(of: vm.didResolveLocationRequest) { _, resolved in
             if resolved, coordinator.currentStep == .location {
@@ -97,11 +99,15 @@ struct OnboardingView: View {
         }
         .task(id: coordinator.currentStep) {
             guard coordinator.currentStep == .cloudSync else { return }
+
             await vm.checkICloudAvailability()
         }
+
         .onChange(of: scenePhase) { _, phase in
             if phase == .active, coordinator.currentStep == .cloudSync {
-                Task { await vm.checkICloudAvailability() }
+                Task {
+                    await vm.checkICloudAvailability()
+                }
             }
         }
         .background {
@@ -123,10 +129,12 @@ struct OnboardingView: View {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     OnboardingFlow(dependencies: dependencies, onFinished: {})
 }
 
 #Preview("iCloud onboarding") {
     let dependencies = AppDependencies.preview()
+
     OnboardingFlow(dependencies: dependencies, initialStep: .cloudSync, onFinished: {})
 }

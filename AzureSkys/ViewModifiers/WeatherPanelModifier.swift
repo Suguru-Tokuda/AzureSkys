@@ -5,6 +5,7 @@ struct WeatherPanelModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+
         content
             .background {
                 shape.fill(.ultraThinMaterial).opacity(0.45)

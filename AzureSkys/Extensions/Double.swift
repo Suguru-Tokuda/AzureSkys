@@ -12,23 +12,25 @@ extension Double {
         switch tempScale {
         case .fahrenheit:
             return kelvinToFahrenheit()
+
         case .celsius:
             return kelvinToCelsius()
         }
     }
-    
+
     func kelvinToFahrenheit() -> Double {
         return (self - 273.15) * 9 / 5 + 32
     }
-    
+
     func kelvinToCelsius() -> Double {
         return self - 273.15
     }
-    
+
     func formatDouble(maxFractions: Int) -> String {
         let formatter = NumberFormatter()
+
         formatter.maximumFractionDigits = maxFractions
-        
+
         return formatter.string(from: self as NSNumber) ?? ""
     }
 }

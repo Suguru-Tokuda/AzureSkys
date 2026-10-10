@@ -24,14 +24,20 @@ final class AzureSkysUITests: XCTestCase {
 
     private func openLocations() {
         app.launch()
+
         let chooseCities = app.buttons["Choose Cities Instead"]
+
         if chooseCities.waitForExistence(timeout: 3) {
             chooseCities.tap()
+
             let notNow = app.buttons["Not Now"]
+
             XCTAssertTrue(notNow.waitForExistence(timeout: 5))
             notNow.tap()
         }
+
         let locations = app.buttons["locationsButton"]
+
         XCTAssertTrue(locations.waitForExistence(timeout: 10))
         locations.tap()
         XCTAssertTrue(app.navigationBars["Weather"].waitForExistence(timeout: 5))
@@ -39,6 +45,7 @@ final class AzureSkysUITests: XCTestCase {
 
     private func search() {
         let field = app.searchFields.firstMatch
+
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         field.tap()
         field.typeText("Chicago")
@@ -47,13 +54,16 @@ final class AzureSkysUITests: XCTestCase {
     func testSettingsTemperatureSelectionAndBackNavigation() {
         openLocations()
         app.buttons["Settings"].tap()
+
         let celsius = app.buttons["Celsius"]
+
         XCTAssertTrue(celsius.waitForExistence(timeout: 5))
         celsius.tap()
         XCTAssertTrue(celsius.isSelected)
         XCTAssertFalse(app.buttons["Fahrenheit"].isSelected)
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
+
         attachment.name = "Settings weather cards"
         attachment.lifetime = .keepAlways
         add(attachment)
@@ -76,7 +86,9 @@ final class AzureSkysUITests: XCTestCase {
     func testCancelPreviewDoesNotSavePlace() {
         openLocations()
         search()
+
         let prediction = app.staticTexts["Chicago IL, USA"].firstMatch
+
         XCTAssertTrue(prediction.waitForExistence(timeout: 5))
         prediction.tap()
         XCTAssertTrue(app.buttons["Add"].waitForExistence(timeout: 5))
@@ -88,13 +100,19 @@ final class AzureSkysUITests: XCTestCase {
     func testAddPlaceAppearsInListAndCanBeSelected() {
         openLocations()
         search()
+
         let prediction = app.staticTexts["Chicago IL, USA"].firstMatch
+
         XCTAssertTrue(prediction.waitForExistence(timeout: 5))
         prediction.tap()
+
         let add = app.buttons["Add"]
+
         XCTAssertTrue(add.waitForExistence(timeout: 5))
         add.tap()
+
         let saved = app.staticTexts["Chicago"].firstMatch
+
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         saved.tap()
         XCTAssertTrue(app.buttons["locationsButton"].waitForExistence(timeout: 5))
@@ -105,7 +123,9 @@ final class AzureSkysUITests: XCTestCase {
         app.launchArguments.append("--search-fails-once")
         openLocations()
         search()
+
         let retry = app.buttons["Retry"]
+
         XCTAssertTrue(retry.waitForExistence(timeout: 5))
         retry.tap()
         XCTAssertTrue(app.staticTexts["Chicago IL, USA"].firstMatch.waitForExistence(timeout: 5))

@@ -12,11 +12,12 @@ struct LocationsView: View {
     @EnvironmentObject private var locationsCoordinator: LocationsCoordinator
     @EnvironmentObject private var locationManager: LocationManager
     let dependencies: AppDependencies
+
     @StateObject var vm: LocationForecastViewModel
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
     var showDismiss: Bool = true
-    
+
     init(dependencies: AppDependencies, showDismiss: Bool = true) {
         self.dependencies = dependencies
         self.showDismiss = showDismiss
@@ -40,13 +41,27 @@ struct LocationsView: View {
                     }
                 }
             }
-            .alert(isPresented: Binding(get: { vm.detailsError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.detailsError, actions: {
-                Button(action: {
-                    vm.dismissError()
-                }, label: {
-                    Text(Strings.ok.rawValue)
-                })
-            })
+            .alert(
+                isPresented: Binding(
+                    get: { vm.detailsError != nil },
+                    set: {
+                        if !$0 {
+                            vm.dismissError()
+                        }
+                    }
+                ),
+                error: vm.detailsError,
+                actions: {
+                    Button(
+                        action: {
+                            vm.dismissError()
+                        },
+                        label: {
+                            Text(Strings.ok.rawValue)
+                        }
+                    )
+                }
+            )
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     if showDismiss {
@@ -54,21 +69,30 @@ struct LocationsView: View {
                             coordinator.dismissLocations()
                         }
                     }
+
                     if let locationAuthorized = locationManager.locationAuthorized,
-                       locationAuthorized == false {
-                        Button(action: {
-                            dependencies.settingsManager.navigateToSettings()
-                        }, label: {
-                            Image(systemName: SystemImages.gear.rawValue)
-                        })
+                        locationAuthorized == false
+                    {
+                        Button(
+                            action: {
+                                dependencies.settingsManager.navigateToSettings()
+                            },
+                            label: {
+                                Image(systemName: SystemImages.gear.rawValue)
+                            }
+                        )
                     }
                 }
+
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button(action: {
-                        locationsCoordinator.showSettings()
-                    }, label: {
-                        Image(systemName: SystemImages.gear.rawValue)
-                    })
+                    Button(
+                        action: {
+                            locationsCoordinator.showSettings()
+                        },
+                        label: {
+                            Image(systemName: SystemImages.gear.rawValue)
+                        }
+                    )
                     .accessibilityLabel(Strings.settings.rawValue)
                 }
             }
@@ -118,7 +142,7 @@ extension LocationsView {
             }
         }
     }
-    
+
     @ViewBuilder
     func locationList() -> some View {
         LocationListView(dependencies: dependencies)
@@ -137,6 +161,7 @@ extension LocationsView {
                     .resizable()
                     .frame(width: 10, height: 10)
             }
+
             Text(option.displayName)
             Spacer()
             Text(Strings.degreePrefixedUnit(option.displayName.first?.uppercased() ?? ""))
@@ -146,6 +171,7 @@ extension LocationsView {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     LocationsView(dependencies: dependencies)
         .preferredColorScheme(.dark)
         .appEnvironment(dependencies)

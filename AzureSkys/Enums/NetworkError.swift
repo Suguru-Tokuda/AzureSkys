@@ -9,11 +9,11 @@ import Foundation
 
 enum NetworkError: Error {
     case badUrl,
-         dataParsingError,
-         serverError,
-         noData,
-         networkUnavailable,
-         unknown
+        dataParsingError,
+        serverError,
+        noData,
+        networkUnavailable,
+        unknown
 }
 
 extension NetworkError: LocalizedError {
@@ -41,7 +41,8 @@ extension NetworkError {
             self = error
         } else if let error = error as? URLError {
             switch error.code {
-            case .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
+            case .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost,
+                .dnsLookupFailed:
                 self = .networkUnavailable
             case .badURL, .unsupportedURL:
                 self = .badUrl

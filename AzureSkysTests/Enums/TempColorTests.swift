@@ -11,8 +11,14 @@ import SwiftUI
 
 final class TempColorTests: XCTestCase {
     func testClassificationBoundaries() {
-        let cases: [(Double, TempColor)] = [(-20, .freezing), (4.9, .freezing), (5, .cold), (9.9, .cold), (10, .cool), (14.9, .cool), (15, .warm), (37.8, .warm), (37.9, .hot)]
-        for (celsius, expected) in cases { XCTAssertEqual(TempColor.getTempColor(tempInKelvin: celsius + 273.15), expected) }
+        let cases: [(Double, TempColor)] = [
+            (-20, .freezing), (4.9, .freezing), (5, .cold), (9.9, .cold), (10, .cool), (14.9, .cool), (15, .warm),
+            (37.8, .warm), (37.9, .hot)
+        ]
+
+        for (celsius, expected) in cases {
+            XCTAssertEqual(TempColor.getTempColor(tempInKelvin: celsius + 273.15), expected)
+        }
     }
 
     func testTemperatureCategoriesUseExpectedColors() {

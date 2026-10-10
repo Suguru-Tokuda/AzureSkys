@@ -19,7 +19,6 @@ final class OnboardingViewModel: ObservableObject {
 
     private var subscriptions = Set<AnyCancellable>()
 
-
     private let locationManager: LocationManager
     private let iCloudManager: ICloudManaging
 
@@ -31,22 +30,31 @@ final class OnboardingViewModel: ObservableObject {
 
     func enableLocation() {
         guard !isRequestingLocation else { return }
+
         didResolveLocationRequest = false
+
         if locationManager.locationManager.authorizationStatus != .notDetermined {
             didResolveLocationRequest = true
+
             return
         }
+
         isRequestingLocation = true
         locationManager.requestAuthorization()
     }
 
     func enableCloudSync() async -> Bool {
-        guard isICloudAvailable, !isCheckingICloud else { return false }
+        guard isICloudAvailable, !isCheckingICloud else {
+            return false
+        }
+
         do {
             try await iCloudManager.setEnabled(true)
+
             return true
         } catch {
             iCloudCheckError = error.localizedDescription
+
             return false
         }
     }
@@ -57,8 +65,11 @@ final class OnboardingViewModel: ObservableObject {
         isCheckingICloud = true
         isICloudAvailable = false
         iCloudCheckError = nil
-        defer { isCheckingICloud = false }
-        
+
+        defer {
+            isCheckingICloud = false
+        }
+
         do {
             isICloudAvailable = try await iCloudManager.isAvailable()
         } catch {
@@ -72,9 +83,11 @@ final class OnboardingViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isAuthorized in
                 guard let self, self.isRequestingLocation, isAuthorized != nil else { return }
+
                 self.isRequestingLocation = false
                 self.didResolveLocationRequest = true
             }
+
             .store(in: &subscriptions)
     }
 }

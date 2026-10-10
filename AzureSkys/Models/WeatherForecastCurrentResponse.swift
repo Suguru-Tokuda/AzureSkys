@@ -20,26 +20,26 @@ struct WeatherForecastCurrentResponse: Decodable, Identifiable {
     let timezone: Int
     let name: String
     let cod: Int
-    
+
     enum CodingKeys: String, CodingKey {
-        case id, 
-             dateTime = "dt",
-             coordinate = "coord",
-             weather,
-             main,
-             visibility,
-             wind,
-             clouds,
-             system = "sys",
-             timezone,
-             name,
-             cod
+        case id,
+            dateTime = "dt",
+            coordinate = "coord",
+            weather,
+            main,
+            visibility,
+            wind,
+            clouds,
+            system = "sys",
+            timezone,
+            name,
+            cod
     }
 }
 
 struct WeatherForecastCoordinate: Decodable {
     let longitude, latitude: Double
-    
+
     enum CodingKeys: String, CodingKey {
         case longitude = "lon"
         case latitude = "lat"

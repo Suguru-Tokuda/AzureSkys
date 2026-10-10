@@ -15,12 +15,20 @@ final class LocationDriver: CLLocationManager {
     var requested = false
     var started = false
     var stopped = false
+
     override var authorizationStatus: CLAuthorizationStatus { status }
 
-    override func requestWhenInUseAuthorization() { requested = true }
+    override func requestWhenInUseAuthorization() {
+        requested = true
+    }
 
-    override func startUpdatingLocation() { started = true }
-    override func stopUpdatingLocation() { stopped = true }
+    override func startUpdatingLocation() {
+        started = true
+    }
+
+    override func stopUpdatingLocation() {
+        stopped = true
+    }
 }
 
 @MainActor
@@ -28,10 +36,15 @@ final class LocationManagerTests: XCTestCase {
     func testStartupAndPermissionMappingWithoutSystemPrompts() {
         let driver = LocationDriver()
         let manager = LocationManager(startAutomatically: true, locationManager: driver)
+
         XCTAssertTrue(driver.requested)
         XCTAssertFalse(driver.started)
         XCTAssertTrue(driver.delegate === manager)
-        for (status, expected) in [(CLAuthorizationStatus.notDetermined, Optional<Bool>.none), (.restricted, false), (.denied, false), (.authorizedAlways, true), (.authorizedWhenInUse, true)] {
+
+        for (status, expected) in [
+            (CLAuthorizationStatus.notDetermined, Optional<Bool>.none), (.restricted, false), (.denied, false),
+            (.authorizedAlways, true), (.authorizedWhenInUse, true)
+        ] {
             driver.status = status
             manager.locationAuthorized = nil
             manager.locationManagerDidChangeAuthorization(driver)
@@ -42,8 +55,11 @@ final class LocationManagerTests: XCTestCase {
     func testRelaunchWithExistingPermissionStartsUpdatesWithoutPrompt() {
         for status in [CLAuthorizationStatus.authorizedWhenInUse, .authorizedAlways] {
             let driver = LocationDriver()
+
             driver.status = status
+
             let manager = LocationManager(locationManager: driver)
+
             XCTAssertEqual(manager.locationAuthorized, true)
             XCTAssertTrue(driver.started)
             XCTAssertFalse(driver.requested)
@@ -53,6 +69,7 @@ final class LocationManagerTests: XCTestCase {
     func testGrantingPermissionStartsUpdatesAfterOnboardingRequest() {
         let driver = LocationDriver()
         let manager = LocationManager(locationManager: driver)
+
         manager.requestAuthorization()
         XCTAssertTrue(driver.requested)
         XCTAssertFalse(driver.started)
@@ -71,9 +88,12 @@ final class LocationManagerTests: XCTestCase {
     func testLatestLocationAndDisabledAutomaticStart() {
         let driver = LocationDriver()
         let manager = LocationManager(startAutomatically: false, locationManager: driver)
+
         XCTAssertFalse(driver.requested)
         XCTAssertFalse(driver.started)
+
         let first = CLLocation(latitude: 1, longitude: 2), last = CLLocation(latitude: 3, longitude: 4)
+
         manager.locationManager(driver, didUpdateLocations: [first, last])
         XCTAssertEqual(manager.currentLocation, last)
         manager.locationManager(driver, didUpdateLocations: [])

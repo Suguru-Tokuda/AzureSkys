@@ -20,20 +20,25 @@ struct LocationAuthorizationRequestView: View {
                 Text(Strings.locationAuthorizationRequired.rawValue)
                     .font(.title3.weight(.bold))
                     .padding(.top, 50)
-                    
+
                 Text(Strings.locationAuthorizationDescription.rawValue)
                     .font(.callout)
                 Spacer()
             }
 
-            Button(action: {
-                settingsManager.navigateToSettings()
-            }, label: {
-                Text(Strings.openSettings.rawValue)
-            })
-            .buttonStyle(OpenSettingsBtnStyle(
-                backgroundColor: .night1,
-                foregroundColor: .white)
+            Button(
+                action: {
+                    settingsManager.navigateToSettings()
+                },
+                label: {
+                    Text(Strings.openSettings.rawValue)
+                }
+            )
+            .buttonStyle(
+                OpenSettingsBtnStyle(
+                    backgroundColor: .night1,
+                    foregroundColor: .white
+                )
             )
         }
     }

@@ -18,13 +18,20 @@ final class IntTests: XCTestCase {
     }
 
     func testRelativeTimeFormatsToday() {
-        let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
+        let formatter = DateFormatter()
+
+        formatter.dateFormat = "yyyy-MM-dd"
         XCTAssertEqual(0.getTimeStr(dateFormat: "yyyy-MM-dd"), formatter.string(from: Date()))
     }
 
     func testUnixFormattingUsesRequestedOffset() {
         // Characterize the current five-hour adjustment until its legacy callers are migrated.
-        let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        XCTAssertEqual(0.unixTimeToDateStr(dateFormat: formatter.dateFormat, timezoneOffset: 3600), formatter.string(from: Date(timeIntervalSince1970: 21600)))
+        let formatter = DateFormatter()
+
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        XCTAssertEqual(
+            0.unixTimeToDateStr(dateFormat: formatter.dateFormat, timezoneOffset: 3600),
+            formatter.string(from: Date(timeIntervalSince1970: 21600))
+        )
     }
 }

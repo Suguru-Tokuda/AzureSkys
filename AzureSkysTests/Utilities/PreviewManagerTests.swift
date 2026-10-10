@@ -12,6 +12,7 @@ import XCTest
 final class PreviewManagerTests: XCTestCase {
     func testFixturesProvideConsistentRenderableForecasts() {
         let oneCall = PreviewManager.oneCallResponse
+
         XCTAssertFalse(oneCall.daily.isEmpty)
         XCTAssertFalse(oneCall.hourly.isEmpty)
         XCTAssertFalse(oneCall.current.weather.isEmpty)

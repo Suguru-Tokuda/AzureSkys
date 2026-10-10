@@ -10,8 +10,9 @@ import SwiftUI
 struct LocationSearchResultListView: View {
     var predictions: [Prediction] = []
     var onSelect: ((Prediction) -> ())?
+
     @Environment(\.dismissSearch) private var dismissSearch
-    
+
     var body: some View {
         List {
             ForEach(predictions) { prediction in

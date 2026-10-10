@@ -12,6 +12,14 @@ import SwiftUI
 @MainActor
 final class WeatherForecastScrollViewTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(WeatherForecastScrollView(forecast: PreviewManager.oneCallResponse, geocode: PreviewManager.geocode, showAnimation: false)))
+        assertVisibleContent(
+            try await renderSnapshot(
+                WeatherForecastScrollView(
+                    forecast: PreviewManager.oneCallResponse,
+                    geocode: PreviewManager.geocode,
+                    showAnimation: false
+                )
+            )
+        )
     }
 }

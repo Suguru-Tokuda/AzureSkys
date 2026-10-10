@@ -11,7 +11,7 @@ struct WeatherDailyForecastListView: View {
     var list: [DailyForecast]
     var timezoneOffset: Int
     var showAnimation: Bool = true
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(Strings.dailyForecast.rawValue)
@@ -20,9 +20,11 @@ struct WeatherDailyForecastListView: View {
 
             VStack(spacing: 0) {
                 ForEach(list) { forecast in
-                    WeatherDailyForecastListCellView(forecast: forecast,
-                                                     timezoneOffset: timezoneOffset,
-                                                     showTempBarAnimation: showAnimation)
+                    WeatherDailyForecastListCellView(
+                        forecast: forecast,
+                        timezoneOffset: timezoneOffset,
+                        showTempBarAnimation: showAnimation
+                    )
                 }
             }
         }
@@ -32,7 +34,9 @@ struct WeatherDailyForecastListView: View {
 }
 
 #Preview {
-    WeatherDailyForecastListView(list: PreviewManager.oneCallResponse.daily,
-                                 timezoneOffset: 0)
-        .preferredColorScheme(.dark)
+    WeatherDailyForecastListView(
+        list: PreviewManager.oneCallResponse.daily,
+        timezoneOffset: 0
+    )
+    .preferredColorScheme(.dark)
 }

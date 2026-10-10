@@ -11,11 +11,19 @@ struct HighLowTemperatures: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var maxTemp: Double
     var minTemp: Double
-    
+
     var body: some View {
         HStack {
-            Text(Strings.highTemperature(maxTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
-            Text(Strings.lowTemperature(minTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()))
+            Text(
+                Strings.highTemperature(
+                    maxTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()
+                )
+            )
+            Text(
+                Strings.lowTemperature(
+                    minTemp.getDegree(tempScale: tempScale).formatDouble(maxFractions: 0).appendDegree()
+                )
+            )
         }
         .opacity(0.85)
     }

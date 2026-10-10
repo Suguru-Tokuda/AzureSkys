@@ -13,6 +13,12 @@ import SwiftUI
 final class LocationViewCellTests: XCTestCase {
     func testRendersWithInjectedDependencies() async throws {
         let dependencies = AppDependencies.preview()
-        assertVisibleContent(try await renderSnapshot(LocationViewCell(dependencies: dependencies, place: testPlace), dependencies: dependencies))
+
+        assertVisibleContent(
+            try await renderSnapshot(
+                LocationViewCell(dependencies: dependencies, place: testPlace),
+                dependencies: dependencies
+            )
+        )
     }
 }

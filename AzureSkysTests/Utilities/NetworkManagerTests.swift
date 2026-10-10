@@ -17,6 +17,7 @@ final class NetworkManagerTests: XCTestCase {
 
     override func setUp() {
         let configuration = URLSessionConfiguration.ephemeral
+
         configuration.protocolClasses = [StubURLProtocol.self]
         session = URLSession(configuration: configuration)
         manager = NetworkManager(session: session)
@@ -32,7 +33,9 @@ final class NetworkManagerTests: XCTestCase {
 
     func testSuccessfulResponseDecodes() async throws {
         StubURLProtocol.response = (200, Data(#"{"value":42}"#.utf8))
+
         let result = try await manager.getData(url: url, type: Payload.self)
+
         XCTAssertEqual(result.value, 42)
     }
 
@@ -52,6 +55,7 @@ final class NetworkManagerTests: XCTestCase {
 
     func testTransportErrorIsPreserved() async {
         StubURLProtocol.failure = URLError(.notConnectedToInternet)
+
         do {
             _ = try await manager.getData(url: url, type: Payload.self)
             XCTFail("Expected transport failure")
@@ -70,38 +74,60 @@ final class NetworkManagerTests: XCTestCase {
     }
 
     func testNilURLFailsForAsyncAndCallbackAPIs() async {
-        do { _ = try await manager.getData(url: nil, type: Payload.self); XCTFail("Expected bad URL") }
-        catch { XCTAssertEqual(error as? NetworkError, .badUrl) }
+        do {
+            _ = try await manager.getData(url: nil, type: Payload.self)
+            XCTFail("Expected bad URL")
+        } catch {
+            XCTAssertEqual(error as? NetworkError, .badUrl)
+        }
+
         let result: Result<Payload, Error> = await withCheckedContinuation { continuation in
             manager.getData(url: nil, type: Payload.self) { continuation.resume(returning: $0) }
         }
-        if case .failure(let error) = result { XCTAssertEqual(error as? NetworkError, .badUrl) }
-        else { XCTFail("Expected callback failure") }
+
+        if case .failure(let error) = result {
+            XCTAssertEqual(error as? NetworkError, .badUrl)
+        } else {
+            XCTFail("Expected callback failure")
+        }
     }
 
     func testCallbackDecodesAndPreservesTransportErrors() async throws {
         StubURLProtocol.response = (200, Data(#"{"value":7}"#.utf8))
+
         let success = await callbackResult()
+
         XCTAssertEqual(try success.get().value, 7)
         StubURLProtocol.failure = URLError(.timedOut)
+
         let failure = await callbackResult()
-        if case .failure(let error) = failure { XCTAssertEqual((error as? URLError)?.code, .timedOut) }
-        else { XCTFail("Expected transport failure") }
+
+        if case .failure(let error) = failure {
+            XCTAssertEqual((error as? URLError)?.code, .timedOut)
+        } else {
+            XCTFail("Expected transport failure")
+        }
     }
 
     func testPublisherValidatesHTTPAndDecodesSuccess() async {
         for code in [200, 500] {
             StubURLProtocol.response = (code, Data(#"{"value":9}"#.utf8))
+
             let completed = expectation(description: "Publisher completion")
             let publisher: AnyPublisher<Payload, Error> = manager.getData(url: url, type: Payload.self)
             let subscription = publisher.sink { result in
-                if case .failure(let error) = result { XCTAssertEqual(error as? NetworkError, .serverError) }
-                else { XCTAssertEqual(code, 200) }
+                if case .failure(let error) = result {
+                    XCTAssertEqual(error as? NetworkError, .serverError)
+                } else {
+                    XCTAssertEqual(code, 200)
+                }
+
                 completed.fulfill()
             } receiveValue: { payload in
                 XCTAssertEqual(code, 200)
                 XCTAssertEqual(payload.value, 9)
             }
+
             await fulfillment(of: [completed], timeout: 2)
             withExtendedLifetime(subscription) {}
         }
@@ -109,6 +135,7 @@ final class NetworkManagerTests: XCTestCase {
 
     func testReachabilityCompletesOnceForCallbackAndAsyncAPIs() async {
         let completed = expectation(description: "First local path update")
+
         completed.assertForOverFulfill = true
         manager.checkNetworkAvailability(queue: DispatchQueue(label: "ReachabilityTests")) { _ in completed.fulfill() }
         await fulfillment(of: [completed], timeout: 3)

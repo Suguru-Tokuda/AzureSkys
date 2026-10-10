@@ -11,7 +11,7 @@ struct WeatherForecastResponse: Decodable {
     let statusCode, message, count: Int
     let list: [WeatherForecast]
     let city: City
-    
+
     enum CodingKeys: String, CodingKey {
         case statusCode = "cod"
         case message
@@ -19,9 +19,10 @@ struct WeatherForecastResponse: Decodable {
         case list
         case city
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         self.statusCode = Int(try container.decode(String.self, forKey: .statusCode)) ?? 0
         self.message = try container.decode(Int.self, forKey: .message)
         self.count = try container.decode(Int.self, forKey: .count)
@@ -39,16 +40,16 @@ struct WeatherForecastResponse: Decodable {
 
     func getDailyForecast() -> [WeatherForecast] {
         var retVal: [WeatherForecast] = []
-        
+
         let count = list.count
         var i = 0
-        
+
         while i < count {
             retVal.append(list[i])
-            
+
             i += 8
         }
-        
+
         return retVal
     }
 }
@@ -65,20 +66,21 @@ struct WeatherForecast: Decodable, Identifiable {
     let snow: Snow?
     let partOfDay: PartOfDay
     let dateForecasted: String
-        
+
     private struct DynamicCodingKeys: CodingKey {
         var stringValue: String
-        
+
         init?(stringValue: String) {
             self.stringValue = stringValue
         }
-        
+
         var intValue: Int?
+
         init?(intValue: Int) {
             return nil
         }
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id = "dt"
         case visibility
@@ -92,9 +94,10 @@ struct WeatherForecast: Decodable, Identifiable {
         case partOfDay = "sys"
         case dateForecasted = "dt_txt"
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         self.id = try container.decode(Int.self, forKey: .id)
         self.visibility = try container.decode(Int.self, forKey: .visibility)
         self.probabilityOfPrecipitation = try container.decode(Double.self, forKey: .probabilityOfPrecipitation)
@@ -104,12 +107,26 @@ struct WeatherForecast: Decodable, Identifiable {
         self.wind = try container.decodeIfPresent(Wind.self, forKey: .wind)
         self.rain = try container.decodeIfPresent(Rain.self, forKey: .rain)
         self.snow = try container.decodeIfPresent(Snow.self, forKey: .snow)
+
         let pod = try container.decodeIfPresent(PartOfDayModel.self, forKey: .partOfDay)
+
         self.partOfDay = pod?.pod == WeatherAPI.dayIconMarker ? PartOfDay.day : PartOfDay.night
         self.dateForecasted = try container.decode(String.self, forKey: .dateForecasted)
     }
-    
-    init(id: Int, visibility: Int, probabilityOfPrecipitation: Double, main: MainModel, weathers: [Weather], clouds: Clouds, wind: Wind, rain: Rain, snow: Snow, partOfDay: PartOfDay, dateForecasted: String) {
+
+    init(
+        id: Int,
+        visibility: Int,
+        probabilityOfPrecipitation: Double,
+        main: MainModel,
+        weathers: [Weather],
+        clouds: Clouds,
+        wind: Wind,
+        rain: Rain,
+        snow: Snow,
+        partOfDay: PartOfDay,
+        dateForecasted: String
+    ) {
         self.id = id
         self.visibility = visibility
         self.probabilityOfPrecipitation = probabilityOfPrecipitation
@@ -128,17 +145,17 @@ struct MainModel: Decodable {
     let temp, feelsLike, tempMin, tempMax: Double
     let tempKf: Double?
     let pressure, seaLevel, groundLevel, humidity: Int?
-    
+
     enum CodingKeys: String, CodingKey {
         case temp,
-             feelsLike = "feels_like",
-             tempMin = "temp_min",
-             tempMax = "temp_max",
-             pressure,
-             seaLevel = "sea_level",
-             groundLevel = "grnd_level",
-             humidity,
-             tempKf = "temp_kf"
+            feelsLike = "feels_like",
+            tempMin = "temp_min",
+            tempMax = "temp_max",
+            pressure,
+            seaLevel = "sea_level",
+            groundLevel = "grnd_level",
+            humidity,
+            tempKf = "temp_kf"
     }
 }
 
@@ -147,13 +164,14 @@ struct Weather: Decodable, Identifiable {
     let main, description, icon: String
     let partOfDay: PartOfDay
     let weatherCondition: WeatherCondition
-    
+
     enum CodingKeys: String, CodingKey {
         case id, main, description, icon
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         self.id = try container.decode(Int.self, forKey: .id)
         self.main = try container.decode(String.self, forKey: .main)
         self.description = try container.decode(String.self, forKey: .description)
@@ -161,8 +179,15 @@ struct Weather: Decodable, Identifiable {
         self.partOfDay = self.icon.contains(WeatherAPI.dayIconMarker) ? .day : .night
         self.weatherCondition = WeatherCondition.getWeatherCondition(str: self.main)
     }
-    
-    init(id: Int, main: String, description: String, icon: String, partOfDay: PartOfDay, weatherCondition: WeatherCondition) {
+
+    init(
+        id: Int,
+        main: String,
+        description: String,
+        icon: String,
+        partOfDay: PartOfDay,
+        weatherCondition: WeatherCondition
+    ) {
         self.id = id
         self.main = main
         self.description = description
@@ -184,7 +209,7 @@ struct Wind: Decodable {
 
 struct Rain: Decodable {
     let rainVolumeForNext3HoursInMM: Double
-    
+
     enum CodingKeys: String, CodingKey {
         case rainVolumeForNext3HoursInMM = "3h"
     }
@@ -192,7 +217,7 @@ struct Rain: Decodable {
 
 struct Snow: Decodable {
     let snowVolumeForNext3HoursInMM: Double
-    
+
     enum CodingKeys: String, CodingKey {
         case snowVolumeForNext3HoursInMM = "3h"
     }
@@ -204,20 +229,21 @@ struct City: Identifiable, Decodable {
     let coordinate: CityCoordinate
     let name, country: String
     let sunrise, sunset: Double?
-    
+
     enum CodingKeys: String, CodingKey {
-        case id, 
-             name,
-             coordinate = "coord",
-             country,
-             population,
-             timezone,
-             sunrise,
-             sunset
+        case id,
+            name,
+            coordinate = "coord",
+            country,
+            population,
+            timezone,
+            sunrise,
+            sunset
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         self.id = try container.decode(Int.self, forKey: .id)
         self.name = try container.decode(String.self, forKey: .name)
         self.coordinate = try container.decode(CityCoordinate.self, forKey: .coordinate)
@@ -227,8 +253,17 @@ struct City: Identifiable, Decodable {
         self.sunrise = try container.decodeIfPresent(Double.self, forKey: .sunrise)
         self.sunset = try container.decodeIfPresent(Double.self, forKey: .sunset)
     }
-    
-    init(id: Int, population: Int?, timezone: Int?, coordinate: CityCoordinate, name: String, country: String, sunrise: Double?, sunset: Double?) {
+
+    init(
+        id: Int,
+        population: Int?,
+        timezone: Int?,
+        coordinate: CityCoordinate,
+        name: String,
+        country: String,
+        sunrise: Double?,
+        sunset: Double?
+    ) {
         self.id = id
         self.population = population
         self.timezone = timezone

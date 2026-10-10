@@ -15,36 +15,83 @@ import CoreLocation
 final class TestKeys: ApiKeyActions {
     var fail = false
 
-    func getGoogleApiKey() throws -> String { if fail { throw PlistError.dataNotFound }; return "key&value" }
+    func getGoogleApiKey() throws -> String {
+        if fail {
+            throw PlistError.dataNotFound
+        }
 
-    func getOpenWeatherApiKey() throws -> String { if fail { throw PlistError.dataNotFound }; return "weather&key" }
+        return "key&value"
+    }
+
+    func getOpenWeatherApiKey() throws -> String {
+        if fail {
+            throw PlistError.dataNotFound
+        }
+
+        return "weather&key"
+    }
 }
 
 final class RecordingNetwork: Networking {
     private let lock = NSLock()
     private var requests: [URL] = []
+
     var available = true
     let response: (URL) throws -> Data
-    init(response: @escaping (URL) throws -> Data) { self.response = response }
-    var urls: [URL] { lock.lock(); defer { lock.unlock() }; return requests }
+
+    init(response: @escaping (URL) throws -> Data) {
+        self.response = response
+    }
+
+    var urls: [URL] {
+        lock.lock()
+
+        defer {
+            lock.unlock()
+        }
+
+        return requests
+    }
 
     func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T {
         let url = try XCTUnwrap(url)
+
         record(url)
+
         return try JSONDecoder().decode(type, from: response(url))
     }
 
-    private func record(_ url: URL) { lock.lock(); defer { lock.unlock() }; requests.append(url) }
+    private func record(_ url: URL) {
+        lock.lock()
 
-    func getData<T: Decodable>(url: URL, type: T.Type) -> AnyPublisher<T, Error> { Fail(error: NetworkError.unknown).eraseToAnyPublisher() }
+        defer {
+            lock.unlock()
+        }
 
-    func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) {
-        Task { do { completionHandler(.success(try await getData(url: url, type: type))) } catch { completionHandler(.failure(error)) } }
+        requests.append(url)
     }
 
-    func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping (Bool) -> Void) { completionHandler(available) }
+    func getData<T: Decodable>(url: URL, type: T.Type) -> AnyPublisher<T, Error> {
+        Fail(error: NetworkError.unknown).eraseToAnyPublisher()
+    }
 
-    func checkNetworkAvailability(queue: DispatchQueue) async -> Bool { available }
+    func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) {
+        Task {
+            do {
+                completionHandler(.success(try await getData(url: url, type: type)))
+            } catch {
+                completionHandler(.failure(error))
+            }
+        }
+    }
+
+    func checkNetworkAvailability(queue: DispatchQueue, completionHandler: @escaping (Bool) -> Void) {
+        completionHandler(available)
+    }
+
+    func checkNetworkAvailability(queue: DispatchQueue) async -> Bool {
+        available
+    }
 }
 
 final class WeatherDouble: WeatherServicing {
@@ -56,15 +103,29 @@ final class WeatherDouble: WeatherServicing {
 
     func getForecast(coordinate: CLLocationCoordinate2D) async throws -> WeatherForecastData {
         coordinates.append(coordinate)
-        if pause { try await Task.sleep(for: .seconds(10)) }
-        if let error { throw error }
+
+        if pause {
+            try await Task.sleep(for: .seconds(10))
+        }
+
+        if let error {
+            throw error
+        }
+
         return WeatherForecastData(forecast: forecast, geocode: PreviewManager.geocode)
     }
 
     func getCurrentWeather(coordinate: CLLocationCoordinate2D) async throws -> WeatherForecastCurrentResponse {
         coordinates.append(coordinate)
-        if pause { try await Task.sleep(for: .seconds(10)) }
-        if let error { throw error }
+
+        if pause {
+            try await Task.sleep(for: .seconds(10))
+        }
+
+        if let error {
+            throw error
+        }
+
         return current
     }
 }
@@ -74,13 +135,31 @@ final class PlaceStoreDouble: PlaceCoreDataActions {
     var saved: [SavedPlace] = []
     var deleted: [SavedPlace] = []
 
-    func savePlaceIntoDatabase(place: SavedPlace) async throws { if let error { throw error }; saved.append(place) }
+    func savePlaceIntoDatabase(place: SavedPlace) async throws {
+        if let error {
+            throw error
+        }
 
-    func getPlaceFromDatabase(id: String) async throws -> SavedPlace? { saved.first { $0.id == id } }
+        saved.append(place)
+    }
 
-    func getPlacesFromDatabase() async throws -> [SavedPlace] { saved }
+    func getPlaceFromDatabase(id: String) async throws -> SavedPlace? {
+        saved.first { $0.id == id }
+    }
 
-    func deleteFromDatabase(place: SavedPlace) async throws { deleted.append(place); if let error { throw error } }
+    func getPlacesFromDatabase() async throws -> [SavedPlace] {
+        saved
+    }
 
-    func clearAllFromDatabase() async throws { saved = [] }
+    func deleteFromDatabase(place: SavedPlace) async throws {
+        deleted.append(place)
+
+        if let error {
+            throw error
+        }
+    }
+
+    func clearAllFromDatabase() async throws {
+        saved = []
+    }
 }

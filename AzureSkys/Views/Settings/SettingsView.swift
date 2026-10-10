@@ -19,7 +19,7 @@ struct SettingsView: View {
             wrappedValue: dependencies.makeSettingsViewModel()
         )
     }
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -52,7 +52,9 @@ struct SettingsView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button { dismiss() } label: {
+                Button {
+                    dismiss()
+                } label: {
                     Image(systemName: SystemImages.chevronLeft.rawValue)
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(.white)
@@ -114,9 +116,11 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 20) {
             sectionHeading(Strings.settingsYourLocation.rawValue)
             HStack(alignment: .center, spacing: 12) {
-                settingHeading(Strings.locationAccess.rawValue,
-                               subtitle: Strings.settingsLocationDescription.rawValue,
-                               icon: .locationFill)
+                settingHeading(
+                    Strings.locationAccess.rawValue,
+                    subtitle: Strings.settingsLocationDescription.rawValue,
+                    icon: .locationFill
+                )
                 Spacer(minLength: 0)
                 Text(vm.locationStatusLabel)
                     .font(.caption.weight(.medium))
@@ -133,9 +137,11 @@ struct SettingsView: View {
                 vm.manageLocationAccess()
             } label: {
                 HStack {
-                    Text(vm.authorizationStatus == .notDetermined
-                         ? Strings.enableLocation.rawValue
-                         : Strings.manageLocation.rawValue)
+                    Text(
+                        vm.authorizationStatus == .notDetermined
+                            ? Strings.enableLocation.rawValue
+                            : Strings.manageLocation.rawValue
+                    )
                     Spacer()
                     Image(systemName: SystemImages.chevronRight.rawValue)
                         .foregroundStyle(secondaryColor)
@@ -199,19 +205,19 @@ struct SettingsView: View {
                     vm.tempScale = scale
                 } label: {
                     Text(scale.shortName)
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .background {
-                        if vm.tempScale == scale {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.blue.opacity(0.55))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .strokeBorder(.white.opacity(0.3))
-                                }
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background {
+                            if vm.tempScale == scale {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(.blue.opacity(0.55))
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .strokeBorder(.white.opacity(0.3))
+                                    }
+                            }
                         }
-                    }
-                    .contentShape(Rectangle())
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(scale.displayName)
@@ -225,18 +231,23 @@ struct SettingsView: View {
         .accessibilityLabel(Strings.temperatureUnit.rawValue)
     }
 
-
     private var syncRow: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Toggle(isOn: Binding(
-                get: { vm.iCloudSyncEnabled && vm.isICloudAvailable },
-                set: { enabled in
-                    Task { await vm.setSyncEnabled(enabled) }
-                }
-            )) {
-                settingHeading(Strings.iCloudSync.rawValue,
-                               subtitle: Strings.settingsSyncDescription.rawValue,
-                               icon: .iCloudFill)
+            Toggle(
+                isOn: Binding(
+                    get: { vm.iCloudSyncEnabled && vm.isICloudAvailable },
+                    set: { enabled in
+                        Task {
+                            await vm.setSyncEnabled(enabled)
+                        }
+                    }
+                )
+            ) {
+                settingHeading(
+                    Strings.iCloudSync.rawValue,
+                    subtitle: Strings.settingsSyncDescription.rawValue,
+                    icon: .iCloudFill
+                )
             }
             .tint(.green)
             .disabled(vm.isUpdatingSync || (!vm.isICloudAvailable && !vm.iCloudSyncEnabled))
@@ -246,9 +257,11 @@ struct SettingsView: View {
                     .font(.footnote)
                     .foregroundStyle(secondaryColor)
             }
+
             if vm.isUpdatingSync {
                 ProgressView().accessibilityLabel(Strings.loading.rawValue)
             }
+
             if let error = vm.displayedSyncError {
                 Text(error)
                     .font(.footnote)

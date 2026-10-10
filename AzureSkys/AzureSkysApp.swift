@@ -13,11 +13,14 @@ struct AzureSkysApp: App {
 
     init() {
         #if DEBUG
-        let isUITesting = ProcessInfo.processInfo.arguments.contains(LaunchArguments.uiTestingArgument)
-        let isUnitTesting = ProcessInfo.processInfo.environment[LaunchArguments.testConfigurationEnvironmentKey] != nil
-        _dependencies = StateObject(wrappedValue: isUITesting ? .uiTesting() : (isUnitTesting ? .preview() : .live()))
+            let isUITesting = ProcessInfo.processInfo.arguments.contains(LaunchArguments.uiTestingArgument)
+            let isUnitTesting =
+                ProcessInfo.processInfo.environment[LaunchArguments.testConfigurationEnvironmentKey] != nil
+            _dependencies = StateObject(
+                wrappedValue: isUITesting ? .uiTesting() : (isUnitTesting ? .preview() : .live())
+            )
         #else
-        _dependencies = StateObject(wrappedValue: .live())
+            _dependencies = StateObject(wrappedValue: .live())
         #endif
     }
 

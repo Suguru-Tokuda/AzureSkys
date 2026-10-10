@@ -16,8 +16,10 @@ extension CoreDataError: LocalizedError {
         switch self {
         case .save:
             return NSLocalizedString(Strings.coreDataSaveError.rawValue, comment: "save")
+
         case .fetch:
             return NSLocalizedString(Strings.coreDataFetchError.rawValue, comment: "fetch")
+
         case .delete:
             return NSLocalizedString(Strings.coreDataDeleteError.rawValue, comment: "delete")
         }

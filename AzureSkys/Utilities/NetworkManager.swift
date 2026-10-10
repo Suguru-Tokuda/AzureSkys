@@ -27,26 +27,33 @@ class NetworkManager: Networking {
     func getData<T: Decodable>(url: URL?, type: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) {
         guard let url else {
             completionHandler(.failure(NetworkError.badUrl))
+
             return
         }
 
         session.dataTask(with: url) { data, response, error in
             if let error {
                 completionHandler(.failure(error))
+
                 return
             }
 
-            completionHandler(Result {
-                try Self.decode(data: data ?? Data(), response: response, type: T.self)
-            })
+            completionHandler(
+                Result {
+                    try Self.decode(data: data ?? Data(), response: response, type: T.self)
+                }
+            )
         }
         .resume()
     }
 
     func getData<T: Decodable>(url: URL?, type: T.Type) async throws -> T {
-        guard let url else { throw NetworkError.badUrl }
+        guard let url else {
+            throw NetworkError.badUrl
+        }
 
         let (data, response) = try await session.data(from: url)
+
         return try Self.decode(data: data, response: response, type: type)
     }
 
@@ -60,10 +67,14 @@ class NetworkManager: Networking {
 
     private static func decode<T: Decodable>(data: Data, response: URLResponse?, type: T.Type) throws -> T {
         guard let response = response as? HTTPURLResponse,
-              (200..<300).contains(response.statusCode) else {
+            (200..<300).contains(response.statusCode)
+        else {
             throw NetworkError.serverError
         }
-        guard !data.isEmpty else { throw NetworkError.noData }
+
+        guard !data.isEmpty else {
+            throw NetworkError.noData
+        }
 
         do {
             return try JSONDecoder().decode(type, from: data)
@@ -76,17 +87,23 @@ class NetworkManager: Networking {
 // MARK: Default implementations
 
 extension Networking {
-    func checkNetworkAvailability(queue: DispatchQueue = DispatchQueue.global(qos: .background), completionHandler: @escaping ((Bool) -> ())) {
+    func checkNetworkAvailability(
+        queue: DispatchQueue = DispatchQueue.global(qos: .background),
+        completionHandler: @escaping ((Bool) -> ())
+    ) {
         let monitor = NWPathMonitor()
         let completionLock = NSLock()
         var completed = false
 
         monitor.pathUpdateHandler = { path in
             completionLock.lock()
+
             guard !completed else {
                 completionLock.unlock()
+
                 return
             }
+
             completed = true
             completionLock.unlock()
 
@@ -95,6 +112,7 @@ extension Networking {
             monitor.cancel()
             completionHandler(path.status == .satisfied)
         }
+
         monitor.start(queue: queue)
     }
 

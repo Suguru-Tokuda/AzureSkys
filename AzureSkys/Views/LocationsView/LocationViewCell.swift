@@ -13,65 +13,85 @@ struct LocationViewCell: View {
     @StateObject var vm: CurrentWeatherForecastViewModel
     var place: SavedPlace?
     var isMyLocation: Bool = false
-    
+
     init(dependencies: AppDependencies, place: SavedPlace? = nil, isMyLocation: Bool = false) {
         _vm = StateObject(wrappedValue: dependencies.makeCurrentWeatherViewModel())
         self.isMyLocation = isMyLocation
         self.place = place
     }
-    
+
     var body: some View {
         ZStack {
             if vm.loadingStatus == .loading {
                 ProgressView(Strings.loading.rawValue)
             }
+
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
                         // MARK: Location Text
-                        Text(isMyLocation ? 
-                                Strings.myLocation.rawValue :
-                                place?.name ?? "")
+                        Text(isMyLocation ? Strings.myLocation.rawValue : place?.name ?? "")
                             .font(.title3)
                             .fontWeight(.bold)
                         // MARK: Time
-                        Text(isMyLocation ? 
-                                vm.currentForecast?.name ?? "" :
-                                vm.currentForecast?
+                        Text(
+                            isMyLocation
+                                ? vm.currentForecast?.name ?? ""
+                                : vm.currentForecast?
                                     .dateTime
-                                    .unixTimeToDateStr(dateFormat: Constants.dateFormat,
-                                                       timezoneOffset: vm.currentForecast?.timezone ?? 0)
-                                    .getDateStrinng(dateFormat: Constants.dateFormat,
-                                                    newDateFormat: "hh:mm") ?? "")
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                                    .unixTimeToDateStr(
+                                        dateFormat: Constants.dateFormat,
+                                        timezoneOffset: vm.currentForecast?.timezone ?? 0
+                                    )
+                                    .getDateStrinng(
+                                        dateFormat: Constants.dateFormat,
+                                        newDateFormat: "hh:mm"
+                                    ) ?? ""
+                        )
+                        .font(.caption)
+                        .fontWeight(.semibold)
                     }
+
                     Spacer()
+
                     if let currentForecast = vm.currentForecast {
                         // MARK: Degree
-                        Text(currentForecast
+                        Text(
+                            currentForecast
                                 .main
                                 .temp
                                 .getDegree(tempScale: tempScale)
                                 .formatDouble(maxFractions: 0)
-                                .appendDegree())
-                            .font(.largeTitle)
+                                .appendDegree()
+                        )
+                        .font(.largeTitle)
                     }
                 }
+
                 Spacer()
                     .frame(height: 25)
                 HStack {
                     HStack {
                         Text(vm.currentForecast?.weather.first?.main ?? Strings.unavailable.rawValue)
+
                         if let currentForecast = vm.currentForecast,
-                           let weather = currentForecast.weather.first {
-                            WeatherImageView(condition: weather.weatherCondition, partOfDay: weather.partOfDay, width: 20)
+                            let weather = currentForecast.weather.first
+                        {
+                            WeatherImageView(
+                                condition: weather.weatherCondition,
+                                partOfDay: weather.partOfDay,
+                                width: 20
+                            )
                         }
                     }
 
                     Spacer()
+
                     if let currentForecast = vm.currentForecast {
-                        HighLowTemperatures(maxTemp: currentForecast.main.tempMax, minTemp: currentForecast.main.tempMin)
+                        HighLowTemperatures(
+                            maxTemp: currentForecast.main.tempMax,
+                            minTemp: currentForecast.main.tempMin
+                        )
                     }
                 }
                 .font(.caption)
@@ -98,16 +118,21 @@ struct LocationViewCell: View {
             } else if let place {
                 vm.setPlace(place: place)
             }
+
             vm.startDataRefreshTimer()
         }
-        .onReceive(NotificationCenter
-                    .default
-                    .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+        .onReceive(
+            NotificationCenter
+                .default
+                .publisher(for: UIApplication.didBecomeActiveNotification)
+        ) { _ in
             vm.didBecomeActive()
         }
-        .onReceive(NotificationCenter
-                    .default
-                    .publisher(for: UIApplication.willResignActiveNotification)) { _ in
+        .onReceive(
+            NotificationCenter
+                .default
+                .publisher(for: UIApplication.willResignActiveNotification)
+        ) { _ in
             vm.willResignActive()
         }
 
@@ -119,7 +144,8 @@ struct LocationViewCell: View {
     @ViewBuilder
     private var rowBackground: some View {
         if let forecast = vm.currentForecast,
-           let weather = forecast.weather.first {
+            let weather = forecast.weather.first
+        {
             weather.weatherCondition.getBackgroundImage(
                 partOfDay: weather.partOfDay,
                 clouds: forecast.clouds.all
@@ -132,6 +158,7 @@ struct LocationViewCell: View {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     LocationViewCell(dependencies: dependencies, isMyLocation: true)
         .appEnvironment(dependencies)
         .preferredColorScheme(.dark)

@@ -13,6 +13,7 @@ struct LocationListView: View {
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.isSearching) private var isSearching
     let dependencies: AppDependencies
+
     @StateObject var vm: LocationsViewModel
     @Environment(\.managedObjectContext) private var context
     init(dependencies: AppDependencies) {
@@ -26,6 +27,7 @@ struct LocationListView: View {
                 BackGroundView()
                     .zIndex(2)
             }
+
             getLocationList()
         }
         .task(id: vm.refreshID(for: context)) {
@@ -40,13 +42,15 @@ extension LocationListView {
     private func getLocationList() -> some View {
         List {
             if let locationAuthorized = locationManager.locationAuthorized,
-               locationAuthorized == true {
+                locationAuthorized == true
+            {
                 LocationViewCell(dependencies: dependencies, isMyLocation: true)
                     .deleteDisabled(true)
                     .onTapGesture {
                         mainCoordinator.selectLocation(nil)
                     }
             }
+
             ForEach(vm.places) { place in
                 LocationViewCell(dependencies: dependencies, place: place)
                     .onTapGesture {
@@ -54,14 +58,29 @@ extension LocationListView {
                     }
             }
             .onDelete { indexSet in
-                Task { await vm.removePlaces(at: indexSet) }
+                Task {
+                    await vm.removePlaces(at: indexSet)
+                }
             }
-            .alert(isPresented: Binding(get: { vm.coreDataError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.coreDataError) {
-                Button(action: {
-                    vm.dismissError()
-                }, label: {
-                    Text(Strings.ok.rawValue)
-                })
+            .alert(
+                isPresented: Binding(
+                    get: { vm.coreDataError != nil },
+                    set: {
+                        if !$0 {
+                            vm.dismissError()
+                        }
+                    }
+                ),
+                error: vm.coreDataError
+            ) {
+                Button(
+                    action: {
+                        vm.dismissError()
+                    },
+                    label: {
+                        Text(Strings.ok.rawValue)
+                    }
+                )
             }
         }
         .listStyle(.plain)
@@ -72,6 +91,7 @@ extension LocationListView {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     LocationListView(dependencies: dependencies)
         .preferredColorScheme(.dark)
         .appEnvironment(dependencies)

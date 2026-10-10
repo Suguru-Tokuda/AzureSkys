@@ -24,7 +24,10 @@ enum ForecastLocation: Identifiable {
     }
 
     var place: SavedPlace? {
-        if case .saved(let place) = self { return place }
+        if case .saved(let place) = self {
+            return place
+        }
+
         return nil
     }
 }
@@ -62,9 +65,10 @@ final class MainCoordinator: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        rootFlow = defaults.bool(
-            forKey: MainCoordinatorConstants.hasSeenOnboarding
-        ) ? .weather : .onboarding
+        rootFlow =
+            defaults.bool(
+                forKey: MainCoordinatorConstants.hasSeenOnboarding
+            ) ? .weather : .onboarding
     }
 
     func goToLocations() {
@@ -73,6 +77,7 @@ final class MainCoordinator: ObservableObject {
 
     func selectLocation(_ place: SavedPlace?) {
         let location = place.map(ForecastLocation.saved) ?? .current
+
         if case .locations = fullScreenDestination {
             selectedLocation = location
             fullScreenDestination = nil
@@ -86,7 +91,9 @@ final class MainCoordinator: ObservableObject {
     }
 
     func dismissLocations() {
-        if case .locations = fullScreenDestination { fullScreenDestination = nil }
+        if case .locations = fullScreenDestination {
+            fullScreenDestination = nil
+        }
     }
 
     func dismissForecast() {
@@ -110,6 +117,7 @@ private enum MainCoordinatorConstants {
     static func savedLocationID(_ placeID: String) -> String {
         "saved:\(placeID)"
     }
+
     static func forecastRouteID(_ locationID: String) -> String {
         "forecast:\(locationID)"
     }

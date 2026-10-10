@@ -9,13 +9,13 @@ import Foundation
 
 enum Weekdays: String {
     case sunday = "Sun",
-         monday = "Mon",
-         tuesday = "Tue",
-         wednesday = "Wed",
-         thursday = "Thu",
-         friday = "Fri",
-         saturday = "Sat"
-    
+        monday = "Mon",
+        tuesday = "Tue",
+        wednesday = "Wed",
+        thursday = "Thu",
+        friday = "Fri",
+        saturday = "Sat"
+
     static func getWeekday(day: Int) -> Weekdays {
         switch day {
         case 1:

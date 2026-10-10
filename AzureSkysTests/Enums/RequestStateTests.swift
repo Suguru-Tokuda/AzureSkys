@@ -11,6 +11,7 @@ import XCTest
 final class RequestStateTests: XCTestCase {
     func testQuietRefreshPreservesDataAndDismissalRestoresIt() {
         var state: RequestState<Int> = .loaded(42)
+
         state = .loading(previous: state.value)
         XCTAssertEqual(state.value, 42)
         XCTAssertEqual(state.loadingStatus, .loaded)
@@ -24,6 +25,7 @@ final class RequestStateTests: XCTestCase {
 
     func testInitialLoadingAndErrorDismissalWithoutData() {
         var state: RequestState<Int> = .loading()
+
         XCTAssertNil(state.value)
         XCTAssertEqual(state.loadingStatus, .loading)
         state = .failed(.serverError)
@@ -35,6 +37,9 @@ final class RequestStateTests: XCTestCase {
         XCTAssertEqual(NetworkError(NetworkError.noData), .noData)
         XCTAssertEqual(NetworkError(URLError(.notConnectedToInternet)), .networkUnavailable)
         XCTAssertEqual(NetworkError(URLError(.networkConnectionLost)), .networkUnavailable)
-        XCTAssertEqual(NetworkError(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "invalid"))), .dataParsingError)
+        XCTAssertEqual(
+            NetworkError(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "invalid"))),
+            .dataParsingError
+        )
     }
 }

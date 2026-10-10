@@ -10,7 +10,7 @@ import Foundation
 enum TempScale: String, CaseIterable, Identifiable {
     // Preserve the stored value used by existing preferences and Settings.bundle.
     case fahrenheit = "Fahrenheight", celsius = "Celsius"
-    
+
     var id: String { self.rawValue }
 
     var displayName: String {

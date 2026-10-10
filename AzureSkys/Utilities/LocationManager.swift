@@ -24,6 +24,7 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.delegate = self
         locationManagerDidChangeAuthorization(locationManager)
+
         if startAutomatically {
             locationManager.requestWhenInUseAuthorization()
         }
@@ -37,26 +38,33 @@ class LocationManager: NSObject, ObservableObject {
 extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let latestLocation = locations.last else { return }
+
         currentLocation = latestLocation
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
+
         switch authorizationStatus {
         case .notDetermined:
             locationAuthorized = nil
+
         case .restricted:
             locationAuthorized = false
             break
+
         case .denied:
             locationAuthorized = false
             break
+
         case .authorizedAlways:
             locationAuthorized = true
             break
+
         case .authorizedWhenInUse:
             locationAuthorized = true
             break
+
         @unknown default:
             locationAuthorized = false
             break

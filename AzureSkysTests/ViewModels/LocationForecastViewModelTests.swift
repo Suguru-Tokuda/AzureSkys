@@ -14,9 +14,16 @@ final class LocationForecastViewModelTests: XCTestCase {
         for staleError in [nil, NetworkError.serverError] {
             let service = ControlledPlacesService()
             let vm = LocationForecastViewModel(placesService: service)
-            let old = Task { await vm.getPredictions(searchText: "old") }
+            let old = Task {
+                await vm.getPredictions(searchText: "old")
+            }
+
             await service.waitForRequest("old")
-            let new = Task { await vm.getPredictions(searchText: "new") }
+
+            let new = Task {
+                await vm.getPredictions(searchText: "new")
+            }
+
             await service.waitForRequest("new")
             await service.finish("new")
             await new.value
@@ -30,7 +37,10 @@ final class LocationForecastViewModelTests: XCTestCase {
     func testClearingSearchRejectsPendingResult() async {
         let service = ControlledPlacesService()
         let vm = LocationForecastViewModel(placesService: service)
-        let request = Task { await vm.getPredictions(searchText: "city") }
+        let request = Task {
+            await vm.getPredictions(searchText: "city")
+        }
+
         await service.waitForRequest("city")
         vm.searchText = "   "
         await service.finish("city")
@@ -42,12 +52,19 @@ final class LocationForecastViewModelTests: XCTestCase {
     func testFailureThenRetryRecovers() async {
         let service = ControlledPlacesService()
         let vm = LocationForecastViewModel(placesService: service)
-        let failed = Task { await vm.getPredictions(searchText: "city") }
+        let failed = Task {
+            await vm.getPredictions(searchText: "city")
+        }
+
         await service.waitForRequest("city")
         await service.finish("city", error: .networkUnavailable)
         await failed.value
         XCTAssertEqual(vm.networkError, .networkUnavailable)
-        let retry = Task { await vm.getPredictions(searchText: "city") }
+
+        let retry = Task {
+            await vm.getPredictions(searchText: "city")
+        }
+
         await service.waitForRequest("city")
         await service.finish("city")
         await retry.value
@@ -58,6 +75,7 @@ final class LocationForecastViewModelTests: XCTestCase {
     func testDetailsFailureDoesNotReplaceSearchState() async {
         let vm = LocationForecastViewModel(placesService: ControlledPlacesService())
         let place = await vm.getPlaceDetails(placeId: "city")
+
         XCTAssertNil(place)
         XCTAssertEqual(vm.detailsError, .networkUnavailable)
         XCTAssertNil(vm.networkError)
@@ -67,6 +85,7 @@ final class LocationForecastViewModelTests: XCTestCase {
 
     func testPendingDebounceDoesNotRetainViewModel() {
         var vm: LocationForecastViewModel? = LocationForecastViewModel(placesService: ControlledPlacesService())
+
         weak var weakVM = vm
         vm?.searchText = "city"
         vm = nil

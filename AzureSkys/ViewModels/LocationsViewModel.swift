@@ -27,18 +27,25 @@ class LocationsViewModel: ObservableObject {
 
     func observeChanges(in context: NSManagedObjectContext) {
         guard observedContext !== context else { return }
+
         observedContext = context
         subscriptions.removeAll()
+
         for name in [Notification.Name.NSManagedObjectContextDidSave, .NSManagedObjectContextObjectsDidChange] {
             NotificationCenter.default.publisher(for: name)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] notification in
                     guard let self, let changed = notification.object as? NSManagedObjectContext,
-                          let current = self.observedContext else { return }
-                    let relevant = name == .NSManagedObjectContextDidSave
+                        let current = self.observedContext
+                    else { return }
+
+                    let relevant =
+                        name == .NSManagedObjectContextDidSave
                         ? changed.persistentStoreCoordinator === current.persistentStoreCoordinator
                         : changed === current
-                    if relevant { self.refreshRevision += 1 }
+                    if relevant {
+                        self.refreshRevision += 1
+                    }
                 }
                 .store(in: &subscriptions)
         }
@@ -48,33 +55,40 @@ class LocationsViewModel: ObservableObject {
         do {
             // The store serializes this fetch with cloud-sync reconfiguration.
             let fetched = try await placeCoreDataManager.getPlacesFromDatabase()
+
             try Task.checkCancellation()
             places = fetched.sorted {
                 let comparison = $0.name.localizedStandardCompare($1.name)
+
                 return comparison == .orderedSame ? $0.id < $1.id : comparison == .orderedAscending
             }
         } catch {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled else {
+                return
+            }
+
             coreDataError = .fetch
         }
     }
 
     func removePlaces(at offsets: IndexSet) async {
         let selected = offsets.compactMap { places.indices.contains($0) ? places[$0] : nil }
+
         await removePlaces(selected)
     }
 
     @Published var coreDataError: CoreDataError?
-    
+
     private let placeCoreDataManager: PlaceCoreDataActions
-    
+
     init(placeCoreDataManager: PlaceCoreDataActions) {
         self.placeCoreDataManager = placeCoreDataManager
     }
-    
+
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
         // Capture the selected places before deletions update the fetched results.
         let places = indexSet.compactMap { SavedPlace(from: results[$0]) }
+
         Task { [weak self] in
             await self?.removePlaces(places)
         }
@@ -82,6 +96,7 @@ class LocationsViewModel: ObservableObject {
 
     func removePlaces(_ places: [SavedPlace]) async {
         coreDataError = nil
+
         for place in places {
             do {
                 try await placeCoreDataManager.deleteFromDatabase(place: place)

@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     let dependencies: AppDependencies
+
     @EnvironmentObject var coordinator: MainCoordinator
-    
+
     var body: some View {
         switch coordinator.rootFlow {
         case .onboarding:
@@ -18,6 +19,7 @@ struct ContentView: View {
                 dependencies: dependencies,
                 onFinished: coordinator.completeOnboarding
             )
+
         case .weather:
             mainView
         }
@@ -30,6 +32,7 @@ struct ContentView: View {
                 switch destination {
                 case .locations:
                     LocationsFlow(dependencies: dependencies, showDismiss: true)
+
                 case .forecast(let location):
                     WeatherForecastView(dependencies: dependencies, location: location, presentation: .fullScreen)
                 }
@@ -39,6 +42,7 @@ struct ContentView: View {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     ContentView(dependencies: dependencies)
         .appEnvironment(dependencies)
         .preferredColorScheme(.dark)

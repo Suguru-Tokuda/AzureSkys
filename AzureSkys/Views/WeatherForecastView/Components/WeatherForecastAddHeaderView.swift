@@ -13,29 +13,35 @@ struct WeatherForecastAddHeaderView: View {
 
     var body: some View {
         HStack {
-            Button(action: {
-                cancelBtnTapped?()
-            }, label: {
-                Text(Strings.cancel.rawValue)
-                    .shadow(
-                        color: .black.opacity(0.5),
-                        radius: 3,
-                        x: 0,
-                        y: 2
-                    )
-            })
+            Button(
+                action: {
+                    cancelBtnTapped?()
+                },
+                label: {
+                    Text(Strings.cancel.rawValue)
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 3,
+                            x: 0,
+                            y: 2
+                        )
+                }
+            )
             Spacer()
-            Button(action: {
-                addBtnTapped?()
-            }, label: {
-                Text(Strings.add.rawValue)
-                    .shadow(
-                        color: .black.opacity(0.5),
-                        radius: 3,
-                        x: 0,
-                        y: 2
-                    )
-            })
+            Button(
+                action: {
+                    addBtnTapped?()
+                },
+                label: {
+                    Text(Strings.add.rawValue)
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 3,
+                            x: 0,
+                            y: 2
+                        )
+                }
+            )
         }
         .fontWeight(.semibold)
     }

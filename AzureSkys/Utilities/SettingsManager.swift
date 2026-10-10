@@ -12,8 +12,12 @@ class SettingsManager {
     private let canOpen: (URL) -> Bool
     private let open: (URL) -> Void
 
-    init(canOpen: @escaping (URL) -> Bool = { UIApplication.shared.canOpenURL($0) },
-         open: @escaping (URL) -> Void = { UIApplication.shared.open($0) }) {
+    init(
+        canOpen: @escaping (URL) -> Bool = {
+            UIApplication.shared.canOpenURL($0)
+        },
+        open: @escaping (URL) -> Void = { UIApplication.shared.open($0) }
+    ) {
         self.canOpen = canOpen
         self.open = open
     }
@@ -22,10 +26,13 @@ class SettingsManager {
         switch locationManager.locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestAuthorization()
+
         case .denied, .authorizedWhenInUse, .authorizedAlways:
             navigateToSettings()
+
         case .restricted:
             break
+
         @unknown default:
             break
         }
@@ -33,7 +40,8 @@ class SettingsManager {
 
     func navigateToSettings() {
         guard let settingsURL = URL(string: UIApplication.openSettingsURLString),
-              canOpen(settingsURL) else { return }
+            canOpen(settingsURL)
+        else { return }
         open(settingsURL)
     }
 }

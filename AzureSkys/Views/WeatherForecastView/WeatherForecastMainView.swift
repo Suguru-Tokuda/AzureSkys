@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WeatherForecastMainView: View {
     let dependencies: AppDependencies
+
     @EnvironmentObject var locationManager: LocationManager
     @EnvironmentObject var coordinator: MainCoordinator
 
@@ -23,6 +24,7 @@ struct WeatherForecastMainView: View {
 
 #Preview {
     let dependencies = AppDependencies.preview()
+
     WeatherForecastMainView(dependencies: dependencies)
         .appEnvironment(dependencies)
 }

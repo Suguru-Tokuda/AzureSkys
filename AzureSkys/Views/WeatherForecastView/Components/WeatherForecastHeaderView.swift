@@ -14,7 +14,7 @@ struct WeatherForecastHeaderView: View {
     var dailyForecast: DailyForecast
     var isMyLocation: Bool = false
     var scrollViewOffsetPercentage: CGFloat
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: -10) {
             HStack(alignment: .top) {
@@ -40,11 +40,12 @@ struct WeatherForecastHeaderView: View {
                 .fontWeight(.thin)
                 .offset(x: 10)
                 .shadow(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)
-            
+
             VStack(alignment: .leading) {
                 if let weather = currentForecast.weather.first {
                     Text(weather.main)
                 }
+
                 HighLowTemperatures(maxTemp: dailyForecast.temp.max, minTemp: dailyForecast.temp.min)
             }
             .font(.title3.weight(.semibold))

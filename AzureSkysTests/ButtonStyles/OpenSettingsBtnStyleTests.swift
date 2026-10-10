@@ -12,6 +12,12 @@ import SwiftUI
 @MainActor
 final class OpenSettingsBtnStyleTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(Button("Open Settings") {}.buttonStyle(OpenSettingsBtnStyle(backgroundColor: .blue, foregroundColor: .white))))
+        assertVisibleContent(
+            try await renderSnapshot(
+                Button("Open Settings") {}.buttonStyle(
+                    OpenSettingsBtnStyle(backgroundColor: .blue, foregroundColor: .white)
+                )
+            )
+        )
     }
 }

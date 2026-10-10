@@ -23,31 +23,32 @@ class LocalFileManager: LocalFileManaging, ObservableObject {
         guard let data = image.pngData() else {
             throw FileManagerError.data
         }
-        
+
         guard let path: URL = getPath(name: name) else {
             throw FileManagerError.badPath
         }
-        
+
         do {
             try data.write(to: path)
         } catch {
             throw FileManagerError.save
         }
     }
-    
+
     func getImage(name: String) throws -> UIImage? {
         guard let path = getPath(name: name) else {
             throw FileManagerError.badPath
         }
-        
+
         do {
             let data = try Data(contentsOf: path)
+
             return UIImage(data: data)
         } catch {
             throw FileManagerError.retrieve
         }
     }
-    
+
     func getPath(name: String) -> URL? {
         directory?.appending(path: name)
     }

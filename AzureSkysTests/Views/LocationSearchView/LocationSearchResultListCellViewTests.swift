@@ -12,6 +12,13 @@ import SwiftUI
 @MainActor
 final class LocationSearchResultListCellViewTests: XCTestCase {
     func testDisplayedStateChangesRenderedContent() async throws {
-        try await assertDifferent(LocationSearchResultListCellView(prediction: Prediction(id: UUID(), description: "Chicago", placeId: "city")), LocationSearchResultListCellView(prediction: Prediction(id: UUID(), description: "Atlanta", placeId: "city")))
+        try await assertDifferent(
+            LocationSearchResultListCellView(
+                prediction: Prediction(id: UUID(), description: "Chicago", placeId: "city")
+            ),
+            LocationSearchResultListCellView(
+                prediction: Prediction(id: UUID(), description: "Atlanta", placeId: "city")
+            )
+        )
     }
 }

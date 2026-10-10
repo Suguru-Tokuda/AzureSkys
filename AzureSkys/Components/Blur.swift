@@ -17,7 +17,7 @@ struct Backdrop<UIViewType: UIBackdropView>: UIViewRepresentable {
     func makeUIView(context: Context) -> UIBackdropView {
         UIBackdropView()
     }
-    
+
     func updateUIView(_ uiView: UIBackdropView, context: Context) {
     }
 }

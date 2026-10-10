@@ -10,5 +10,7 @@ import XCTest
 @testable import AzureSkys
 
 final class UserDefaultKeysTests: XCTestCase {
-    func testTemperaturePreferenceKeyRemainsCompatible() { XCTAssertEqual(UserDefaultKeys.tempScale.rawValue, "tempScale") }
+    func testTemperaturePreferenceKeyRemainsCompatible() {
+        XCTAssertEqual(UserDefaultKeys.tempScale.rawValue, "tempScale")
+    }
 }

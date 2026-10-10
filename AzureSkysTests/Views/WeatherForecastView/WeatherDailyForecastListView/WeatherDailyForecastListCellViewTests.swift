@@ -12,6 +12,14 @@ import SwiftUI
 @MainActor
 final class WeatherDailyForecastListCellViewTests: XCTestCase {
     func testRendersVisibleContentWithFixtureData() async throws {
-        assertVisibleContent(try await renderSnapshot(WeatherDailyForecastListCellView(forecast: PreviewManager.oneCallResponse.daily[0], timezoneOffset: 0, showTempBarAnimation: false)))
+        assertVisibleContent(
+            try await renderSnapshot(
+                WeatherDailyForecastListCellView(
+                    forecast: PreviewManager.oneCallResponse.daily[0],
+                    timezoneOffset: 0,
+                    showTempBarAnimation: false
+                )
+            )
+        )
     }
 }

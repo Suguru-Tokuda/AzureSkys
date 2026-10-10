@@ -19,18 +19,22 @@ class WeatherForecastViewModel: ObservableObject {
     var geocode: WeatherGeocode? { requestState.value?.geocode }
     var networkError: NetworkError? { requestState.error }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
+
     @Published var locationAuthorized: Bool?
     var place: SavedPlace?
     var currentLocation: CLLocation?
     var cancellables = Set<AnyCancellable>()
-    
+
     private let weatherService: WeatherServicing
     private let coreDataManager: PlaceCoreDataActions
+
     var locationManager: LocationManager?
+
     private var wasInactive = false
 
     func didBecomeActive() {
         guard wasInactive else { return }
+
         wasInactive = false
         startDataRefreshTimer(showLoading: false)
     }
@@ -42,8 +46,10 @@ class WeatherForecastViewModel: ObservableObject {
 
     private let refreshScheduler = RefreshScheduler()
 
-    init(weatherService: WeatherServicing,
-         coreDataManager: PlaceCoreDataActions) {
+    init(
+        weatherService: WeatherServicing,
+        coreDataManager: PlaceCoreDataActions
+    ) {
         self.weatherService = weatherService
         self.coreDataManager = coreDataManager
     }
@@ -51,7 +57,7 @@ class WeatherForecastViewModel: ObservableObject {
     deinit {
         self.cancellables.removeAll()
     }
-    
+
     /**
         Adds subscription for the current location from the locationManager
      */
@@ -62,8 +68,11 @@ class WeatherForecastViewModel: ObservableObject {
                 .receive(on: RunLoop.main)
                 .sink { [weak self] receivedVal in
                     guard let self else { return }
+
                     self.locationAuthorized = receivedVal.0
+
                     let callApi = self.currentLocation == nil && receivedVal.1 != nil
+
                     self.currentLocation = receivedVal.1
 
                     if callApi && refreshScheduler.isRunning {
@@ -73,33 +82,46 @@ class WeatherForecastViewModel: ObservableObject {
                 .store(in: &cancellables)
         }
     }
-    
+
     func getWeatherForecastData(showLoading: Bool = true) async {
         guard let currentLocation else { return }
+
         await getWeatherForecastData(coordinate: currentLocation.coordinate, showLoading: showLoading)
     }
 
     func getWeatherForecastData(place: SavedPlace, showLoading: Bool = true) async {
-        let coordinate = CLLocationCoordinate2D(latitude: place.latitude,
-                                                longitude: place.longitude)
+        let coordinate = CLLocationCoordinate2D(
+            latitude: place.latitude,
+            longitude: place.longitude
+        )
         await getWeatherForecastData(coordinate: coordinate, showLoading: showLoading)
     }
 
     private func getWeatherForecastData(coordinate: CLLocationCoordinate2D, showLoading: Bool) async {
-        guard !Task.isCancelled else { return }
-        if case .loading = requestState { return }
+        guard !Task.isCancelled else {
+            return
+        }
+
+        if case .loading = requestState {
+            return
+        }
+
         let previous = requestState.value
+
         requestState = .loading(previous: showLoading ? nil : previous)
 
         do {
             let data = try await weatherService.getForecast(coordinate: coordinate)
+
             try Task.checkCancellation()
             requestState = .loaded(data)
         } catch {
             guard !Task.isCancelled else {
                 requestState = previous.map(RequestState.loaded) ?? .idle
+
                 return
             }
+
             requestState = .failed(NetworkError(error), previous: previous)
         }
     }
@@ -111,7 +133,7 @@ class WeatherForecastViewModel: ObservableObject {
             await self.getWeatherForecastData(showLoading: showLoading)
         }
     }
-    
+
     func dismissError() {
         coreDataError = nil
     }
@@ -124,24 +146,25 @@ class WeatherForecastViewModel: ObservableObject {
         self.cancellables.removeAll()
         self.addLocationSubscriptions()
     }
-    
+
     func addPlace(place: SavedPlace?, completionHandler: @escaping (Result<Bool, Error>) -> Void) {
         if let place {
             Task { [weak self] in
                 guard let self else { return }
+
                 do {
                     coreDataError = nil
                     try await coreDataManager.savePlaceIntoDatabase(place: place)
                     completionHandler(.success(true))
                 } catch {
                     self.coreDataError = CoreDataError.save
-                    
+
                     completionHandler(.failure(error))
                 }
             }
         }
     }
-    
+
 }
 
 // MARK: Refresh scheduling

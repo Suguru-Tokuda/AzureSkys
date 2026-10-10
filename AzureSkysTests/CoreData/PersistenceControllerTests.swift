@@ -4,6 +4,17 @@ import CoreData
 
 @MainActor
 final class PersistenceControllerTests: XCTestCase {
+    func testStartupDoesNotEraseAnErrorReportedByTheSyncEngine() async throws {
+        let sync = SyncDouble()
+        let persistence = PersistenceController(inMemory: true, syncCoordinatorFactory: { _ in sync })
+        sync.onStart = { [weak persistence] in
+            persistence?.reportSyncError(CoreDataError.save)
+        }
+        try await persistence.setSyncEnabled(true)
+        XCTAssertTrue(persistence.syncEnabled)
+        XCTAssertNotNil(persistence.accountChangeError)
+    }
+
     func testTemporaryContainersAreIsolatedAndMergeChanges() throws {
         let first = PersistenceController(inMemory: true)
         let second = PersistenceController(inMemory: true)
@@ -154,7 +165,11 @@ final class PersistenceControllerTests: XCTestCase {
 private final class SyncDouble: LocationSyncControlling {
     var available = true
     var isRunning = false
-    func start() async throws { isRunning = available }
+    var onStart: (() -> Void)?
+    func start() async throws {
+        isRunning = available
+        onStart?()
+    }
     func stop() async { isRunning = false }
     func enqueueLocalChanges() async throws {}
 }

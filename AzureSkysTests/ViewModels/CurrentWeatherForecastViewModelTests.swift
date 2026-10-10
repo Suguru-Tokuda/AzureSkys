@@ -50,12 +50,14 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
 
     func testLocationSubscriptionsAndScheduler() async {
         let vm = CurrentWeatherForecastViewModel(weatherService: WeatherDouble())
-        let location = LocationManager(startAutomatically: false)
+        let driver = LocationDriver()
+        let location = LocationManager(startAutomatically: false, locationManager: driver)
         vm.setLocationManager(locationManager: location)
         vm.startDataRefreshTimer()
         location.currentLocation = CLLocation(latitude: 1, longitude: 2)
-        location.locationAuthorized = true
-        for _ in 0..<100 { if vm.currentForecast != nil { break }; try? await Task.sleep(for: .milliseconds(5)) }
+        driver.status = .authorizedWhenInUse
+        location.locationManagerDidChangeAuthorization(driver)
+        for _ in 0..<100 { if vm.currentForecast != nil && vm.locationAuthorized == true { break }; try? await Task.sleep(for: .milliseconds(5)) }
         XCTAssertNotNil(vm.currentForecast)
         XCTAssertEqual(vm.locationAuthorized, true)
         vm.endDataRefreshTimer()

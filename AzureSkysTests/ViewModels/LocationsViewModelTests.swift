@@ -11,6 +11,31 @@ import XCTest
 
 @MainActor
 final class LocationsViewModelTests: XCTestCase {
+    func testPlacesSortAlphabeticallyAndDeleteUsingDisplayedOrder() async {
+        let store = PlaceStoreDouble()
+        store.saved = ["Zurich", "amsterdam", "Boston"].map {
+            SavedPlace(id: $0, name: $0, formattedAddress: "", latitude: 0, longitude: 0, addressComponents: [])
+        }
+        let vm = LocationsViewModel(placeCoreDataManager: store)
+        await vm.loadPlaces()
+        XCTAssertEqual(vm.places.map(\.name), ["amsterdam", "Boston", "Zurich"])
+        await vm.removePlaces(at: IndexSet([0, 2, 99]))
+        XCTAssertEqual(store.deleted.map(\.name), ["amsterdam", "Zurich"])
+    }
+
+    func testCancelledLoadPreservesPlacesAndDoesNotReportError() async {
+        let store = PlaceStoreDouble()
+        store.saved = [testPlace]
+        let vm = LocationsViewModel(placeCoreDataManager: store)
+        await vm.loadPlaces()
+        store.saved = []
+        let task = Task { await vm.loadPlaces() }
+        task.cancel()
+        await task.value
+        XCTAssertEqual(vm.places, [testPlace])
+        XCTAssertNil(vm.coreDataError)
+    }
+
     func testDeletionErrorCanBeDismissedAndRetried() async {
         let store = PlaceStoreDouble()
         let vm = LocationsViewModel(placeCoreDataManager: store)

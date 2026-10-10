@@ -25,6 +25,7 @@ final class PersistenceController: ObservableObject {
     @Published private(set) var viewContext: NSManagedObjectContext
     @Published private(set) var isReconfiguring = false
     @Published private(set) var accountChangeError: Error?
+    @Published var pendingUploadCount = 0
     private(set) var container: NSPersistentContainer
     private(set) var syncEnabled = false
     private let inMemory: Bool
@@ -93,9 +94,9 @@ final class PersistenceController: ObservableObject {
         requestedSyncEnabled = enabled
         if enabled {
             do {
+                accountChangeError = nil
                 try await syncCoordinator?.start()
                 syncEnabled = syncCoordinator?.isRunning ?? false
-                accountChangeError = nil
             } catch {
                 requestedSyncEnabled = previousRequest
                 await syncCoordinator?.stop()
@@ -112,9 +113,9 @@ final class PersistenceController: ObservableObject {
     private func refreshSync() async {
         guard requestedSyncEnabled else { return }
         do {
+            accountChangeError = nil
             try await syncCoordinator?.start()
             syncEnabled = syncCoordinator?.isRunning ?? false
-            accountChangeError = nil
         } catch {
             accountChangeError = error
             syncEnabled = false

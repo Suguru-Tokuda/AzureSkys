@@ -9,7 +9,8 @@ import XCTest
 import CoreLocation
 @testable import AzureSkys
 
-private final class LocationDriver: CLLocationManager {
+// Controllable Core Location driver shared by location and view model tests.
+final class LocationDriver: CLLocationManager {
     var status: CLAuthorizationStatus = .notDetermined
     var requested = false
     var started = false

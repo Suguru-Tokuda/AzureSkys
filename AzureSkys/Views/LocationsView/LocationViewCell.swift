@@ -11,7 +11,6 @@ struct LocationViewCell: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     @EnvironmentObject var locationManager: LocationManager
     @StateObject var vm: CurrentWeatherForecastViewModel
-    @State var isActive: Bool?
     var place: SavedPlace?
     var isMyLocation: Bool = false
     
@@ -104,16 +103,12 @@ struct LocationViewCell: View {
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            if isActive != nil {
-                self.isActive = true
-                vm.startDataRefreshTimer()
-            }
+            vm.didBecomeActive()
         }
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            isActive = false
-            vm.endDataRefreshTimer()
+            vm.willResignActive()
         }
 
         .onDisappear {

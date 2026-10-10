@@ -43,6 +43,11 @@ class LocationForecastViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func retrySearch() async {
+        guard !searchText.isEmpty else { return }
+        await getPredictions(searchText: searchText)
+    }
+
     func dismissError() {
         detailsState.dismissError()
     }

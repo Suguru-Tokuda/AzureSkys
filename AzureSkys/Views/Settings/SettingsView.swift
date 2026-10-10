@@ -12,19 +12,9 @@ struct SettingsView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage(UserDefaultKeys.tempScale.rawValue)
-    private var tempScale: TempScale = .fahrenheit
-
-    @AppStorage(UserDefaultKeys.iCloudSyncEnabled.rawValue)
-    private var iCloudSyncEnabled = false
-
-    @EnvironmentObject private var locationManager: LocationManager
-    private let settingsManager: SettingsManager
-
     @StateObject private var vm: SettingsViewModel
 
     init(dependencies: AppDependencies) {
-        settingsManager = dependencies.settingsManager
         _vm = StateObject(
             wrappedValue: dependencies.makeSettingsViewModel()
         )
@@ -83,23 +73,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .onReceive(
-            NotificationCenter.default.publisher(for: .CKAccountChanged)
-        ) { _ in
-            Task {
-                await vm.refreshICloudAvailability()
-            }
-        }
-    }
-
-    private var locationStatusLabel: String {
-        switch locationManager.authorizationStatus {
-        case .notDetermined: return Strings.locationNotRequested.rawValue
-        case .denied: return Strings.locationDenied.rawValue
-        case .restricted: return Strings.locationRestricted.rawValue
-        case .authorizedAlways, .authorizedWhenInUse: return Strings.locationEnabled.rawValue
-        @unknown default: return Strings.locationUnknown.rawValue
-        }
     }
 
     private var secondaryColor: Color {
@@ -145,7 +118,7 @@ struct SettingsView: View {
                                subtitle: Strings.settingsLocationDescription.rawValue,
                                icon: .locationFill)
                 Spacer(minLength: 0)
-                Text(locationStatusLabel)
+                Text(vm.locationStatusLabel)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(secondaryColor)
                     .padding(.horizontal, 12)
@@ -157,10 +130,10 @@ struct SettingsView: View {
             Divider().overlay(.white.opacity(0.12))
 
             Button {
-                settingsManager.manageLocationAccess(locationManager: locationManager)
+                vm.manageLocationAccess()
             } label: {
                 HStack {
-                    Text(locationManager.authorizationStatus == .notDetermined
+                    Text(vm.authorizationStatus == .notDetermined
                          ? Strings.enableLocation.rawValue
                          : Strings.manageLocation.rawValue)
                     Spacer()
@@ -171,9 +144,9 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .disabled(locationManager.authorizationStatus == .restricted)
+            .disabled(vm.authorizationStatus == .restricted)
 
-            if locationManager.authorizationStatus == .restricted {
+            if vm.authorizationStatus == .restricted {
                 Text(Strings.locationRestrictedDescription.rawValue)
                     .font(.footnote)
                     .foregroundStyle(secondaryColor)
@@ -223,13 +196,13 @@ struct SettingsView: View {
         HStack(spacing: 4) {
             ForEach(TempScale.allCases) { scale in
                 Button {
-                    tempScale = scale
+                    vm.tempScale = scale
                 } label: {
                     Text(scale.shortName)
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .background {
-                        if tempScale == scale {
+                        if vm.tempScale == scale {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(.blue.opacity(0.55))
                                 .overlay {
@@ -242,7 +215,7 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(scale.displayName)
-                .accessibilityAddTraits(tempScale == scale ? .isSelected : [])
+                .accessibilityAddTraits(vm.tempScale == scale ? .isSelected : [])
             }
         }
         .padding(4)
@@ -256,7 +229,7 @@ struct SettingsView: View {
     private var syncRow: some View {
         VStack(alignment: .leading, spacing: 16) {
             Toggle(isOn: Binding(
-                get: { iCloudSyncEnabled && vm.isICloudAvailable },
+                get: { vm.iCloudSyncEnabled && vm.isICloudAvailable },
                 set: { enabled in
                     Task { await vm.setSyncEnabled(enabled) }
                 }
@@ -266,12 +239,17 @@ struct SettingsView: View {
                                icon: .iCloudFill)
             }
             .tint(.green)
-            .disabled(vm.isUpdatingSync || (!vm.isICloudAvailable && !iCloudSyncEnabled))
+            .disabled(vm.isUpdatingSync || (!vm.isICloudAvailable && !vm.iCloudSyncEnabled))
 
+            if vm.iCloudSyncEnabled && vm.pendingUploadCount > 0 {
+                Text("Changes waiting to upload: \(vm.pendingUploadCount)")
+                    .font(.footnote)
+                    .foregroundStyle(secondaryColor)
+            }
             if vm.isUpdatingSync {
                 ProgressView().accessibilityLabel(Strings.loading.rawValue)
             }
-            if let error = vm.syncError {
+            if let error = vm.displayedSyncError {
                 Text(error)
                     .font(.footnote)
                     .foregroundStyle(secondaryColor)

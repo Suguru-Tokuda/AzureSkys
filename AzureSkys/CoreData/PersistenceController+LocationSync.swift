@@ -16,7 +16,7 @@ struct PendingLocationChange: Equatable {
 
 extension PersistenceController {
     func pendingLocationChanges() async throws -> [PendingLocationChange] {
-        try await performBackgroundTask { context in
+        let changes = try await performBackgroundTask { context in
             let rows = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "LocalSyncAction"))
             let changes = rows.compactMap { row -> PendingLocationChange? in
                 guard let id = row.value(forKey: "id") as? String,
@@ -30,6 +30,8 @@ extension PersistenceController {
             if context.hasChanges { try context.save() }
             return changes
         }
+        pendingUploadCount = changes.count
+        return changes
     }
 
     func recordForSync(_ id: String) async throws -> CKRecord? {

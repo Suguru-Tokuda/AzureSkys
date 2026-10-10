@@ -13,7 +13,6 @@ struct WeatherForecastView: View {
     let dependencies: AppDependencies
     @StateObject var vm: WeatherForecastViewModel
     @State var scrollViewOffset: CGFloat = .zero
-    @State var isActive: Bool?
     let location: ForecastLocation
     let presentation: Presentation
     private var place: SavedPlace? { location.place }
@@ -73,16 +72,12 @@ struct WeatherForecastView: View {
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            if isActive != nil {
-                self.isActive = true
-                vm.startDataRefreshTimer(showLoading: false)
-            }
+            vm.didBecomeActive()
         }
         .onReceive(NotificationCenter
                     .default
                     .publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            isActive = false
-            vm.endDataRefreshTimer()
+            vm.willResignActive()
         }
         .background {
             BackGroundView()

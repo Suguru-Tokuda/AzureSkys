@@ -33,3 +33,11 @@ The new zone is `AzureSkysLocations`. Its record type is `AzureSkysPlace`. Recor
 4. Upgrade all participating devices. Older app versions use the old Core Data zone; new versions use the new zone. The one-time import preserves existing data, but it does not provide ongoing synchronization with older versions.
 
 Automated tests exercise the actual local model, migration, record encoding, journal revisions, batch construction, and import/acknowledgement handling. They do not prove live server synchronization or production-schema availability.
+
+## App Store reinstall recovery
+
+Publishing an App Store build does not deploy the new CloudKit schema. Before shipping a version that writes `AzureSkysPlace`, open CloudKit Console, select `iCloud.com.stokuda.weather`, and review/deploy the development schema changes to production. Verify the record type and all six fields in the table above exist in production. If the type is missing from development, first run the app against development with iCloud enabled and successfully upload a saved location to initialize it.
+
+A location appearing in the app proves a local save, not a successful cloud upload. Settings displays pending uploads and sync errors. The app requests an upload when local changes are queued; CloudKit still controls retries after failures. Preserve the installed app's local data until uploads have succeeded. Validate restoration on another device with the same iCloud account before testing deletion of the original installation.
+
+Deploying the schema enables future uploads; it cannot recover local-only records erased by uninstall. Previously uploaded legacy records are retained in the old zone and remain eligible for migration. If restoration remains empty after schema deployment and enabling sync, inspect the production CloudKit error and legacy-import path rather than assuming the local preference is the cause.

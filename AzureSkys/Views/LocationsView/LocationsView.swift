@@ -29,9 +29,7 @@ struct LocationsView: View {
                 if let error = vm.networkError {
                     RetryView(errorMessage: error.localizedDescription) {
                         Task {
-                            if !vm.searchText.isEmpty {
-                                await vm.getPredictions(searchText: vm.searchText)
-                            }
+                            await vm.retrySearch()
                         }
                     }
                 } else {

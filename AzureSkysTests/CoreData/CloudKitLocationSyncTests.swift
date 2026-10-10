@@ -12,6 +12,27 @@ import CoreData
 
 @MainActor
 final class CloudKitLocationSyncTests: XCTestCase {
+    func testAcknowledgedRecordsRestoreIntoAnEmptyInstallation() async throws {
+        let original = PersistenceController(inMemory: true)
+        try await PlaceCoreDataManager(persistence: original).savePlaceIntoDatabase(place: testPlace)
+        let pending = try await original.pendingLocationChanges()
+        let savedRecord = try await original.recordForSync(testPlace.id)
+        let record = try XCTUnwrap(savedRecord)
+        try await original.acknowledgeLocationChanges(
+            saved: [record], deleted: [], sent: Dictionary(uniqueKeysWithValues: pending.map { ($0.id, $0) }))
+        let remaining = try await original.pendingLocationChanges()
+        XCTAssertTrue(remaining.isEmpty)
+
+        // A reinstall has neither the old SQLite store nor the old sync cursor.
+        let reinstalled = PersistenceController(inMemory: true)
+        XCTAssertNil(try reinstalled.metadata("ckSyncState"))
+        try await reinstalled.applyRemoteLocations([record], deletedIDs: [])
+        let restored = try await PlaceCoreDataManager(persistence: reinstalled).getPlacesFromDatabase()
+        XCTAssertEqual(restored, [testPlace])
+        let uploads = try await reinstalled.pendingLocationChanges()
+        XCTAssertTrue(uploads.isEmpty)
+    }
+
     func testCloudRecordRoundTripAndSystemFieldsRestore() throws {
         let record = try LocationCloudRecord.make(testPlace, systemFields: nil)
         XCTAssertEqual(try LocationCloudRecord.place(from: record), testPlace)

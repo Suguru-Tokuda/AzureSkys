@@ -15,14 +15,6 @@ struct LocationListView: View {
     let dependencies: AppDependencies
     @StateObject var vm: LocationsViewModel
     @Environment(\.managedObjectContext) private var context
-    @State private var places: [SavedPlace] = []
-    @State private var refreshRevision = 0
-
-    private struct RefreshID: Equatable {
-        let context: ObjectIdentifier
-        let revision: Int
-    }
-    
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
         _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
@@ -36,28 +28,9 @@ struct LocationListView: View {
             }
             getLocationList()
         }
-        .task(id: RefreshID(context: ObjectIdentifier(context), revision: refreshRevision)) {
-            do {
-                // The store serializes this fetch with cloud-sync reconfiguration.
-                let fetchedPlaces = try await dependencies.placeStore.getPlacesFromDatabase()
-                try Task.checkCancellation()
-                places = fetchedPlaces
-            } catch is CancellationError {
-                // A newer context or database change has scheduled another fetch.
-            } catch {
-                guard !Task.isCancelled else { return }
-                vm.coreDataError = .fetch
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave).receive(on: DispatchQueue.main)) { notification in
-            guard let savedContext = notification.object as? NSManagedObjectContext,
-                  savedContext.persistentStoreCoordinator === context.persistentStoreCoordinator else { return }
-            refreshRevision += 1
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { notification in
-            guard let changedContext = notification.object as? NSManagedObjectContext,
-                  changedContext === context else { return }
-            refreshRevision += 1
+        .task(id: vm.refreshID(for: context)) {
+            vm.observeChanges(in: context)
+            await vm.loadPlaces()
         }
     }
 }
@@ -74,17 +47,14 @@ extension LocationListView {
                         mainCoordinator.selectLocation(nil)
                     }
             }
-            ForEach(places) { place in
+            ForEach(vm.places) { place in
                 LocationViewCell(dependencies: dependencies, place: place)
                     .onTapGesture {
                         mainCoordinator.selectLocation(place)
                     }
             }
             .onDelete { indexSet in
-                let selectedPlaces = indexSet.compactMap { index in
-                    places.indices.contains(index) ? places[index] : nil
-                }
-                Task { await vm.removePlaces(selectedPlaces) }
+                Task { await vm.removePlaces(at: indexSet) }
             }
             .alert(isPresented: Binding(get: { vm.coreDataError != nil }, set: { if !$0 { vm.dismissError() } }), error: vm.coreDataError) {
                 Button(action: {

@@ -25,6 +25,7 @@ final class CloudKitLocationSync: CKSyncEngineDelegate, LocationSyncControlling 
     private var restartRequested = false
     private var generation = 0
     private var activationRetry: Task<Void, Never>?
+    private var uploadTask: Task<Void, Never>?
     private var inFlight: [String: PendingLocationChange] = [:]
     var isRunning: Bool { engine != nil }
 
@@ -110,6 +111,8 @@ final class CloudKitLocationSync: CKSyncEngineDelegate, LocationSyncControlling 
         activationRetry = nil
         restartRequested = false
         generation += 1
+        uploadTask?.cancel()
+        uploadTask = nil
         let previous = engine
         engine = nil
         inFlight.removeAll()
@@ -118,6 +121,24 @@ final class CloudKitLocationSync: CKSyncEngineDelegate, LocationSyncControlling 
 
     func enqueueLocalChanges() async throws {
         try await enqueueLocalChanges(retrying: [])
+        requestUpload()
+    }
+
+    private func requestUpload() {
+        guard uploadTask == nil, let engine,
+            !engine.state.pendingRecordZoneChanges.isEmpty || !engine.state.pendingDatabaseChanges.isEmpty
+        else { return }
+        uploadTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                if self.engine === engine { self.uploadTask = nil }
+            }
+            do {
+                try await engine.sendChanges()
+            } catch {
+                if self.engine === engine { self.persistence?.reportSyncError(error) }
+            }
+        }
     }
 
     private func enqueueLocalChanges(retrying: Set<String>) async throws {
@@ -300,6 +321,8 @@ final class CloudKitLocationSync: CKSyncEngineDelegate, LocationSyncControlling 
         activationRetry?.cancel()
         activationRetry = nil
         generation += 1
+        uploadTask?.cancel()
+        uploadTask = nil
         engine = nil
         inFlight.removeAll()
         // Avoid awaiting cancellation from inside an engine callback.

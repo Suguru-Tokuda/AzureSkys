@@ -99,7 +99,8 @@ final class AppDependencies: ObservableObject {
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
-        SettingsViewModel(iCloudManager: iCloudManager)
+        SettingsViewModel(iCloudManager: iCloudManager, persistence: persistenceController,
+                          locationManager: locationManager, settingsManager: settingsManager)
     }
 
     private static var syncEnabled: Bool {

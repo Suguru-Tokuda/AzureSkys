@@ -27,6 +27,19 @@ class WeatherForecastViewModel: ObservableObject {
     private let weatherService: WeatherServicing
     private let coreDataManager: PlaceCoreDataActions
     var locationManager: LocationManager?
+    private var wasInactive = false
+
+    func didBecomeActive() {
+        guard wasInactive else { return }
+        wasInactive = false
+        startDataRefreshTimer(showLoading: false)
+    }
+
+    func willResignActive() {
+        wasInactive = true
+        endDataRefreshTimer()
+    }
+
     private let refreshScheduler = RefreshScheduler()
 
     init(weatherService: WeatherServicing,

@@ -1,43 +1,15 @@
-# Location persistence and iCloud sync
+# iCloud location sync
 
-Locations live in the local-only `WeatherLocalCoreData` store. The UI and location services never read a CloudKit-managed store. `CloudKitLocationSync` uses `CKSyncEngine` against the existing `iCloud.com.stokuda.weather` private database.
+Saved locations use `NSPersistentCloudKitContainer` with the `WeatherCoreData` model and the `iCloud.com.stokuda.weather` private database. Core Data owns record serialization, persistent history, imports, exports, conflict handling, and network retries.
 
-A location edit and its `LocalSyncAction` are committed in the same Core Data transaction. Each edit gets a revision UUID. Successful per-record server responses clear only the matching revision; a newer edit remains queued. The journal is authoritative if serialized engine state is older than the local database after a crash. Engine state and CKRecord system fields are stored in Core Data, not in location backup files.
+The iCloud setting reloads the same SQLite store with `cloudKitContainerOptions` enabled or disabled. Local locations remain available with sync off. Background saves are serialized against store replacement, and the UI receives the replacement view context. In-memory previews and tests never enable mirroring. Completed Core Data sync events supply errors shown in Settings; Core Data does not expose the former custom journal's pending-upload count.
 
-Remote changes are applied locally without creating upload actions. Pending local edits take precedence until acknowledged. Server-record conflicts retain the pending local intent, adopt the latest server system fields, and retry. Network and authentication retries are managed by CKSyncEngine. Missing records and deleted zones are handled explicitly.
+`AppDependencies` opens the local persistence stack, constructs `PlaceCoreDataManager` to migrate and reconcile saved locations, and then enables CloudKit mirroring according to the saved preference. The manager owns migration and observes successful CloudKit import/export events, checking against the current container so observation survives sync toggles. It also reconciles before saves and list reads. `PersistenceController` owns only stack loading, replacement, serialized context work, and sync-error reporting; it has no place-specific dependency or maintenance hook. It saves ordinary Core Data deletions, so mirroring removes redundant cloud records too. An existing CloudKit record is preferred over a new local duplicate; when several cloud records exist, the lexicographically smallest record name survives on every device. Local-only duplicates are collapsed before export. The list fetch no longer filters duplicate rows.
 
-Turning sync off cancels engine operations without modifying local locations or pending edits. Signing out retains local data and account identity. A different iCloud account pauses sync instead of automatically uploading the previous account's locations. Signing back into the original account allows syncing to resume. Transferring locations to another account requires a future explicit user flow.
+CloudKit mirroring does not support unique constraints. Two offline devices can still create separate records for the same place; reconciliation removes the extras after those records meet. Two-device testing must verify that both devices keep the same cloud record and that duplicate deletions reach CloudKit.
 
-## Migration
+At first launch after this change, locations from `WeatherCoreData.local.sqlite` are copied into the original `WeatherCoreData.sqlite` store before mirroring starts. The newer local store is authoritative, including deletions, and a persistent-store metadata marker prevents repeating the migration. The source store is retained. The local model versions remain bundled so existing stores can be read.
 
-The old SQLite database is read once through NSPersistentContainer, without a CloudKit mirroring delegate. The original local model version is retained and a V2 model adds revision IDs and cached CloudKit system fields, allowing automatic migration of the previous two-store bridge's locations and pending deletions.
+Records in the former custom `AzureSkysLocations` zone are not imported by Core Data. Installed devices migrate their saved local locations; a fresh installation can restore records from Core Data's `com.apple.coredata.cloudkit.zone`, but cannot restore locations that exist only in the former custom zone.
 
-On first activation, the coordinator reads all pages of the old `com.apple.coredata.cloudkit.zone` using CloudKit change tokens. `CD_PlaceEntity` records are imported into the local store without overwriting existing locations or pending deletions. Import failures leave the migration incomplete for retry. Imported locations are queued for the new zone. The old cloud zone and its records are never modified or deleted.
-
-The new zone is `AzureSkysLocations`. Its record type is `AzureSkysPlace`. Record names are the stable saved-place IDs. Fields:
-
-| Field             | CloudKit type                                    |
-| ----------------- | ------------------------------------------------ |
-| id                | String                                           |
-| name              | String                                           |
-| formattedAddress  | String                                           |
-| latitude          | Double                                           |
-| longitude         | Double                                           |
-| addressComponents | Bytes (existing address-component JSON encoding) |
-
-## Release validation
-
-1. On an iCloud-enabled development device, verify initial migration, remote-only legacy locations, and interrupted migration retry. Use the CloudKit development environment to create and inspect the new schema.
-2. Test two devices with the new version: additions, deletions, edits during uploads, offline edits, relaunch, iCloud disabled in Settings, and sign-out/sign-in. Verify a different account cannot receive the original account's data.
-3. Deploy the `AzureSkysPlace` development schema to production in CloudKit Console before releasing the app. Production cannot create the new fields dynamically.
-4. Upgrade all participating devices. Older app versions use the old Core Data zone; new versions use the new zone. The one-time import preserves existing data, but it does not provide ongoing synchronization with older versions.
-
-Automated tests exercise the actual local model, migration, record encoding, journal revisions, batch construction, and import/acknowledgement handling. They do not prove live server synchronization or production-schema availability.
-
-## App Store reinstall recovery
-
-Publishing an App Store build does not deploy the new CloudKit schema. Before shipping a version that writes `AzureSkysPlace`, open CloudKit Console, select `iCloud.com.stokuda.weather`, and review/deploy the development schema changes to production. Verify the record type and all six fields in the table above exist in production. If the type is missing from development, first run the app against development with iCloud enabled and successfully upload a saved location to initialize it.
-
-A location appearing in the app proves a local save, not a successful cloud upload. Settings displays pending uploads and sync errors. The app requests an upload when local changes are queued; CloudKit still controls retries after failures. Preserve the installed app's local data until uploads have succeeded. Validate restoration on another device with the same iCloud account before testing deletion of the original installation.
-
-Deploying the schema enables future uploads; it cannot recover local-only records erased by uninstall. Previously uploaded legacy records are retained in the old zone and remain eligible for migration. If restoration remains empty after schema deployment and enabling sync, inspect the production CloudKit error and legacy-import path rather than assuming the local preference is the cause.
+Validate syncing, deletion propagation, account changes, and offline edits on two devices sharing an iCloud account. Before release, verify the Core Data schema is deployed to production in CloudKit Console. Simulator tests verify local persistence and migration; they do not verify live iCloud uploads.

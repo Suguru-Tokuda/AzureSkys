@@ -49,11 +49,14 @@ final class AppDependencies: ObservableObject {
     static func live() -> AppDependencies {
         let networkManager = NetworkManager()
         let apiKeyManager = ApiKeyManager()
-        let persistenceController = PersistenceController(syncEnabled: syncEnabled)
+        let persistenceController = PersistenceController()
+        // Prepare saved locations before starting CloudKit mirroring.
+        let placeStore = PlaceCoreDataManager(persistence: persistenceController)
         let iCloudManager = ICloudManager(persistence: persistenceController)
 
         Task {
             do {
+                try await persistenceController.setSyncEnabled(syncEnabled)
                 try await iCloudManager.restoreSyncAfterReinstall()
             } catch {
                 persistenceController.reportSyncError(error)
@@ -63,7 +66,7 @@ final class AppDependencies: ObservableObject {
         let dependencies = AppDependencies(
             weatherService: WeatherService(networkManager: networkManager, apiKeyManager: apiKeyManager),
             placesService: PlacesService(networkManager: networkManager, apiKeyManager: apiKeyManager),
-            placeStore: PlaceCoreDataManager(persistence: persistenceController),
+            placeStore: placeStore,
             persistenceController: persistenceController,
             locationManager: LocationManager(),
             coordinator: MainCoordinator(),

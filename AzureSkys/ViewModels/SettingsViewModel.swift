@@ -40,7 +40,6 @@ final class SettingsViewModel: ObservableObject {
     private let settingsManager: SettingsManager?
     private var subscriptions = Set<AnyCancellable>()
 
-    var pendingUploadCount: Int { persistence?.pendingUploadCount ?? 0 }
     var displayedSyncError: String? { syncError ?? persistence?.accountChangeError?.localizedDescription }
     var authorizationStatus: CLAuthorizationStatus { locationManager?.authorizationStatus ?? .notDetermined }
     var locationStatusLabel: String {

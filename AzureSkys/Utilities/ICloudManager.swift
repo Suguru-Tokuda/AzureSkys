@@ -32,7 +32,7 @@ final class ICloudManager: ICloudManaging {
             let zones = try await database.allRecordZones()
 
             return zones.contains {
-                $0.zoneID == LocationCloudRecord.zoneID || $0.zoneID == LocationCloudRecord.legacyZoneID
+                $0.zoneID.zoneName == "com.apple.coredata.cloudkit.zone"
             }
         }
     ) async throws {

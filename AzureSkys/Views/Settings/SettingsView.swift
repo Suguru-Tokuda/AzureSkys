@@ -252,12 +252,6 @@ struct SettingsView: View {
             .tint(.green)
             .disabled(vm.isUpdatingSync || (!vm.isICloudAvailable && !vm.iCloudSyncEnabled))
 
-            if vm.iCloudSyncEnabled && vm.pendingUploadCount > 0 {
-                Text("Changes waiting to upload: \(vm.pendingUploadCount)")
-                    .font(.footnote)
-                    .foregroundStyle(secondaryColor)
-            }
-
             if vm.isUpdatingSync {
                 ProgressView().accessibilityLabel(Strings.loading.rawValue)
             }

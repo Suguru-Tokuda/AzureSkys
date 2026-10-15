@@ -10,7 +10,6 @@ import SwiftUI
 struct WeatherThreeHourlyForecastListViewCell: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     var forecast: Forecast
-    var timezoneOffset: Int
     var isFirst: Bool
 
     var body: some View {
@@ -20,7 +19,7 @@ struct WeatherThreeHourlyForecastListViewCell: View {
                     ? Strings.now.rawValue
                     : forecast
                         .dateTime
-                        .unixTimeToDateStr(dateFormat: Constants.dateFormat, timezoneOffset: timezoneOffset)
+                        .unixTimeToDateStr(dateFormat: Constants.dateFormat)
                         .getDateStrinng(dateFormat: Constants.dateFormat, newDateFormat: "ha")
             )
 
@@ -37,7 +36,6 @@ struct WeatherThreeHourlyForecastListViewCell: View {
 #Preview {
     WeatherThreeHourlyForecastListViewCell(
         forecast: PreviewManager.oneCallResponse.current,
-        timezoneOffset: 0,
         isFirst: false
     )
     .environmentObject(LocalFileManager())

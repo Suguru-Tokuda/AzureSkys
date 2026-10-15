@@ -40,8 +40,7 @@ struct LocationViewCell: View {
                                 : vm.currentForecast?
                                     .dateTime
                                     .unixTimeToDateStr(
-                                        dateFormat: Constants.dateFormat,
-                                        timezoneOffset: vm.currentForecast?.timezone ?? 0
+                                        dateFormat: Constants.dateFormat
                                     )
                                     .getDateStrinng(
                                         dateFormat: Constants.dateFormat,

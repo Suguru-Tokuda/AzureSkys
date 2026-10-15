@@ -22,15 +22,13 @@ extension Int {
         return ""
     }
 
-    func unixTimeToDateStr(dateFormat: String, timezoneOffset: Int) -> String {
-        let fiveHours = 5 * 60 * 60
-        let currentDateInUnixTimestamp = self + fiveHours + timezoneOffset
-        let date = Date(timeIntervalSince1970: TimeInterval(currentDateInUnixTimestamp))
+    func unixTimeToDateStr(dateFormat: String) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(self))
+        let formatter = DateFormatter()
+        formatter.dateFormat = dateFormat
+        formatter.timeZone = .current
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = dateFormat
-
-        return dateFormatter.string(from: date)
+        return formatter.string(from: date)
     }
 
     func toMiles() -> Int {

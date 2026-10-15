@@ -13,7 +13,7 @@ struct WeatherForecastOneCallResponse: Decodable {
     let timezone: String
     let timezoneOffset: Int
     let current: Forecast
-    let hourly: [Forecast]
+    var hourly: [Forecast]
     let daily: [DailyForecast]
 
     enum CodingKeys: String, CodingKey {

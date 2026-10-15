@@ -15,12 +15,10 @@ final class WeatherThreeHourlyForecastListViewCellTests: XCTestCase {
         try await assertDifferent(
             WeatherThreeHourlyForecastListViewCell(
                 forecast: PreviewManager.oneCallResponse.current,
-                timezoneOffset: 0,
                 isFirst: true
             ),
             WeatherThreeHourlyForecastListViewCell(
                 forecast: PreviewManager.oneCallResponse.current,
-                timezoneOffset: 0,
                 isFirst: false
             )
         )

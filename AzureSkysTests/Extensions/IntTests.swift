@@ -24,14 +24,24 @@ final class IntTests: XCTestCase {
         XCTAssertEqual(0.getTimeStr(dateFormat: "yyyy-MM-dd"), formatter.string(from: Date()))
     }
 
-    func testUnixFormattingUsesRequestedOffset() {
-        // Characterize the current five-hour adjustment until its legacy callers are migrated.
-        let formatter = DateFormatter()
+    func testUnixFormattingUsesDeviceTimeZoneWithoutShiftingTimestamp() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
 
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        XCTAssertEqual(
-            0.unixTimeToDateStr(dateFormat: formatter.dateFormat, timezoneOffset: 3600),
-            formatter.string(from: Date(timeIntervalSince1970: 21600))
-        )
+        // Include the epoch and winter/summer dates to cover historical and DST offsets.
+        for timestamp in [0, 1736949600, 1752588000, 1792103176] {
+            let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+            let expected = String(
+                format: "%04d-%02d-%02d %02d:%02d",
+                components.year!, components.month!, components.day!, components.hour!, components.minute!
+            )
+
+            XCTAssertEqual(
+                timestamp.unixTimeToDateStr(dateFormat: "yyyy-MM-dd HH:mm"),
+                expected,
+                "Timestamp: \(timestamp), time zone: \(calendar.timeZone.identifier)"
+            )
+        }
     }
 }

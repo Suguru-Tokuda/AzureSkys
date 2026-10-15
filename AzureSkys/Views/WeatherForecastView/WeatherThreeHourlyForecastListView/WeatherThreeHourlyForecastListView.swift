@@ -23,7 +23,6 @@ struct WeatherThreeHourlyForecastListView: View {
                     ForEach(Array(forecast.hourly.enumerated()), id: \.offset) { i, item in
                         WeatherThreeHourlyForecastListViewCell(
                             forecast: item,
-                            timezoneOffset: forecast.timezoneOffset,
                             isFirst: i == 0
                         )
                         .frame(width: 52, height: hourlyCellHeight)

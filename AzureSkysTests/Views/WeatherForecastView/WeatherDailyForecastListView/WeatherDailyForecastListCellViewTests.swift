@@ -16,7 +16,6 @@ final class WeatherDailyForecastListCellViewTests: XCTestCase {
             try await renderSnapshot(
                 WeatherDailyForecastListCellView(
                     forecast: PreviewManager.oneCallResponse.daily[0],
-                    timezoneOffset: 0,
                     showTempBarAnimation: false
                 )
             )

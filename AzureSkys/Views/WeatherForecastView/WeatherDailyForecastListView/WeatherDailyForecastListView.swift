@@ -22,7 +22,6 @@ struct WeatherDailyForecastListView: View {
                 ForEach(list) { forecast in
                     WeatherDailyForecastListCellView(
                         forecast: forecast,
-                        timezoneOffset: timezoneOffset,
                         showTempBarAnimation: showAnimation
                     )
                 }

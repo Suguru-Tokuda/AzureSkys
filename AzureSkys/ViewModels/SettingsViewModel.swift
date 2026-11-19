@@ -11,17 +11,15 @@ import CoreLocation
 import SwiftUI
 
 @MainActor
-final class SettingsViewModel: ObservableObject {
-    @Published private(set) var isICloudAvailable = false
-
-    @Published private(set) var isUpdatingSync = false
-    @Published var syncError: String?
-
-    @Published var tempScale: TempScale = .fahrenheit {
+@Observable
+final class SettingsViewModel {
+    private(set) var isICloudAvailable = false
+    private(set) var isUpdatingSync = false
+    private(set) var iCloudSyncEnabled = false
+    private(set) var syncError: String?
+    private(set) var tempScale: TempScale = .fahrenheit {
         didSet { UserDefaults.standard.set(tempScale.rawValue, forKey: UserDefaultKeys.tempScale.rawValue) }
     }
-
-    @Published private(set) var iCloudSyncEnabled = false
 
     private func refreshPreferences() {
         let defaults = UserDefaults.standard
@@ -38,10 +36,13 @@ final class SettingsViewModel: ObservableObject {
     private let persistence: PersistenceController?
     private let locationManager: LocationManager?
     private let settingsManager: SettingsManager?
-    private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
 
-    var displayedSyncError: String? { syncError ?? persistence?.accountChangeError?.localizedDescription }
-    var authorizationStatus: CLAuthorizationStatus { locationManager?.authorizationStatus ?? .notDetermined }
+    // Mirrored from ObservableObject dependencies so observation tracks them.
+    private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    private var accountChangeError: Error?
+
+    var displayedSyncError: String? { syncError ?? accountChangeError?.localizedDescription }
     var locationStatusLabel: String {
         switch authorizationStatus {
         case .notDetermined: return Strings.locationNotRequested.rawValue
@@ -71,15 +72,28 @@ final class SettingsViewModel: ObservableObject {
         self.locationManager = locationManager
         self.settingsManager = settingsManager
         refreshPreferences()
-        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+        addSubscriptions()
+    }
+
+    private func addSubscriptions() {
+        locationManager?.$authorizationStatus
+            .sink { [weak self] status in self?.authorizationStatus = status }
+            .store(in: &subscriptions)
+
+        persistence?.$accountChangeError
+            .sink { [weak self] error in self?.accountChangeError = error }
+            .store(in: &subscriptions)
+
+        NotificationCenter
+            .default
+            .publisher(for: UserDefaults.didChangeNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.refreshPreferences() }
             .store(in: &subscriptions)
-        persistence?.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
-            .store(in: &subscriptions)
-        locationManager?.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
-            .store(in: &subscriptions)
-        NotificationCenter.default.publisher(for: .CKAccountChanged)
+
+        NotificationCenter
+            .default
+            .publisher(for: .CKAccountChanged)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 Task {
@@ -116,4 +130,25 @@ final class SettingsViewModel: ObservableObject {
             isICloudAvailable = false
         }
     }
+
+    func selectTempScale(_ scale: TempScale) {
+        tempScale = scale
+    }
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension SettingsViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: SettingsViewModel
+
+        var accountChangeError: Error? { target.accountChangeError }
+        var subscriptionCount: Int { target.subscriptions.count }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

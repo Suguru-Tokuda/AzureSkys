@@ -13,7 +13,7 @@ struct LocationsView: View {
     @EnvironmentObject private var locationManager: LocationManager
     let dependencies: AppDependencies
 
-    @StateObject var vm: LocationForecastViewModel
+    @State var vm: LocationForecastViewModel
     @Environment(\.dismissSearch) private var dismissSearch
     @AppStorage(UserDefaultKeys.tempScale.rawValue) private var tempScale: TempScale = .fahrenheit
     var showDismiss: Bool = true
@@ -21,7 +21,7 @@ struct LocationsView: View {
     init(dependencies: AppDependencies, showDismiss: Bool = true) {
         self.dependencies = dependencies
         self.showDismiss = showDismiss
-        _vm = StateObject(wrappedValue: dependencies.makeLocationSearchViewModel())
+        _vm = State(initialValue: dependencies.makeLocationSearchViewModel())
     }
 
     var body: some View {

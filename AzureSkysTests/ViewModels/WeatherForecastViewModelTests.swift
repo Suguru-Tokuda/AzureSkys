@@ -30,7 +30,7 @@ final class WeatherForecastViewModelTests: XCTestCase {
         XCTAssertNotNil(vm.forecast)
         service.error = nil
         vm.setPlace()
-        vm.currentLocation = CLLocation(latitude: 45, longitude: 67)
+        vm.testHooks.setCurrentLocation(CLLocation(latitude: 45, longitude: 67))
         await vm.loadWeatherData(showLoading: true)
         XCTAssertNil(vm.networkError)
         XCTAssertEqual(service.coordinates.last?.latitude, 45)
@@ -122,6 +122,6 @@ final class WeatherForecastViewModelTests: XCTestCase {
         XCTAssertEqual(vm.locationAuthorized, true)
         vm.endDataRefreshTimer()
         vm.setLocationManager(locationManager: location)
-        XCTAssertEqual(vm.cancellables.count, 1)
+        XCTAssertEqual(vm.testHooks.subscriptionCount, 1)
     }
 }

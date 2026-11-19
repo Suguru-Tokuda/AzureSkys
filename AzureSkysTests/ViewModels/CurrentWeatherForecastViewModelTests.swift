@@ -26,7 +26,7 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentForecast?.name, "Test City")
         XCTAssertEqual(service.coordinates.last?.longitude, testPlace.longitude)
         vm.place = nil
-        vm.currentLocation = CLLocation(latitude: 45, longitude: 67)
+        vm.testHooks.setCurrentLocation(CLLocation(latitude: 45, longitude: 67))
         await vm.loadCurrentWeatherData(showLoading: true)
         XCTAssertEqual(service.coordinates.last?.latitude, 45)
     }
@@ -39,7 +39,7 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
         await vm.loadCurrentWeatherData(showLoading: true)
         service.error = NetworkError.serverError
         await vm.loadCurrentWeatherData(showLoading: false)
-        XCTAssertEqual(vm.requestState.error, .serverError)
+        XCTAssertEqual(vm.testHooks.requestState.error, .serverError)
         XCTAssertNotNil(vm.currentForecast)
         service.error = nil
         service.pause = true
@@ -57,7 +57,7 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
         task.cancel()
         await task.value
         XCTAssertEqual(vm.loadingStatus, .loaded)
-        XCTAssertNil(vm.requestState.error)
+        XCTAssertNil(vm.testHooks.requestState.error)
     }
 
     func testLocationSubscriptionsAndScheduler() async {
@@ -72,7 +72,7 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
         location.locationManagerDidChangeAuthorization(driver)
 
         for _ in 0..<100 {
-            if vm.currentForecast != nil && vm.locationAuthorized == true {
+            if vm.currentForecast != nil && vm.testHooks.locationAuthorized == true {
                 break
             }
 
@@ -80,9 +80,9 @@ final class CurrentWeatherForecastViewModelTests: XCTestCase {
         }
 
         XCTAssertNotNil(vm.currentForecast)
-        XCTAssertEqual(vm.locationAuthorized, true)
+        XCTAssertEqual(vm.testHooks.locationAuthorized, true)
         vm.endDataRefreshTimer()
         vm.setLocationManager(locationManager: location)
-        XCTAssertEqual(vm.cancellables.count, 1)
+        XCTAssertEqual(vm.testHooks.subscriptionCount, 1)
     }
 }

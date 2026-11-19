@@ -10,15 +10,22 @@ import CoreData
 import Combine
 
 @MainActor
-class LocationsViewModel: ObservableObject {
-    @Published private(set) var places: [SavedPlace] = []
-    @Published private(set) var refreshRevision = 0
-    private var observedContext: NSManagedObjectContext?
-    private var subscriptions = Set<AnyCancellable>()
-
+@Observable
+class LocationsViewModel {
     struct RefreshID: Equatable {
         let context: ObjectIdentifier
         let revision: Int
+    }
+
+    var places: [SavedPlace] = []
+    var coreDataError: CoreDataError?
+    private var refreshRevision = 0
+    private let placeCoreDataManager: PlaceCoreDataActions
+    @ObservationIgnored private var observedContext: NSManagedObjectContext?
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+
+    init(placeCoreDataManager: PlaceCoreDataActions) {
+        self.placeCoreDataManager = placeCoreDataManager
     }
 
     func refreshID(for context: NSManagedObjectContext) -> RefreshID {
@@ -36,7 +43,7 @@ class LocationsViewModel: ObservableObject {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] notification in
                     guard let self, let changed = notification.object as? NSManagedObjectContext,
-                        let current = self.observedContext
+                        let current = observedContext
                     else { return }
 
                     let relevant =
@@ -44,7 +51,7 @@ class LocationsViewModel: ObservableObject {
                         ? changed.persistentStoreCoordinator === current.persistentStoreCoordinator
                         : changed === current
                     if relevant {
-                        self.refreshRevision += 1
+                        refreshRevision += 1
                     }
                 }
                 .store(in: &subscriptions)
@@ -77,14 +84,6 @@ class LocationsViewModel: ObservableObject {
         await removePlaces(selected)
     }
 
-    @Published var coreDataError: CoreDataError?
-
-    private let placeCoreDataManager: PlaceCoreDataActions
-
-    init(placeCoreDataManager: PlaceCoreDataActions) {
-        self.placeCoreDataManager = placeCoreDataManager
-    }
-
     func removeCity(results: FetchedResults<PlaceEntity>, indexSet: IndexSet) {
         // Capture the selected places before deletions update the fetched results.
         let places = indexSet.compactMap { SavedPlace(from: results[$0]) }
@@ -110,3 +109,21 @@ class LocationsViewModel: ObservableObject {
         coreDataError = nil
     }
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension LocationsViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: LocationsViewModel
+
+        var refreshRevision: Int { target.refreshRevision }
+        var observedContext: NSManagedObjectContext? { target.observedContext }
+        var subscriptionCount: Int { target.subscriptions.count }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

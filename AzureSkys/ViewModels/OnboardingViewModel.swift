@@ -9,15 +9,15 @@ import Combine
 import SwiftUI
 
 @MainActor
-final class OnboardingViewModel: ObservableObject {
-    @Published private(set) var didResolveLocationRequest = false
-    private var isRequestingLocation = false
-
-    @Published private(set) var isICloudAvailable = false
-    @Published private(set) var isCheckingICloud = false
-    @Published var iCloudCheckError: String?
-
-    private var subscriptions = Set<AnyCancellable>()
+@Observable
+final class OnboardingViewModel {
+    private(set) var didResolveLocationRequest = false
+    private(set) var isICloudAvailable = false
+    private(set) var isCheckingICloud = false
+    private(set) var iCloudCheckError: String?
+    
+    @ObservationIgnored private var isRequestingLocation = false
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
 
     private let locationManager: LocationManager
     private let iCloudManager: ICloudManaging
@@ -84,10 +84,26 @@ final class OnboardingViewModel: ObservableObject {
             .sink { [weak self] isAuthorized in
                 guard let self, self.isRequestingLocation, isAuthorized != nil else { return }
 
-                self.isRequestingLocation = false
-                self.didResolveLocationRequest = true
+                isRequestingLocation = false
+                didResolveLocationRequest = true
             }
-
             .store(in: &subscriptions)
     }
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension OnboardingViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: OnboardingViewModel
+
+        var isRequestingLocation: Bool { target.isRequestingLocation }
+        var subscriptionCount: Int { target.subscriptions.count }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

@@ -10,12 +10,12 @@ import SwiftUI
 struct LocationViewCell: View {
     @AppStorage(UserDefaultKeys.tempScale.rawValue) var tempScale: TempScale = .fahrenheit
     @EnvironmentObject var locationManager: LocationManager
-    @StateObject var vm: CurrentWeatherForecastViewModel
+    @State var vm: CurrentWeatherForecastViewModel
     var place: SavedPlace?
     var isMyLocation: Bool = false
 
     init(dependencies: AppDependencies, place: SavedPlace? = nil, isMyLocation: Bool = false) {
-        _vm = StateObject(wrappedValue: dependencies.makeCurrentWeatherViewModel())
+        _vm = State(initialValue: dependencies.makeCurrentWeatherViewModel())
         self.isMyLocation = isMyLocation
         self.place = place
     }

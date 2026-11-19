@@ -7,25 +7,24 @@
 
 import Combine
 import MapKit
+import Observation
 import SwiftUI
 
 @MainActor
-class CurrentWeatherForecastViewModel: ObservableObject {
-    @Published private(set) var requestState: RequestState<WeatherForecastCurrentResponse> = .idle
+@Observable
+class CurrentWeatherForecastViewModel {
     var currentForecast: WeatherForecastCurrentResponse? { requestState.value }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
-
-    @Published var locationAuthorized: Bool?
-    var place: SavedPlace?
-
-    var currentLocation: CLLocation?
-    var cancellables = Set<AnyCancellable>()
-
     private let weatherService: WeatherServicing
+    private var requestState: RequestState<WeatherForecastCurrentResponse> = .idle
+    private let refreshScheduler = RefreshScheduler()
 
-    var locationManager: LocationManager?
-
-    private var wasInactive = false
+    @ObservationIgnored var place: SavedPlace?
+    @ObservationIgnored private var currentLocation: CLLocation?
+    @ObservationIgnored private var locationAuthorized: Bool?
+    @ObservationIgnored private var locationManager: LocationManager?
+    @ObservationIgnored private var cancellables = Set<AnyCancellable>()
+    @ObservationIgnored private var wasInactive = false
 
     func didBecomeActive() {
         guard wasInactive else { return }
@@ -39,14 +38,8 @@ class CurrentWeatherForecastViewModel: ObservableObject {
         endDataRefreshTimer()
     }
 
-    private let refreshScheduler = RefreshScheduler()
-
     init(weatherService: WeatherServicing) {
         self.weatherService = weatherService
-    }
-
-    deinit {
-        self.cancellables.removeAll()
     }
 
     func setLocationManager(locationManager: LocationManager) {
@@ -149,3 +142,25 @@ extension CurrentWeatherForecastViewModel {
         refreshScheduler.stop()
     }
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension CurrentWeatherForecastViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: CurrentWeatherForecastViewModel
+
+        var requestState: RequestState<WeatherForecastCurrentResponse> { target.requestState }
+        var locationAuthorized: Bool? { target.locationAuthorized }
+        var subscriptionCount: Int { target.cancellables.count }
+
+        func setCurrentLocation(_ location: CLLocation?) {
+            target.currentLocation = location
+        }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

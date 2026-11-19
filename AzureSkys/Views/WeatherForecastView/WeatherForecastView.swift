@@ -12,7 +12,7 @@ struct WeatherForecastView: View {
     @EnvironmentObject var locationManager: LocationManager
     let dependencies: AppDependencies
 
-    @StateObject var vm: WeatherForecastViewModel
+    @State var vm: WeatherForecastViewModel
     @State var scrollViewOffset: CGFloat = .zero
     let location: ForecastLocation
     let presentation: Presentation
@@ -27,7 +27,7 @@ struct WeatherForecastView: View {
         self.dependencies = dependencies
         self.location = location
         self.presentation = presentation
-        _vm = StateObject(wrappedValue: dependencies.makeWeatherForecastViewModel())
+        _vm = State(initialValue: dependencies.makeWeatherForecastViewModel())
     }
 
     var body: some View {

@@ -6,41 +6,34 @@
 //
 
 import Foundation
-import Combine
+import Observation
 
 @MainActor
-class LocationForecastViewModel: ObservableObject {
-    @Published var searchText = ""
-    @Published private(set) var searchState: RequestState<[Prediction]> = .idle
-    @Published private(set) var detailsState: RequestState<SavedPlace> = .idle
+@Observable
+class LocationForecastViewModel {
+    var searchText = "" {
+        didSet {
+            guard searchText != oldValue else { return }
+            replaceSearch(query: searchText, debounce: true)
+        }
+    }
     var predictions: [Prediction] { searchState.value ?? [] }
     var loadingStatus: LoadingStatus { searchState.loadingStatus }
     var networkError: NetworkError? { searchState.error }
     var detailsError: NetworkError? { detailsState.error }
+    private var searchState: RequestState<[Prediction]> = .idle
+    private var detailsState: RequestState<SavedPlace> = .idle
 
-    private var cancellables = Set<AnyCancellable>()
-    private var searchTask: Task<Void, Never>?
-    private var searchRequestID = UUID()
-
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
+    @ObservationIgnored private var searchRequestID = UUID()
     private let placesService: PlacesServicing
 
     init(placesService: PlacesServicing) {
         self.placesService = placesService
-        self.addSubscriptions()
     }
 
     deinit {
         searchTask?.cancel()
-        cancellables.removeAll()
-    }
-
-    private func addSubscriptions() {
-        $searchText
-            .removeDuplicates()
-            .sink { [weak self] query in
-                self?.replaceSearch(query: query, debounce: true)
-            }
-            .store(in: &cancellables)
     }
 
     func retrySearch() async {
@@ -141,3 +134,21 @@ class LocationForecastViewModel: ObservableObject {
     }
 
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension LocationForecastViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: LocationForecastViewModel
+
+        var searchState: RequestState<[Prediction]> { target.searchState }
+        var detailsState: RequestState<SavedPlace> { target.detailsState }
+        var hasActiveSearch: Bool { target.searchTask != nil }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

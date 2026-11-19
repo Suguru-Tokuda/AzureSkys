@@ -14,11 +14,11 @@ struct LocationListView: View {
     @Environment(\.isSearching) private var isSearching
     let dependencies: AppDependencies
 
-    @StateObject var vm: LocationsViewModel
+    @State var vm: LocationsViewModel
     @Environment(\.managedObjectContext) private var context
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
-        _vm = StateObject(wrappedValue: dependencies.makeLocationsViewModel())
+        _vm = State(initialValue: dependencies.makeLocationsViewModel())
     }
 
     var body: some View {

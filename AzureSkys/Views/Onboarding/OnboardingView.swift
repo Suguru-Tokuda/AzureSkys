@@ -9,12 +9,12 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject var vm: OnboardingViewModel
+    @State var vm: OnboardingViewModel
 
     @EnvironmentObject private var coordinator: OnboardingCoordiantor
 
     init(dependencies: AppDependencies) {
-        _vm = StateObject(wrappedValue: dependencies.makeOnboardingViewModel())
+        _vm = State(initialValue: dependencies.makeOnboardingViewModel())
     }
 
     var body: some View {

@@ -5,32 +5,28 @@
 //  Created by Suguru Tokuda on 11/27/23.
 //
 
-import Foundation
 import SwiftUI
 import Combine
 import MapKit
 
 @MainActor
-class WeatherForecastViewModel: ObservableObject {
-    @Published var showForecastAnimation = true
-    @Published private(set) var requestState: RequestState<WeatherForecastData> = .idle
-    @Published var coreDataError: CoreDataError?
+@Observable
+class WeatherForecastViewModel {
+    private(set) var showForecastAnimation = true
+    private(set) var locationAuthorized: Bool?
+    private(set) var coreDataError: CoreDataError?
     var forecast: WeatherForecastOneCallResponse? { requestState.value?.forecast }
     var geocode: WeatherGeocode? { requestState.value?.geocode }
     var networkError: NetworkError? { requestState.error }
     var loadingStatus: LoadingStatus { requestState.loadingStatus }
-
-    @Published var locationAuthorized: Bool?
-    var place: SavedPlace?
-    var currentLocation: CLLocation?
-    var cancellables = Set<AnyCancellable>()
-
+    private var requestState: RequestState<WeatherForecastData> = .idle
+    @ObservationIgnored private(set) var place: SavedPlace?
+    @ObservationIgnored private(set) var currentLocation: CLLocation?
+    @ObservationIgnored private var cancellables = Set<AnyCancellable>()
+    @ObservationIgnored private var wasInactive = false
+    @ObservationIgnored var locationManager: LocationManager?
     private let weatherService: WeatherServicing
     private let coreDataManager: PlaceCoreDataActions
-
-    var locationManager: LocationManager?
-
-    private var wasInactive = false
 
     func didBecomeActive() {
         guard wasInactive else { return }
@@ -52,10 +48,6 @@ class WeatherForecastViewModel: ObservableObject {
     ) {
         self.weatherService = weatherService
         self.coreDataManager = coreDataManager
-    }
-
-    deinit {
-        self.cancellables.removeAll()
     }
 
     /**
@@ -185,3 +177,24 @@ extension WeatherForecastViewModel {
         refreshScheduler.stop()
     }
 }
+
+// MARK: Test hooks
+
+#if DEBUG
+extension WeatherForecastViewModel {
+    /// Exposes private state to unit tests without widening its access level.
+    @MainActor
+    struct TestHooks {
+        fileprivate let target: WeatherForecastViewModel
+
+        var requestState: RequestState<WeatherForecastData> { target.requestState }
+        var subscriptionCount: Int { target.cancellables.count }
+
+        func setCurrentLocation(_ location: CLLocation?) {
+            target.currentLocation = location
+        }
+    }
+
+    var testHooks: TestHooks { TestHooks(target: self) }
+}
+#endif

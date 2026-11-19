@@ -12,11 +12,11 @@ struct SettingsView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var vm: SettingsViewModel
+    @State private var vm: SettingsViewModel
 
     init(dependencies: AppDependencies) {
-        _vm = StateObject(
-            wrappedValue: dependencies.makeSettingsViewModel()
+        _vm = State(
+            initialValue: dependencies.makeSettingsViewModel()
         )
     }
 
@@ -202,7 +202,7 @@ struct SettingsView: View {
         HStack(spacing: 4) {
             ForEach(TempScale.allCases) { scale in
                 Button {
-                    vm.tempScale = scale
+                    vm.selectTempScale(scale)
                 } label: {
                     Text(scale.shortName)
                         .font(.subheadline.weight(.semibold))
